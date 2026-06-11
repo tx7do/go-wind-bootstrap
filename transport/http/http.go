@@ -19,12 +19,17 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"time"
 
+	tokenbucket "github.com/tx7do/go-wind-plugins/ratelimit/tokenbucket"
 	httpPlugin "github.com/tx7do/go-wind-plugins/transport/http"
 	corsMW "github.com/tx7do/go-wind-plugins/transport/http/middleware/cors"
 	loggingMW "github.com/tx7do/go-wind-plugins/transport/http/middleware/logging"
+	ratelimitMW "github.com/tx7do/go-wind-plugins/transport/http/middleware/ratelimit"
 	recoveryMW "github.com/tx7do/go-wind-plugins/transport/http/middleware/recovery"
 	requestidMW "github.com/tx7do/go-wind-plugins/transport/http/middleware/requestid"
+	timeoutMW "github.com/tx7do/go-wind-plugins/transport/http/middleware/timeout"
+	tracingMW "github.com/tx7do/go-wind-plugins/transport/http/middleware/tracing"
 	"github.com/tx7do/go-wind/transport"
 
 	bootstrap "github.com/tx7do/go-wind-bootstrap"
@@ -141,8 +146,26 @@ func applyMiddleware(srv *httpPlugin.Server, mw *v1.Server_Http_Middleware) {
 			srv.Use(requestidMW.Middleware())
 		}
 	}
-	// Tracing and RateLimit require external dependencies (otel, limiter).
-	// They are handled by dedicated adapter sub-modules.
+	if t := mw.GetTracing(); t != nil {
+		srv.Use(tracingMW.Middleware())
+	}
+	if rl := mw.GetRateLimit(); rl != nil {
+		limiter, err := tokenbucket.New(float64(rl.GetRate()), float64(rl.GetBurst()))
+		if err == nil {
+			var rlOpts []ratelimitMW.Option
+			if rl.GetWait() {
+				rlOpts = append(rlOpts, ratelimitMW.WithWait())
+			}
+			srv.Use(ratelimitMW.Middleware(limiter, rlOpts...))
+		}
+	}
+	if to := mw.GetTimeout(); to != nil {
+		timeoutMs := to.GetDefaultTimeoutMs()
+		if timeoutMs <= 0 {
+			timeoutMs = 5000
+		}
+		srv.Use(timeoutMW.Middleware(time.Duration(timeoutMs) * time.Millisecond))
+	}
 }
 
 // ---------------------------------------------------------------------------

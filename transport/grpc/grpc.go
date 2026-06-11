@@ -18,6 +18,8 @@ import (
 
 	grpcLogging "github.com/tx7do/go-wind-plugins/transport/grpc/middleware/logging"
 	grpcRecovery "github.com/tx7do/go-wind-plugins/transport/grpc/middleware/recovery"
+	grpcTracing "github.com/tx7do/go-wind-plugins/transport/grpc/middleware/tracing"
+	grpcValidate "github.com/tx7do/go-wind-plugins/transport/grpc/middleware/validate"
 	grpcPlugin "github.com/tx7do/go-wind-plugins/transport/grpc/server"
 	"github.com/tx7do/go-wind/transport"
 	"google.golang.org/grpc"
@@ -89,8 +91,12 @@ func newBuilder(cfg *v1.Server) (transport.Server, error) {
 		if mw.GetLogging() != nil {
 			interceptors = append(interceptors, grpcLogging.UnaryInterceptor())
 		}
-		// Tracing and Validate require external dependencies.
-		// They are handled by dedicated adapter sub-modules.
+		if mw.GetTracing() != nil {
+			interceptors = append(interceptors, grpcTracing.UnaryInterceptor())
+		}
+		if mw.GetValidate() != nil {
+			interceptors = append(interceptors, grpcValidate.UnaryServerInterceptor())
+		}
 	}
 	interceptors = append(interceptors, unaryMiddlewares...)
 
