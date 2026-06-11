@@ -22,6 +22,19 @@ const (
 	ServerTypeWebRTC       = "webrtc"
 	ServerTypeAsynq        = "asynq"
 	ServerTypeMachinery    = "machinery"
+
+	// Broker-based transport servers.
+	ServerTypeKafka    = "kafka"
+	ServerTypeRabbitMQ = "rabbitmq"
+	ServerTypeRedis    = "redis"
+	ServerTypeNATS     = "nats"
+	ServerTypeMQTT     = "mqtt"
+	ServerTypePulsar   = "pulsar"
+	ServerTypeActiveMQ = "activemq"
+	ServerTypeAzureSB  = "azuresb"
+	ServerTypeNSQ      = "nsq"
+	ServerTypeRocketMQ = "rocketmq"
+	ServerTypeSQS      = "sqs"
 )
 
 // Config type 常量，用于注册 ConfigAction 时的 key。

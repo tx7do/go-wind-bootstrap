@@ -26,7 +26,11 @@ type ServerBuilder func(cfg *v1.Server) (transport.Server, error)
 type LogBuilder func(cfg *v1.Logger) (log.Logger, func(), error)
 
 // RegistryAction performs registration/deregistration lifecycle.
-type RegistryAction func(ctx context.Context, appCfg *v1.App, endpoints []string) (func(), error)
+//
+// The cfg parameter carries the full registry configuration so that
+// the action can extract its own sub-configuration.
+// Deprecated: Use RegisterRegistryAction with the new signature instead.
+type RegistryAction func(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.Registry) (func(), error)
 
 // ConfigAction performs config source loading/watching.
 type ConfigAction func(ctx context.Context, cfg *v1.Config) (func(), error)

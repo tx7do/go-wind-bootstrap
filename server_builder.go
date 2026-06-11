@@ -40,6 +40,19 @@ func resolveServer(cfg *v1.Server) ([]transport.Server, func(), error) {
 		{"webrtc", serverTypeWebRTC, cfg.GetWebrtc() != nil},
 		{"asynq", serverTypeAsynq, cfg.GetAsynq() != nil},
 		{"machinery", serverTypeMachinery, cfg.GetMachinery() != nil},
+
+		// Broker-based servers.
+		{"kafka", serverTypeKafka, cfg.GetKafka() != nil},
+		{"rabbitmq", serverTypeRabbitMQ, cfg.GetRabbitmq() != nil},
+		{"redis", serverTypeRedis, cfg.GetRedisServer() != nil},
+		{"nats", serverTypeNATS, cfg.GetNats() != nil},
+		{"mqtt", serverTypeMQTT, cfg.GetMqtt() != nil},
+		{"pulsar", serverTypePulsar, cfg.GetPulsar() != nil},
+		{"activemq", serverTypeActiveMQ, cfg.GetActivemq() != nil},
+		{"azuresb", serverTypeAzureSB, cfg.GetAzuresb() != nil},
+		{"nsq", serverTypeNSQ, cfg.GetNsq() != nil},
+		{"rocketmq", serverTypeRocketMQ, cfg.GetRocketmq() != nil},
+		{"sqs", serverTypeSQS, cfg.GetSqs() != nil},
 	}
 
 	for _, f := range fields {
@@ -84,4 +97,16 @@ const (
 	serverTypeWebRTC       = "webrtc"
 	serverTypeAsynq        = "asynq"
 	serverTypeMachinery    = "machinery"
+
+	serverTypeKafka    = "kafka"
+	serverTypeRabbitMQ = "rabbitmq"
+	serverTypeRedis    = "redis"
+	serverTypeNATS     = "nats"
+	serverTypeMQTT     = "mqtt"
+	serverTypePulsar   = "pulsar"
+	serverTypeActiveMQ = "activemq"
+	serverTypeAzureSB  = "azuresb"
+	serverTypeNSQ      = "nsq"
+	serverTypeRocketMQ = "rocketmq"
+	serverTypeSQS      = "sqs"
 )

@@ -319,4 +319,112 @@ message Server {
   optional Webrtc webrtc = 18;
   optional Asynq asynq = 19;
   optional Machinery machinery = 20;
+
+  // Kafka 消息队列 Server。
+  message Kafka {
+    // Broker 地址列表。
+    repeated string addrs = 1;
+    // 编解码器：json / proto。
+    string codec = 2;
+  }
+
+  // RabbitMQ 消息队列 Server。
+  message Rabbitmq {
+    // Broker 地址列表。
+    repeated string addrs = 1;
+    // 编解码器：json / proto。
+    string codec = 2;
+  }
+
+  // Redis 消息队列 Server。
+  message RedisServer {
+    // Redis 地址。
+    string addr = 1;
+    // 编解码器：json / proto。
+    string codec = 2;
+  }
+
+  // NATS 消息队列 Server。
+  message Nats {
+    // Broker 地址列表。
+    repeated string addrs = 1;
+    // 编解码器：json / proto。
+    string codec = 2;
+  }
+
+  // MQTT 消息队列 Server。
+  message Mqtt {
+    // Broker 地址列表。
+    repeated string addrs = 1;
+    // 编解码器：json / proto。
+    string codec = 2;
+  }
+
+  // Pulsar 消息队列 Server。
+  message Pulsar {
+    // Broker 地址列表。
+    repeated string addrs = 1;
+    // 编解码器：json / proto。
+    string codec = 2;
+  }
+
+  // ActiveMQ 消息队列 Server。
+  message Activemq {
+    // Broker 地址列表。
+    repeated string addrs = 1;
+    // 编解码器：json / proto。
+    string codec = 2;
+  }
+
+  // Azure Service Bus 消息队列 Server。
+  message Azuresb {
+    // 连接字符串。
+    string connection_string = 1;
+    // 编解码器：json / proto。
+    string codec = 2;
+  }
+
+  // NSQ 消息队列 Server。
+  message Nsq {
+    // NSQd 地址列表。
+    repeated string addrs = 1;
+    // Lookupd 地址列表。
+    repeated string lookupd_addrs = 2;
+    // 编解码器：json / proto。
+    string codec = 3;
+  }
+
+  // RocketMQ 消息队列 Server。
+  message Rocketmq {
+    // NameServer 地址列表。
+    repeated string name_server_addrs = 1;
+    // 编解码器：json / proto。
+    string codec = 2;
+    // 驱动类型：v2 / v5 / aliyun。默认 v5。
+    string driver_type = 3;
+  }
+
+  // SQS 消息队列 Server。
+  message Sqs {
+    // AWS 区域。
+    string region = 1;
+    // SQS 端点。
+    string endpoint = 2;
+    // 队列 URL。
+    string queue_url = 3;
+    // 编解码器：json / proto。
+    string codec = 4;
+  }
+
+  optional Kafka kafka = 21;
+  optional Rabbitmq rabbitmq = 22;
+  optional RedisServer redis_server = 23;
+  optional Nats nats = 24;
+  optional Mqtt mqtt = 25;
+  optional Pulsar pulsar = 26;
+  optional Activemq activemq = 27;
+  optional Azuresb azuresb = 28;
+  optional Nsq nsq = 29;
+  optional Rocketmq rocketmq = 30;
+  optional Sqs sqs = 31;
 }
