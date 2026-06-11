@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package bootstrap.v1;
+
+option go_package = "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1";
+
+// Workflow 描述工作流引擎客户端配置。
+message Workflow {
+  // Temporal 工作流引擎。
+  message Temporal {
+    // Temporal 服务端地址，默认 "localhost:7233"。
+    string host_port = 1;
+    // 命名空间，默认 "default"。
+    string namespace = 2;
+  }
+
+  // Argo Workflows 引擎。
+  message Argo {
+    // Argo Server API URL。
+    string server_url = 1;
+    // Kubernetes 命名空间。
+    string namespace = 2;
+    // Bearer 认证令牌。
+    string token = 3;
+    // 是否跳过 TLS 证书验证。
+    bool insecure_skip_verify = 4;
+  }
+
+  // Netflix Conductor 引擎。
+  message Conductor {
+    // Conductor Server API URL。
+    string server_url = 1;
+    // 认证密钥（Orkes Cloud）。
+    string auth_key = 2;
+    // 认证密钥 Secret。
+    string auth_secret = 3;
+  }
+
+  // GoWorkflows 引擎（基于 go-workflows）。
+  message Goworkflows {
+    // 后端类型：sqlite / mysql / redis / postgres。
+    string backend = 1;
+    // 数据库连接字符串或 DSN。
+    string dsn = 2;
+  }
+
+  optional Temporal temporal = 1;
+  optional Argo argo = 2;
+  optional Conductor conductor = 3;
+  optional Goworkflows goworkflows = 4;
+}

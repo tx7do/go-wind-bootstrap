@@ -11,6 +11,9 @@ import "bootstrap/v1/tracer.proto";
 import "bootstrap/v1/metrics.proto";
 import "bootstrap/v1/broker.proto";
 import "bootstrap/v1/storage.proto";
+import "bootstrap/v1/ai.proto";
+import "bootstrap/v1/workflow.proto";
+import "bootstrap/v1/cache.proto";
 
 option go_package = "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1";
 
@@ -44,4 +47,13 @@ message BootstrapConfig {
 
   // 对象存储，支持 MinIO / S3。
   Storage storage = 9;
+
+  // AI 模型客户端，支持 OpenAI / LangChainGo / Eino。
+  Ai ai = 10;
+
+  // 工作流引擎，支持 Temporal / Argo / Conductor / GoWorkflows。
+  Workflow workflow = 11;
+
+  // 缓存，支持 Local（内存）/ Redis。
+  Cache cache = 12;
 }

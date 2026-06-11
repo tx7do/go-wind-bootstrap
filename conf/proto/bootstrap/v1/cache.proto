@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package bootstrap.v1;
+
+option go_package = "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1";
+
+// Cache 描述缓存配置。
+message Cache {
+  // 本地内存缓存（基于 FreeCache）。
+  message Local {
+    // 预分配缓存大小（字节），默认 256MB。
+    int32 size = 1;
+    // 默认 TTL（秒），0 表示永不过期。
+    int32 default_ttl_seconds = 2;
+  }
+
+  // Redis 缓存。
+  message Redis {
+    // Redis 服务地址，如 "localhost:6379"。
+    string addr = 1;
+    // Redis 密码。
+    string password = 2;
+    // Redis 数据库编号，默认 0。
+    int32 db = 3;
+    // 键前缀，用于命名空间隔离。
+    string key_prefix = 4;
+  }
+
+  optional Local local = 1;
+  optional Redis redis = 2;
+}

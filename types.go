@@ -118,3 +118,24 @@ const (
 	StorageTypeMinio = "minio"
 	StorageTypeS3    = "s3"
 )
+
+// AI type 常量，用于注册 AiBuilder 时的 key。
+const (
+	AiTypeOpenAI      = "openai"
+	AiTypeLangChainGo = "langchaingo"
+	AiTypeEino        = "eino"
+)
+
+// Workflow type 常量，用于注册 WorkflowBuilder 时的 key。
+const (
+	WorkflowTypeTemporal    = "temporal"
+	WorkflowTypeArgo        = "argo"
+	WorkflowTypeConductor   = "conductor"
+	WorkflowTypeGoWorkflows = "goworkflows"
+)
+
+// Cache type 常量，用于注册 CacheBuilder 时的 key。
+const (
+	CacheTypeLocal = "local"
+	CacheTypeRedis = "redis"
+)

@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package bootstrap.v1;
+
+option go_package = "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1";
+
+// Ai 描述 AI 模型客户端配置。
+message Ai {
+  message CloudConfig {
+    string api_key = 1;
+    string base_url = 2;
+    string organization = 3;
+  }
+
+  message LocalConfig {
+    string host = 1;
+    int32 port = 2;
+  }
+
+  // OpenAI 兼容客户端。
+  message Openai {
+    // 模型类型：1=local, 2=cloud。
+    int32 model_type = 1;
+    // 模型名称。
+    string model_name = 2;
+    // 超时时间（秒）。
+    int32 timeout_seconds = 3;
+    // 云端配置。
+    optional CloudConfig cloud = 4;
+    // 本地配置。
+    optional LocalConfig local = 5;
+  }
+
+  // LangChainGo 客户端。
+  message Langchaingo {
+    int32 model_type = 1;
+    string model_name = 2;
+    int32 timeout_seconds = 3;
+    optional CloudConfig cloud = 4;
+    optional LocalConfig local = 5;
+  }
+
+  // Eino (字节跳动) 客户端。
+  message Eino {
+    int32 model_type = 1;
+    string model_name = 2;
+    int32 timeout_seconds = 3;
+    optional CloudConfig cloud = 4;
+    optional LocalConfig local = 5;
+  }
+
+  optional Openai openai = 1;
+  optional Langchaingo langchaingo = 2;
+  optional Eino eino = 3;
+}
