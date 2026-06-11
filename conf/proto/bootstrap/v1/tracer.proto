@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package bootstrap.v1;
+
+option go_package = "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1";
+
+// Tracer 描述分布式追踪配置。
+message Tracer {
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+
+    OTLP = 1;
+  }
+
+  message Otlp {
+    // OTLP Collector 端点地址。
+    string endpoint = 1;
+    // 是否使用 insecure 连接。
+    bool insecure = 2;
+    // Headers。
+    map<string, string> headers = 3;
+    // 采样策略：always_on / always_off / trace_id_ratio / parent_based。
+    string sampler = 4;
+    // trace_id_ratio 模式下的采样比率 (0.0 ~ 1.0)。
+    double sample_ratio = 5;
+  }
+
+  string type = 1;
+
+  // 追踪类型：otlp。
+  optional Otlp otlp = 2;
+}

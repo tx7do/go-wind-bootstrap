@@ -1,0 +1,171 @@
+syntax = "proto3";
+
+package bootstrap.v1;
+
+option go_package = "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1";
+
+// Config 描述配置中心来源。
+// 配置可以混合使用，同一 Config 中可同时设置多种配置源。
+message Config {
+  // 文件配置源。
+  message File {
+    // 配置文件路径。
+    string path = 1;
+    // 文件格式：json / yaml / toml。留空则按扩展名推断。
+    string format = 2;
+    // 是否启用文件变更监听（基于 fsnotify）。
+    bool watch = 3;
+  }
+
+  // 嵌入文件系统配置源（如 go:embed）。
+  // 适用于将配置文件嵌入二进制的场景。
+  message Fs {
+    // 嵌入文件系统内的文件路径。
+    string path = 1;
+  }
+
+  // Etcd 配置源。
+  message Etcd {
+    repeated string endpoints = 1;
+    // 配置键路径。
+    string path = 2;
+    string username = 3;
+    string password = 4;
+    // 是否使用前缀模式（监听一个目录而非单个键）。
+    bool prefix = 5;
+  }
+
+  // Nacos 配置源。
+  message Nacos {
+    repeated string server_addrs = 1;
+    string namespace = 2;
+    string group = 3;
+    string data_id = 4;
+    string format = 5;
+  }
+
+  // Consul 配置源。
+  message Consul {
+    string address = 1;
+    // 配置键路径。
+    string path = 2;
+    string token = 3;
+    string scheme = 4;
+  }
+
+  // Apollo 配置源。
+  message Apollo {
+    string app_id = 1;
+    string cluster = 2;
+    // Apollo 命名空间名称。
+    string namespace = 3;
+    string ip = 4;
+    // Apollo 配置中心地址。
+    string endpoint = 5;
+    // 应用密钥。
+    string secret = 6;
+    // 是否备份配置到本地。
+    bool is_backup_config = 7;
+    // 本地备份路径。
+    string backup_path = 8;
+  }
+
+  // Kubernetes ConfigMap 配置源。
+  message Kubernetes {
+    string namespace = 1;
+    string config_map_name = 2;
+    string key = 3;
+    // 标签选择器，如 app=test。
+    string label_selector = 4;
+    // 字段选择器。
+    string field_selector = 5;
+    // KubeConfig 文件路径（集群外使用）。
+    string kube_config = 6;
+    // Master URL。
+    string master = 7;
+  }
+
+  // Redis 配置源。
+  message Redis {
+    string address = 1;
+    // Redis 键路径。
+    string path = 2;
+    string password = 3;
+    int32 db = 4;
+  }
+
+  // Zookeeper 配置源。
+  message Zookeeper {
+    repeated string endpoints = 1;
+    // ZNode 路径。
+    string path = 2;
+  }
+
+  // HashiCorp Vault 配置源。
+  message Vault {
+    string address = 1;
+    string token = 2;
+    // Vault secret 路径，如 secret/data/myapp/config。
+    string path = 3;
+    string mount_path = 4;
+    // Secret Data 中的键名，默认 "content"。
+    string data_key = 5;
+    // 轮询间隔（毫秒）。默认 30000。Vault 不支持推送通知。
+    int32 poll_interval = 6;
+  }
+
+  // HTTP 配置源。
+  message Http {
+    string url = 1;
+    string method = 2;
+    map<string, string> headers = 3;
+    string format = 4;
+    // 轮询间隔（毫秒）。默认 30000。使用 ETag 条件请求优化。
+    int32 poll_interval = 5;
+  }
+
+  // 环境变量配置源。
+  message Env {
+    // 环境变量前缀，如 "APP_"。
+    string prefix = 1;
+    // 环境变量分隔符。
+    string separator = 2;
+    // 默认环境变量名。
+    string key = 3;
+  }
+
+  // 对象存储配置源（S3 兼容）。
+  message Oss {
+    string endpoint = 1;
+    string bucket = 2;
+    // 对象键（文件路径）。
+    string key = 3;
+    string access_key_id = 4;
+    string access_key_secret = 5;
+    // 轮询间隔（毫秒）。默认 30000。通过 ETag 检测变更。
+    int32 poll_interval = 6;
+  }
+
+  // Polaris 配置源。
+  message Polaris {
+    string address = 1;
+    string namespace = 2;
+    string group = 3;
+    string file_name = 4;
+  }
+
+  optional File file = 1;
+  optional Fs fs = 2;
+  optional Etcd etcd = 3;
+  optional Nacos nacos = 4;
+  optional Consul consul = 5;
+  optional Apollo apollo = 6;
+  optional Kubernetes kubernetes = 7;
+  optional Redis redis = 8;
+  optional Zookeeper zookeeper = 9;
+  optional Vault vault = 10;
+  optional Http http = 11;
+  optional Env env = 12;
+  optional Oss oss = 13;
+  optional Polaris polaris = 14;
+}

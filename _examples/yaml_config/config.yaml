@@ -1,0 +1,15 @@
+app:
+  id: yaml-config-demo
+  name: yaml_config_example
+  version: "1.0.0"
+  env: development
+
+server:
+  http:
+    addr: ":8080"
+
+logger:
+  type: zap
+  zap:
+    level: info
+    format: json

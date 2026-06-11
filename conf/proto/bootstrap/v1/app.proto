@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package bootstrap.v1;
+
+import "google/protobuf/duration.proto";
+
+option go_package = "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1";
+
+// App 定义应用元数据，对应 wind.WithID / WithName / WithVersion 等选项。
+message App {
+  // 服务实例唯一标识，留空则自动生成。
+  string id = 1;
+
+  // 服务名称。
+  string name = 2;
+
+  // 服务版本号。
+  string version = 3;
+
+  // 运行环境：dev / staging / production。
+  string env = 4;
+
+  // 优雅停机超时时间。
+  google.protobuf.Duration stop_timeout = 5;
+}

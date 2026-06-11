@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package bootstrap.v1;
+
+option go_package = "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1";
+
+// Metrics 描述指标监控配置。
+message Metrics {
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+
+    PROMETHEUS = 1;
+    OTLP = 2;
+  }
+
+  message Prometheus {
+    // Prometheus metrics 暴露地址。
+    string addr = 1;
+    // Metrics HTTP 路径，默认 "/metrics"。
+    string path = 2;
+  }
+
+  message Otlp {
+    // OTLP Collector 端点地址。
+    string endpoint = 1;
+    bool insecure = 2;
+    map<string, string> headers = 3;
+    // 推送间隔（秒）。
+    int32 push_interval = 4;
+  }
+
+  string type = 1;
+
+  // 指标类型：prometheus / otlp。
+  optional Prometheus prometheus = 2;
+  optional Otlp otlp = 3;
+}

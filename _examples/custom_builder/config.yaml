@@ -1,0 +1,40 @@
+app:
+  id: fullstack-demo
+  name: fullstack_example
+  version: "1.0.0"
+  env: development
+
+server:
+  http:
+    addr: ":8080"
+  grpc:
+    addr: ":9000"
+
+logger:
+  type: zap
+  zap:
+    level: info
+    format: json
+
+registry:
+  type: consul
+  consul:
+    address: localhost:8500
+
+tracer:
+  type: otlp
+  otlp:
+    endpoint: localhost:4317
+    insecure: true
+
+metrics:
+  type: prometheus
+  prometheus:
+    addr: ":9090"
+    path: /metrics
+
+broker:
+  kafka:
+    brokers:
+      - localhost:9092
+    group_id: fullstack-demo

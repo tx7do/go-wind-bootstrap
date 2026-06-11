@@ -1,0 +1,204 @@
+syntax = "proto3";
+
+package bootstrap.v1;
+
+option go_package = "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1";
+
+// Logger 描述日志系统配置。
+message Logger {
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+
+    ZAP = 1;
+    ZEROLOG = 2;
+    SLOG = 3;
+    LOGRUS = 4;
+    CHARM = 5;
+    PHUSLU = 6;
+    GLOG = 7;
+    HCLOG = 8;
+    FLUENT = 9;
+    LOKI = 10;
+    SENTRY = 11;
+    ALIYUN = 12;
+    TENCENT = 13;
+    CLOUDWATCH = 14;
+  }
+
+  // Zap 日志配置。
+  message Zap {
+    string level = 1;
+    string format = 2;
+    string output_path = 3;
+    string error_output_path = 4;
+  }
+
+  // Zerolog 日志配置。
+  message Zerolog {
+    string level = 1;
+    string format = 2;
+    string output_path = 3;
+  }
+
+  // Slog（Go 标准库）日志配置。
+  message Slog {
+    string level = 1;
+    string format = 2;
+    string output_path = 3;
+  }
+
+  // Logrus 日志配置。
+  message Logrus {
+    string level = 1;
+    string format = 2;
+    string output_path = 3;
+  }
+
+  // Charm（Charmbracelet）日志配置。
+  message Charm {
+    string level = 1;
+    string format = 2;
+    string output_path = 3;
+  }
+
+  // Phuslu 日志配置。
+  message Phuslu {
+    string level = 1;
+    string format = 2;
+    string output_path = 3;
+  }
+
+  // Glog（Google glog）日志配置。
+  // glog 的级别由命令行 flag（-v, -stderrthreshold）控制。
+  message Glog {
+    // 日志目录，留空使用系统临时目录。
+    string log_dir = 1;
+    // 是否同时输出到 stderr。
+    bool logtostderr = 2;
+    // stderr 最低输出级别（INFO=0, WARNING=1, ERROR=2, FATAL=3）。
+    int32 stderrthreshold = 3;
+    // V 级别详细度（对应 -v flag）。
+    int32 v = 4;
+  }
+
+  // Hclog（HashiCorp hclog）日志配置。
+  message Hclog {
+    string level = 1;
+    // 日志格式：json / text。
+    string format = 2;
+    string output_path = 3;
+    // Logger 名称。
+    string name = 4;
+    // 是否包含时间戳。
+    bool include_location = 5;
+    // 时间格式。
+    string time_format = 6;
+  }
+
+  // Fluentd 日志配置。
+  message Fluent {
+    // Fluentd 地址，如 tcp://127.0.0.1:24224 或 unix://var/run/fluent/fluent.sock。
+    string addr = 1;
+    // 连接超时（毫秒）。
+    int32 timeout = 2;
+    // 写入超时（毫秒）。
+    int32 write_timeout = 3;
+    // 缓冲区大小限制（字节）。
+    int32 buffer_limit = 4;
+    // 重试等待时间（毫秒）。
+    int32 retry_wait = 5;
+    // 最大重试次数。
+    int32 max_retry = 6;
+    // 最大重试等待时间（毫秒）。
+    int32 max_retry_wait = 7;
+    // Tag 前缀。
+    string tag_prefix = 8;
+    // 是否异步发送。
+    bool async = 9;
+  }
+
+  // Grafana Loki 日志配置。
+  message Loki {
+    // Loki HTTP Push 端点，如 http://loki:3100/loki/api/v1/push。
+    string endpoint = 1;
+    // 流标签，如 app=my-service, env=production。
+    map<string, string> labels = 2;
+    // 批量推送阈值（条数）。默认 100。
+    int32 batch_size = 3;
+    // 刷新间隔（毫秒）。默认 5000。
+    int32 flush_interval = 4;
+  }
+
+  // Sentry 日志配置。
+  message Sentry {
+    // Sentry 项目 DSN。
+    string dsn = 1;
+    // 运行环境标签，如 production / staging / development。
+    string environment = 2;
+    // 发布版本标签，如 myapp@1.0.0。
+    string release = 3;
+    // 服务器名称标签。
+    string server_name = 4;
+  }
+
+  // 阿里云 SLS 日志配置。
+  message Aliyun {
+    // SLS Endpoint，如 cn-hangzhou.log.aliyuncs.com。
+    string endpoint = 1;
+    // Project 名称。
+    string project = 2;
+    // Logstore 名称。
+    string logstore = 3;
+    // AccessKey ID。
+    string access_key = 4;
+    // AccessKey Secret。
+    string access_secret = 5;
+    // Security Token（STS 临时凭证）。
+    string security_token = 6;
+  }
+
+  // 腾讯云 CLS 日志配置。
+  message Tencent {
+    // CLS Endpoint。
+    string endpoint = 1;
+    // 日志主题 ID。
+    string topic_id = 2;
+    // AccessKey ID。
+    string access_key = 3;
+    // AccessKey Secret。
+    string access_secret = 4;
+  }
+
+  // AWS CloudWatch Logs 日志配置。
+  message Cloudwatch {
+    // AWS 区域，如 us-east-1。
+    string region = 1;
+    // 日志组名称。
+    string log_group = 2;
+    // 日志流名称。
+    string log_stream = 3;
+    // 批量刷新阈值（条数）。默认 100。
+    int32 batch_size = 4;
+    // 定时刷新间隔（毫秒）。默认 5000。设为 0 禁用定时刷新。
+    int32 flush_interval = 5;
+  }
+
+  string type = 1;
+
+  // 本地日志库。
+  optional Zap zap = 2;
+  optional Zerolog zerolog = 3;
+  optional Slog slog = 4;
+  optional Logrus logrus = 5;
+  optional Charm charm = 6;
+  optional Phuslu phuslu = 7;
+  optional Glog glog = 8;
+  optional Hclog hclog = 9;
+  // 远程/云端日志服务。
+  optional Fluent fluent = 10;
+  optional Loki loki = 11;
+  optional Sentry sentry = 12;
+  optional Aliyun aliyun = 13;
+  optional Tencent tencent = 14;
+  optional Cloudwatch cloudwatch = 15;
+}

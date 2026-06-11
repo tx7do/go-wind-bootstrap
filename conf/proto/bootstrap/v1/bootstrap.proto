@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package bootstrap.v1;
+
+import "bootstrap/v1/app.proto";
+import "bootstrap/v1/server.proto";
+import "bootstrap/v1/config.proto";
+import "bootstrap/v1/registry.proto";
+import "bootstrap/v1/log.proto";
+import "bootstrap/v1/tracer.proto";
+import "bootstrap/v1/metrics.proto";
+import "bootstrap/v1/broker.proto";
+
+option go_package = "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1";
+
+// BootstrapConfig 是 go-wind-bootstrap 的顶层配置，
+// 声明式描述一个应用的完整拓扑：传输层、配置中心、注册中心、日志、追踪、指标、消息代理。
+// bootstrap 引擎将此配置解析为 wind.Option 链，最终创建并运行 wind.App。
+message BootstrapConfig {
+  // 应用元数据。
+  App app = 1;
+
+  // 传输层，支持通过 optional 字段同时配置多种传输协议。
+  Server server = 2;
+
+  // 配置中心，支持通过 optional 字段同时配置多种配置源（混合配置）。
+  Config config = 3;
+
+  // 服务注册发现。
+  Registry registry = 4;
+
+  // 日志系统。
+  Logger logger = 5;
+
+  // 分布式追踪。
+  Tracer tracer = 6;
+
+  // 指标监控。
+  Metrics metrics = 7;
+
+  // 消息代理，支持通过 optional 字段同时配置多种消息中间件。
+  Broker broker = 8;
+}

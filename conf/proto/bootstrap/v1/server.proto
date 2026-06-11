@@ -1,0 +1,235 @@
+syntax = "proto3";
+
+package bootstrap.v1;
+
+option go_package = "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1";
+
+// Server 描述一个传输层实例，对应 wind.WithServer。
+// 同一 Server 消息中可同时包含多种传输层配置，bootstrap 会分别创建对应的实例。
+message Server {
+  message TLS {
+    message File {
+      optional string cert_path = 1;
+      optional string key_path = 2;
+      optional string ca_path = 3;
+    }
+    message Config {
+      optional bytes cert_pem = 1;
+      optional bytes key_pem = 2;
+      optional bytes ca_pem = 3;
+    }
+
+    optional File file = 1;
+    optional Config config = 2;
+
+    bool insecure_skip_verify = 3;
+  }
+
+  // HTTP 传输层。
+  message Http {
+    // HTTP 中间件配置。
+    message Middleware {
+      // Recovery 中间件：捕获 panic 并返回 500。
+      message Recovery {
+        // 是否记录堆栈跟踪。默认 true。
+        optional bool stack_trace = 1;
+      }
+
+      // CORS 跨域中间件。
+      message Cors {
+        // 允许的源列表，为空表示允许所有源（*）。
+        repeated string allowed_origins = 1;
+        // 允许的 HTTP 方法，为空使用默认值。
+        repeated string allowed_methods = 2;
+        // 允许的请求头。
+        repeated string allowed_headers = 3;
+        // 暴露给浏览器的响应头。
+        repeated string exposed_headers = 4;
+        // 是否允许携带凭证（Cookie 等）。
+        bool allow_credentials = 5;
+        // 预检请求缓存时间（秒）。
+        int32 max_age = 6;
+      }
+
+      // Logging 请求日志中间件。
+      message Logging {
+        // 跳过日志记录的路径（如 /healthz）。
+        repeated string skip_paths = 1;
+      }
+
+      // RequestID 请求 ID 中间件。
+      message RequestId {
+        // 请求 ID 请求头名称，默认 X-Request-Id。
+        optional string header_name = 1;
+      }
+
+      // Tracing OpenTelemetry 链路追踪中间件。无需额外配置，自动使用全局 TracerProvider。
+      message Tracing {}
+
+      // RateLimit 限流中间件。
+      message RateLimit {
+        // 每秒允许的请求数。
+        double rate = 1;
+        // 突发容量。
+        int32 burst = 2;
+        // 是否使用等待模式（平滑限流）。
+        bool wait = 3;
+      }
+
+      // Timeout 请求超时中间件。
+      message Timeout {
+        // 默认超时时间（毫秒）。
+        int64 default_timeout_ms = 1;
+        // 超时后返回的 HTTP 状态码，默认 503。
+        int32 status_code = 2;
+      }
+
+      optional Recovery recovery = 1;
+      optional Cors cors = 2;
+      optional Logging logging = 3;
+      optional RequestId request_id = 4;
+      optional Tracing tracing = 5;
+      optional RateLimit rate_limit = 6;
+      optional Timeout timeout = 7;
+    }
+
+    // 监听地址，如 ":8080"。
+    string addr = 1;
+    // HTTP 驱动：net/http / chi / gin / fiber。留空默认 net/http。
+    string driver = 2;
+    TLS tls = 3;
+    // 中间件配置，按字段顺序注册。
+    Middleware middleware = 4;
+  }
+
+  // HTTP/3 (QUIC) 传输层。
+  message Http3 {
+    // 监听地址，如 ":443"。
+    string addr = 1;
+    TLS tls = 2;
+  }
+
+  // gRPC 传输层。
+  message Grpc {
+    // gRPC 中间件配置。
+    message Middleware {
+      // Recovery 中间件：捕获 panic 并返回 Internal 错误。
+      message Recovery {}
+
+      // Logging 请求日志中间件。
+      message Logging {}
+
+      // Tracing OpenTelemetry 链路追踪中间件。
+      message Tracing {}
+
+      // Validate 参数校验中间件。
+      message Validate {}
+
+      optional Recovery recovery = 1;
+      optional Logging logging = 2;
+      optional Tracing tracing = 3;
+      optional Validate validate = 4;
+    }
+
+    // 监听地址，如 ":9000"。
+    string addr = 1;
+    // 是否启用 gRPC 反射。
+    bool reflection = 2;
+    TLS tls = 3;
+    // 中间件配置。
+    Middleware middleware = 4;
+  }
+
+  // GraphQL 传输层（基于 gqlgen，运行在 HTTP 之上）。
+  message Graphql {
+    // 监听地址，如 ":8080"。
+    string addr = 1;
+    TLS tls = 2;
+  }
+
+  // SSE (Server-Sent Events) 传输层。
+  message Sse {
+    // 监听地址，如 ":8080"。
+    string addr = 1;
+    // SSE 事件路径，默认 "/events"。
+    string path = 2;
+    TLS tls = 3;
+  }
+
+  // WebSocket 传输层。
+  message Websocket {
+    // 监听地址，如 ":8080"。
+    string addr = 1;
+    // WebSocket 路径，默认 "/ws"。
+    string path = 2;
+    TLS tls = 3;
+  }
+
+  // TCP 传输层。
+  message Tcp {
+    // 监听地址，如 ":9000"。
+    string addr = 1;
+    TLS tls = 2;
+  }
+
+  // UDP 传输层。
+  message Udp {
+    // 监听地址，如 ":9000"。
+    string addr = 1;
+  }
+
+  // KCP 传输层（基于 UDP 的可靠传输）。
+  message Kcp {
+    // 监听地址，如 ":9000"。
+    string addr = 1;
+    // 加密密码。
+    string block_crypt_password = 2;
+    // 加密盐值。
+    string block_crypt_salt = 3;
+    // 前向纠错数据分片数。
+    int32 data_shards = 4;
+    // 前向纠错校验分片数。
+    int32 parity_shards = 5;
+  }
+
+  // Thrift RPC 传输层。
+  message Thrift {
+    // 监听地址，如 ":7700"。
+    string addr = 1;
+    // 协议类型：binary / compact / json。默认 binary。
+    string protocol = 2;
+    // 是否启用缓冲传输。
+    bool buffered = 3;
+    // 是否启用帧传输。
+    bool framed = 4;
+    // 缓冲区大小（字节），默认 8192。
+    int32 buffer_size = 5;
+    TLS tls = 6;
+  }
+
+  // tRPC 传输层（腾讯 tRPC 框架）。
+  message Trpc {
+    // 监听地址。
+    string addr = 1;
+  }
+
+  // WebTransport 传输层（基于 HTTP/3）。
+  message Webtransport {
+    // 监听地址，如 ":443"。
+    string addr = 1;
+    TLS tls = 2;
+  }
+
+  optional Http http = 1;
+  optional Http3 http3 = 2;
+  optional Grpc grpc = 3;
+  optional Graphql graphql = 4;
+  optional Sse sse = 5;
+  optional Websocket websocket = 6;
+  optional Tcp tcp = 7;
+  optional Udp udp = 8;
+  optional Kcp kcp = 9;
+  optional Thrift thrift = 10;
+  optional Trpc trpc = 11;
+  optional Webtransport webtransport = 12;
+}

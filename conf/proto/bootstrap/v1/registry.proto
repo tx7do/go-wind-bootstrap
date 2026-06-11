@@ -1,0 +1,131 @@
+syntax = "proto3";
+
+package bootstrap.v1;
+
+option go_package = "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1";
+
+// Registry 描述服务注册中心配置。
+message Registry {
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+
+    CONSUL = 1;
+    ETCD = 2;
+    NACOS = 3;
+    ZOOKEEPER = 4;
+    POLARIS = 5;
+    EUREKA = 6;
+    KUBERNETES = 7;
+    SERVICE_COMB = 8;
+  }
+
+  message Consul {
+    string address = 1;
+    string scheme = 2;
+    string token = 3;
+    // 健康检查间隔（秒）。
+    int32 health_check_interval = 4;
+    // 健康检查超时（秒）。
+    int32 health_check_timeout = 5;
+    // 是否启用健康检查。
+    bool enable_health_check = 6;
+    // 是否启用心跳。
+    bool heartbeat = 7;
+    // 服务注销临界时间（秒）。
+    int32 deregister_critical_service_after = 8;
+    string datacenter = 9;
+  }
+
+  message Etcd {
+    repeated string endpoints = 1;
+    string username = 2;
+    string password = 3;
+    // 键前缀/命名空间。
+    string prefix = 4;
+    // 注册 TTL（秒）。
+    int32 ttl = 5;
+    // 最大重试次数。
+    int32 max_retry = 6;
+  }
+
+  message Nacos {
+    repeated string server_addrs = 1;
+    string namespace = 2;
+    string group = 3;
+    string cluster_name = 4;
+    double weight = 5;
+    // 配置前缀路径。
+    string prefix = 6;
+    // 默认服务类型。
+    string default_kind = 7;
+  }
+
+  message Zookeeper {
+    repeated string endpoints = 1;
+    // 根路径/命名空间。
+    string root_path = 2;
+    int32 session_timeout = 3;
+    // Digest ACL 用户名。
+    string username = 4;
+    // Digest ACL 密码。
+    string password = 5;
+  }
+
+  message Polaris {
+    string address = 1;
+    string namespace = 2;
+    string service = 3;
+    string token = 4;
+    // 服务协议。
+    string protocol = 5;
+    // 权重 (0~10000)。
+    int32 weight = 6;
+    // 优先级，值越小优先级越低。
+    int32 priority = 7;
+    // 是否健康。
+    bool healthy = 8;
+    // 是否隔离。
+    bool isolate = 9;
+    // 心跳 TTL（秒）。
+    int32 ttl = 10;
+    // 是否启用心跳。
+    bool heartbeat = 11;
+    // 单次查询超时（毫秒）。
+    int32 timeout = 12;
+    // 重试次数。
+    int32 retry_count = 13;
+  }
+
+  message Eureka {
+    repeated string endpoints = 1;
+    string app_name = 2;
+    // 心跳间隔（秒）。
+    int32 heartbeat_interval = 3;
+    // 服务列表刷新间隔（秒）。
+    int32 refresh_interval = 4;
+    // Eureka 路径前缀。
+    string eureka_path = 5;
+  }
+
+  message Kubernetes {
+    string namespace = 1;
+  }
+
+  message ServiceComb {
+    repeated string endpoints = 1;
+    string app_id = 2;
+    string service_name = 3;
+    string version = 4;
+  }
+
+  string type = 1;
+
+  optional Consul consul = 2;
+  optional Etcd etcd = 3;
+  optional Nacos nacos = 4;
+  optional Zookeeper zookeeper = 5;
+  optional Polaris polaris = 6;
+  optional Eureka eureka = 7;
+  optional Kubernetes kubernetes = 8;
+  optional ServiceComb service_comb = 9;
+}

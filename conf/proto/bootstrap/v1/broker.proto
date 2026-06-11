@@ -1,0 +1,142 @@
+syntax = "proto3";
+
+package bootstrap.v1;
+
+option go_package = "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1";
+
+// Broker 描述消息代理配置。
+// 同一 Broker 中可同时配置多个消息代理。
+message Broker {
+  // Apache Kafka 消息代理。
+  message Kafka {
+    repeated string brokers = 1;
+    string group_id = 2;
+    // 认证类型：plain / scram_sha256 / scram_sha512。
+    string auth_type = 3;
+    string username = 4;
+    string password = 5;
+  }
+
+  // RabbitMQ 消息代理。
+  message RabbitMQ {
+    // 连接地址，如 amqp://guest:guest@127.0.0.1:5672/。
+    string url = 1;
+    string exchange = 2;
+    string queue = 3;
+    string username = 4;
+    string password = 5;
+  }
+
+  // Redis 消息代理（基于 Pub/Sub）。
+  message Redis {
+    string address = 1;
+    string password = 2;
+    int32 db = 3;
+  }
+
+  // NATS 消息代理。
+  message Nats {
+    // 连接地址，如 nats://127.0.0.1:4222。
+    string url = 1;
+    string name = 2;
+    string username = 3;
+    string password = 4;
+  }
+
+  // MQTT 消息代理。
+  message Mqtt {
+    // 连接地址，如 tcp://127.0.0.1:1883。
+    string address = 1;
+    string client_id = 2;
+    string username = 3;
+    string password = 4;
+    // QoS 级别：0 / 1 / 2。
+    string qos = 5;
+  }
+
+  // Apache Pulsar 消息代理。
+  message Pulsar {
+    // 连接地址，如 pulsar://localhost:6650。
+    string url = 1;
+    string topic = 2;
+    string subscription = 3;
+    // 认证类型。
+    string auth_type = 4;
+    string token = 5;
+  }
+
+  // Azure Service Bus 消息代理。
+  message Azuresb {
+    // 连接字符串。
+    string connection_string = 1;
+  }
+
+  // Google Cloud Pub/Sub 消息代理。
+  message Gcpubsub {
+    // GCP 项目 ID。
+    string project_id = 1;
+    // 服务账号凭证文件路径。
+    string credentials_file = 2;
+    // 自定义端点（用于模拟器测试）。
+    string endpoint = 3;
+  }
+
+  // NSQ 消息代理。
+  message Nsq {
+    // NSQD 地址列表，如 127.0.0.1:4150。
+    repeated string addrs = 1;
+    // NSQLookupd 地址列表。
+    repeated string lookupd_addrs = 2;
+  }
+
+  // Apache RocketMQ 消息代理（5.x 客户端）。
+  message Rocketmq {
+    // NameServer 地址列表。
+    repeated string name_servers = 1;
+    // NameServer 域名。
+    string name_server_url = 2;
+    string access_key = 3;
+    string secret_key = 4;
+    string security_token = 5;
+    string group_name = 6;
+    string namespace = 7;
+    string instance_name = 8;
+    // 消费者组名称。
+    string topic = 9;
+    // 重试次数。
+    int32 retry_count = 10;
+  }
+
+  // AWS SQS 消息代理。
+  message Sqs {
+    // AWS 区域。
+    string region = 1;
+    // 自定义端点（用于 ElasticMQ/LocalStack 测试）。
+    string endpoint = 2;
+    // 默认队列 URL。
+    string queue_url = 3;
+  }
+
+  // STOMP 协议消息代理（如 ActiveMQ、RabbitMQ STOMP）。
+  message Stomp {
+    // 连接地址，如 stomp://127.0.0.1:61613。
+    string address = 1;
+    string username = 2;
+    string password = 3;
+    // 虚拟主机。
+    string vhost = 4;
+  }
+
+  optional Kafka kafka = 1;
+  optional RabbitMQ rabbitmq = 2;
+  optional Redis redis = 3;
+  optional Nats nats = 4;
+  optional Mqtt mqtt = 5;
+  optional Pulsar pulsar = 6;
+  optional Azuresb azuresb = 7;
+  optional Gcpubsub gcpubsub = 8;
+  optional Nsq nsq = 9;
+  optional Rocketmq rocketmq = 10;
+  optional Sqs sqs = 11;
+  optional Stomp stomp = 12;
+}
