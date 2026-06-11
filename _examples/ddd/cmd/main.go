@@ -22,10 +22,13 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 
 	gormCrud "github.com/tx7do/go-crud/gorm"
 	bootstrap "github.com/tx7do/go-wind-bootstrap"
@@ -99,7 +102,15 @@ func main() {
 		"env", cfg.GetApp().GetEnv(),
 	)
 
-	if err := ctx.App().Run(nil); err != nil {
+	if err := ctx.App().Run(signalContext()); err != nil {
 		slog.Error("application exited with error", "error", err)
 	}
+}
+
+// signalContext 创建一个监听 SIGINT/SIGTERM 的 context，
+// 收到信号时自动 cancel，触发优雅关闭。
+func signalContext() context.Context {
+	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	_ = cancel
+	return ctx
 }

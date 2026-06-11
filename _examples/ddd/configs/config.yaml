@@ -16,7 +16,7 @@ logger:
 
 database:
   sql:
-    driver: sqlite
+    driver: go_sqlite
     source: ":memory:"
     migrate: true
 

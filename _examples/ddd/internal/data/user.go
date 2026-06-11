@@ -11,6 +11,7 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/tx7do/go-wind-bootstrap/_examples/ddd/internal/domain"
+	gormAdapter "github.com/tx7do/go-wind-bootstrap/database/gorm"
 )
 
 // 确保 userRepo 实现了 domain.UserRepository 接口。
@@ -29,6 +30,12 @@ type userPO struct {
 // TableName 指定 GORM 表名。
 func (userPO) TableName() string { return "users" }
 
+func init() {
+	// 将 userPO 注册到 GORM 适配层的全局迁移模型表。
+	// 当 config.yaml 中 migrate: true 时，Bootstrap 会自动执行 AutoMigrate。
+	gormAdapter.RegisterMigrateModel(&userPO{})
+}
+
 // NewUserRepository 创建基于 GORM 的用户仓储。
 //
 // db 参数来自 bootstrap 的 Database 适配层：
@@ -36,9 +43,6 @@ func (userPO) TableName() string { return "users" }
 //	rawDB := ctx.Database(bootstrap.DatabaseTypeGorm).(*gormCrud.Client)
 //	db := rawDB.DB
 func NewUserRepository(db *gorm.DB) domain.UserRepository {
-	// 自动迁移表结构
-	_ = db.AutoMigrate(&userPO{})
-
 	return &userRepo{db: db}
 }
 
