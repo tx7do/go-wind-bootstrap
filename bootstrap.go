@@ -42,19 +42,20 @@ import (
 //
 //	b, ok := brokers[bootstrap.BrokerTypeKafka]
 //	if ok { /* use b as your kafka broker */ }
-func Bootstrap(ctx context.Context, cfg *v1.BootstrapConfig) (*wind.App, map[string]any, map[string]any, map[string]any, map[string]any, map[string]any, func(), error) {
+func Bootstrap(ctx context.Context, cfg *v1.BootstrapConfig) (*wind.App, map[string]any, map[string]any, map[string]any, map[string]any, map[string]any, map[string]any, func(), error) {
 	if cfg == nil {
-		return nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("bootstrap: config is nil")
+		return nil, nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("bootstrap: config is nil")
 	}
 
 	var (
-		opts      []wind.Option
-		cleanup   = func() {}
-		brokers   map[string]any
-		storages  map[string]any
-		aiClients map[string]any
-		workflows map[string]any
-		caches    map[string]any
+		opts          []wind.Option
+		cleanup       = func() {}
+		brokers       map[string]any
+		storages      map[string]any
+		aiClients     map[string]any
+		workflows     map[string]any
+		caches        map[string]any
+		scriptEngines map[string]any
 	)
 
 	// 1. App metadata.
@@ -66,7 +67,7 @@ func Bootstrap(ctx context.Context, cfg *v1.BootstrapConfig) (*wind.App, map[str
 	if logCfg := cfg.GetLogger(); logCfg != nil {
 		logger, logCleanup, err := resolveLog(logCfg)
 		if err != nil {
-			return nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("bootstrap: resolve log: %w", err)
+			return nil, nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("bootstrap: resolve log: %w", err)
 		}
 		if logger != nil {
 			opts = append(opts, wind.WithLogger(logger))
@@ -81,7 +82,7 @@ func Bootstrap(ctx context.Context, cfg *v1.BootstrapConfig) (*wind.App, map[str
 	if srvCfg := cfg.GetServer(); srvCfg != nil {
 		servers, srvCleanup, err := resolveServer(srvCfg)
 		if err != nil {
-			return nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("bootstrap: resolve server: %w", err)
+			return nil, nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("bootstrap: resolve server: %w", err)
 		}
 		if len(servers) > 0 {
 			opts = append(opts, wind.WithServer(servers...))
@@ -96,7 +97,7 @@ func Bootstrap(ctx context.Context, cfg *v1.BootstrapConfig) (*wind.App, map[str
 	if regCfg := cfg.GetRegistry(); regCfg != nil {
 		regCleanup, err := resolveRegistry(ctx, regCfg, cfg.GetApp())
 		if err != nil {
-			return nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("bootstrap: resolve registry: %w", err)
+			return nil, nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("bootstrap: resolve registry: %w", err)
 		}
 		if regCleanup != nil {
 			prev := cleanup
@@ -108,7 +109,7 @@ func Bootstrap(ctx context.Context, cfg *v1.BootstrapConfig) (*wind.App, map[str
 	if confCfg := cfg.GetConfig(); confCfg != nil {
 		confCleanup, err := resolveConfig(ctx, confCfg)
 		if err != nil {
-			return nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("bootstrap: resolve config source: %w", err)
+			return nil, nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("bootstrap: resolve config source: %w", err)
 		}
 		if confCleanup != nil {
 			prev := cleanup
@@ -120,7 +121,7 @@ func Bootstrap(ctx context.Context, cfg *v1.BootstrapConfig) (*wind.App, map[str
 	if tracerCfg := cfg.GetTracer(); tracerCfg != nil {
 		tp, tracerCleanup, err := resolveTracer(tracerCfg)
 		if err != nil {
-			return nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("bootstrap: resolve tracer: %w", err)
+			return nil, nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("bootstrap: resolve tracer: %w", err)
 		}
 		if tp != nil {
 			prev := cleanup
@@ -132,7 +133,7 @@ func Bootstrap(ctx context.Context, cfg *v1.BootstrapConfig) (*wind.App, map[str
 	if metricsCfg := cfg.GetMetrics(); metricsCfg != nil {
 		metricsCleanup, err := resolveMetrics(metricsCfg)
 		if err != nil {
-			return nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("bootstrap: resolve metrics: %w", err)
+			return nil, nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("bootstrap: resolve metrics: %w", err)
 		}
 		if metricsCleanup != nil {
 			prev := cleanup
@@ -144,7 +145,7 @@ func Bootstrap(ctx context.Context, cfg *v1.BootstrapConfig) (*wind.App, map[str
 	if brokerCfg := cfg.GetBroker(); brokerCfg != nil {
 		inst, brokerCleanup, err := resolveBroker(ctx, brokerCfg)
 		if err != nil {
-			return nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("bootstrap: resolve broker: %w", err)
+			return nil, nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("bootstrap: resolve broker: %w", err)
 		}
 		brokers = inst
 		if brokerCleanup != nil {
@@ -157,7 +158,7 @@ func Bootstrap(ctx context.Context, cfg *v1.BootstrapConfig) (*wind.App, map[str
 	if storageCfg := cfg.GetStorage(); storageCfg != nil {
 		inst, storageCleanup, err := resolveStorage(ctx, storageCfg)
 		if err != nil {
-			return nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("bootstrap: resolve storage: %w", err)
+			return nil, nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("bootstrap: resolve storage: %w", err)
 		}
 		storages = inst
 		if storageCleanup != nil {
@@ -170,7 +171,7 @@ func Bootstrap(ctx context.Context, cfg *v1.BootstrapConfig) (*wind.App, map[str
 	if aiCfg := cfg.GetAi(); aiCfg != nil {
 		inst, aiCleanup, err := resolveAi(ctx, aiCfg)
 		if err != nil {
-			return nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("bootstrap: resolve ai: %w", err)
+			return nil, nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("bootstrap: resolve ai: %w", err)
 		}
 		aiClients = inst
 		if aiCleanup != nil {
@@ -183,7 +184,7 @@ func Bootstrap(ctx context.Context, cfg *v1.BootstrapConfig) (*wind.App, map[str
 	if wfCfg := cfg.GetWorkflow(); wfCfg != nil {
 		inst, wfCleanup, err := resolveWorkflow(ctx, wfCfg)
 		if err != nil {
-			return nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("bootstrap: resolve workflow: %w", err)
+			return nil, nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("bootstrap: resolve workflow: %w", err)
 		}
 		workflows = inst
 		if wfCleanup != nil {
@@ -196,7 +197,7 @@ func Bootstrap(ctx context.Context, cfg *v1.BootstrapConfig) (*wind.App, map[str
 	if cacheCfg := cfg.GetCache(); cacheCfg != nil {
 		inst, cacheCleanup, err := resolveCache(ctx, cacheCfg)
 		if err != nil {
-			return nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("bootstrap: resolve cache: %w", err)
+			return nil, nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("bootstrap: resolve cache: %w", err)
 		}
 		caches = inst
 		if cacheCleanup != nil {
@@ -205,15 +206,28 @@ func Bootstrap(ctx context.Context, cfg *v1.BootstrapConfig) (*wind.App, map[str
 		}
 	}
 
+	// 13. Script Engine.
+	if scriptCfg := cfg.GetScript(); scriptCfg != nil {
+		inst, scriptCleanup, err := resolveScriptEngine(ctx, scriptCfg)
+		if err != nil {
+			return nil, nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("bootstrap: resolve script engine: %w", err)
+		}
+		scriptEngines = inst
+		if scriptCleanup != nil {
+			prev := cleanup
+			cleanup = func() { scriptCleanup(); prev() }
+		}
+	}
+
 	app := wind.New(opts...)
-	return app, brokers, storages, aiClients, workflows, caches, cleanup, nil
+	return app, brokers, storages, aiClients, workflows, caches, scriptEngines, cleanup, nil
 }
 
 // Run is a convenience function that calls [Bootstrap] and then [wind.App.Run].
 // It is intended for simple use cases where broker instances are not needed;
 // for more control, use [Bootstrap] or [BootstrapWithContext] directly.
 func Run(ctx context.Context, cfg *v1.BootstrapConfig) error {
-	app, _, _, _, _, _, cleanup, err := Bootstrap(ctx, cfg)
+	app, _, _, _, _, _, _, cleanup, err := Bootstrap(ctx, cfg)
 	if err != nil {
 		return err
 	}
@@ -237,12 +251,12 @@ func BootstrapWithContext(ctx context.Context, cfg *v1.BootstrapConfig) (*Contex
 	}
 	ctx, cancel := signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM)
 
-	app, brokers, storages, aiClients, workflows, caches, cleanup, err := Bootstrap(ctx, cfg)
+	app, brokers, storages, aiClients, workflows, caches, scriptEngines, cleanup, err := Bootstrap(ctx, cfg)
 	if err != nil {
 		cancel()
 		return nil, err
 	}
-	return newContext(cfg, app, brokers, storages, aiClients, workflows, caches, cleanup, cancel), nil
+	return newContext(cfg, app, brokers, storages, aiClients, workflows, caches, scriptEngines, cleanup, cancel), nil
 }
 
 // RunApp is the sealed one-call entry point. It:
@@ -267,7 +281,7 @@ func RunApp(configPath string) error {
 		return fmt.Errorf("bootstrap: %w", err)
 	}
 
-	app, _, _, _, _, _, cleanup, err := Bootstrap(ctx, cfg)
+	app, _, _, _, _, _, _, cleanup, err := Bootstrap(ctx, cfg)
 	if err != nil {
 		return err
 	}

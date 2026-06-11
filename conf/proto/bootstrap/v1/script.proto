@@ -1,0 +1,130 @@
+syntax = "proto3";
+
+package bootstrap.v1;
+
+option go_package = "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1";
+
+// Script 描述脚本引擎配置。
+message Script {
+  // 脚本引擎类型枚举。
+  enum EngineType {
+    ENGINE_TYPE_UNSPECIFIED = 0;
+
+    LUA        = 1;  // Lua (gopher-lua)        — 游戏脚本 / 配置逻辑 / 嵌入式扩展
+    JAVASCRIPT = 2;  // JavaScript (goja)       — 前端复用 / 规则引擎 / 快速原型
+    GPYTHON    = 3;  // Python (gpython)        — 数据处理 / 运维脚本 / 算法验证
+    YAEGI      = 4;  // Go (Yaegi)              — 动态插件 / DevOps 工具链
+    WAZERO     = 5;  // WebAssembly (wazero)    — 高性能沙箱 / 跨语言模块复用
+    CEL        = 6;  // CEL (cel-go)            — 策略引擎 / 权限规则 / 条件判断
+    EXPR       = 7;  // Expr (expr-lang)        — 业务表达式 / 模板引擎 / 数据筛选
+    STARLARK   = 8;  // Starlark (starlark-go)  — 构建工具 / 安全脚本 / Bazel 规则
+    TCL        = 9;  // TCL (modernc/tcl)       — 传统系统兼容 / 网络设备脚本
+  }
+
+  EngineType engine = 1;             // 选择的脚本引擎类型
+  EngineOptions options = 2;         // 引擎配置
+  Source source = 3;                 // 脚本来源配置
+  Pool pool = 4;                     // 池配置
+
+  // 统一的引擎选项 —— 所有引擎共用同一组配置字段。
+  message EngineOptions {
+    bool enabled = 1;                // 是否启用
+    repeated string paths = 2;       // 搜索路径或工作目录列表
+    string entry = 3;                // 入口脚本 key / 文件名
+    repeated string pre_load_scripts = 4; // 预加载脚本列表
+    bool hot_reload = 5;             // 是否启用热加载
+  }
+
+  // 脚本来源配置 —— 决定脚本从哪里加载。
+  message Source {
+    enum Type {
+      TYPE_UNSPECIFIED = 0;
+
+      // 内置来源。
+      FILE   = 1;  // 本地文件系统
+      MEMORY = 2;  // 内存
+      EMBED  = 3;  // go:embed 嵌入
+      MULTI  = 4;  // 多源聚合
+
+      // 扩展来源。
+      S3       = 10;  // Amazon S3 / 兼容对象存储
+      ETCD     = 11;  // etcd KV
+      CONSUL   = 12;  // Consul KV
+      REDIS    = 13;  // Redis
+      HTTP     = 14;  // HTTP 远程拉取
+      GIT      = 15;  // Git 仓库
+      DATABASE = 16;  // SQL 数据库
+    }
+
+    enum MultiStrategy {
+      MULTI_STRATEGY_UNSPECIFIED = 0;
+      FALLBACK  = 1;  // 顺序尝试，首个成功者胜出
+      FIRST_OK  = 2;  // 并发拉取，取最快返回
+    }
+
+    Type type = 1;                            // 来源类型
+    repeated string paths = 2;                // 搜索路径
+    MultiStrategy strategy = 3;               // 聚合策略（仅 MULTI）
+    string cache_ttl = 4;                     // 缓存 TTL（如 "5m"）
+
+    // S3 来源配置。
+    message S3Options {
+      string bucket = 1;
+      string region = 2;
+      string prefix = 3;
+    }
+
+    // ETCD 来源配置。
+    message EtcdOptions {
+      repeated string endpoints = 1;
+      string prefix = 2;
+    }
+
+    // Consul 来源配置。
+    message ConsulOptions {
+      string address = 1;
+      string prefix = 2;
+    }
+
+    // Redis 来源配置。
+    message RedisOptions {
+      string addr = 1;
+      int32 db = 2;
+      string prefix = 3;
+    }
+
+    // HTTP 来源配置。
+    message HttpOptions {
+      string base_url = 1;
+    }
+
+    // Git 来源配置。
+    message GitOptions {
+      string url = 1;
+      string branch = 2;
+      string subdir = 3;
+    }
+
+    // Database 来源配置。
+    message DatabaseOptions {
+      string dsn = 1;
+      string table = 2;
+      string key_column = 3;
+      string content_column = 4;
+    }
+
+    optional S3Options s3_options = 10;
+    optional EtcdOptions etcd_options = 11;
+    optional ConsulOptions consul_options = 12;
+    optional RedisOptions redis_options = 13;
+    optional HttpOptions http_options = 14;
+    optional GitOptions git_options = 15;
+    optional DatabaseOptions database_options = 16;
+  }
+
+  // 池配置：初始实例数与最大实例数。
+  message Pool {
+    int32 initial = 1; // 初始实例数
+    int32 max = 2;     // 最大实例数
+  }
+}

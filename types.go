@@ -139,3 +139,16 @@ const (
 	CacheTypeLocal = "local"
 	CacheTypeRedis = "redis"
 )
+
+// Script Engine type 常量。
+const (
+	ScriptEngineLua        = "lua"
+	ScriptEngineJavaScript = "javascript"
+	ScriptEngineGPython    = "gpython"
+	ScriptEngineYaegi      = "yaegi"
+	ScriptEngineWazero     = "wazero"
+	ScriptEngineCEL        = "cel"
+	ScriptEngineExpr       = "expr"
+	ScriptEngineStarlark   = "starlark"
+	ScriptEngineTcl        = "tcl"
+)

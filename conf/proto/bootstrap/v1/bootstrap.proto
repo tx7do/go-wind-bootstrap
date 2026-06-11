@@ -14,6 +14,7 @@ import "bootstrap/v1/storage.proto";
 import "bootstrap/v1/ai.proto";
 import "bootstrap/v1/workflow.proto";
 import "bootstrap/v1/cache.proto";
+import "bootstrap/v1/script.proto";
 
 option go_package = "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1";
 
@@ -56,4 +57,7 @@ message BootstrapConfig {
 
   // 缓存，支持 Local（内存）/ Redis。
   Cache cache = 12;
+
+  // 脚本引擎，支持 Lua / JavaScript / Python / CEL / Expr 等。
+  Script script = 13;
 }

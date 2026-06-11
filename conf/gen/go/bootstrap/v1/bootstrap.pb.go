@@ -49,7 +49,9 @@ type BootstrapConfig struct {
 	// 工作流引擎，支持 Temporal / Argo / Conductor / GoWorkflows。
 	Workflow *Workflow `protobuf:"bytes,11,opt,name=workflow,proto3" json:"workflow,omitempty"`
 	// 缓存，支持 Local（内存）/ Redis。
-	Cache         *Cache `protobuf:"bytes,12,opt,name=cache,proto3" json:"cache,omitempty"`
+	Cache *Cache `protobuf:"bytes,12,opt,name=cache,proto3" json:"cache,omitempty"`
+	// 脚本引擎，支持 Lua / JavaScript / Python / CEL / Expr 等。
+	Script        *Script `protobuf:"bytes,13,opt,name=script,proto3" json:"script,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -168,11 +170,18 @@ func (x *BootstrapConfig) GetCache() *Cache {
 	return nil
 }
 
+func (x *BootstrapConfig) GetScript() *Script {
+	if x != nil {
+		return x.Script
+	}
+	return nil
+}
+
 var File_bootstrap_v1_bootstrap_proto protoreflect.FileDescriptor
 
 const file_bootstrap_v1_bootstrap_proto_rawDesc = "" +
 	"\n" +
-	"\x1cbootstrap/v1/bootstrap.proto\x12\fbootstrap.v1\x1a\x16bootstrap/v1/app.proto\x1a\x19bootstrap/v1/server.proto\x1a\x19bootstrap/v1/config.proto\x1a\x1bbootstrap/v1/registry.proto\x1a\x16bootstrap/v1/log.proto\x1a\x19bootstrap/v1/tracer.proto\x1a\x1abootstrap/v1/metrics.proto\x1a\x19bootstrap/v1/broker.proto\x1a\x1abootstrap/v1/storage.proto\x1a\x15bootstrap/v1/ai.proto\x1a\x1bbootstrap/v1/workflow.proto\x1a\x18bootstrap/v1/cache.proto\"\xb3\x04\n" +
+	"\x1cbootstrap/v1/bootstrap.proto\x12\fbootstrap.v1\x1a\x16bootstrap/v1/app.proto\x1a\x19bootstrap/v1/server.proto\x1a\x19bootstrap/v1/config.proto\x1a\x1bbootstrap/v1/registry.proto\x1a\x16bootstrap/v1/log.proto\x1a\x19bootstrap/v1/tracer.proto\x1a\x1abootstrap/v1/metrics.proto\x1a\x19bootstrap/v1/broker.proto\x1a\x1abootstrap/v1/storage.proto\x1a\x15bootstrap/v1/ai.proto\x1a\x1bbootstrap/v1/workflow.proto\x1a\x18bootstrap/v1/cache.proto\x1a\x19bootstrap/v1/script.proto\"\xe1\x04\n" +
 	"\x0fBootstrapConfig\x12#\n" +
 	"\x03app\x18\x01 \x01(\v2\x11.bootstrap.v1.AppR\x03app\x12,\n" +
 	"\x06server\x18\x02 \x01(\v2\x14.bootstrap.v1.ServerR\x06server\x12,\n" +
@@ -186,7 +195,8 @@ const file_bootstrap_v1_bootstrap_proto_rawDesc = "" +
 	"\x02ai\x18\n" +
 	" \x01(\v2\x10.bootstrap.v1.AiR\x02ai\x122\n" +
 	"\bworkflow\x18\v \x01(\v2\x16.bootstrap.v1.WorkflowR\bworkflow\x12)\n" +
-	"\x05cache\x18\f \x01(\v2\x13.bootstrap.v1.CacheR\x05cacheB\xbc\x01\n" +
+	"\x05cache\x18\f \x01(\v2\x13.bootstrap.v1.CacheR\x05cache\x12,\n" +
+	"\x06script\x18\r \x01(\v2\x14.bootstrap.v1.ScriptR\x06scriptB\xbc\x01\n" +
 	"\x10com.bootstrap.v1B\x0eBootstrapProtoP\x01ZGgithub.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1;bootstrapv1\xa2\x02\x03BXX\xaa\x02\fBootstrap.V1\xca\x02\fBootstrap\\V1\xe2\x02\x18Bootstrap\\V1\\GPBMetadata\xea\x02\rBootstrap::V1b\x06proto3"
 
 var (
@@ -216,6 +226,7 @@ var file_bootstrap_v1_bootstrap_proto_goTypes = []any{
 	(*Ai)(nil),              // 10: bootstrap.v1.Ai
 	(*Workflow)(nil),        // 11: bootstrap.v1.Workflow
 	(*Cache)(nil),           // 12: bootstrap.v1.Cache
+	(*Script)(nil),          // 13: bootstrap.v1.Script
 }
 var file_bootstrap_v1_bootstrap_proto_depIdxs = []int32{
 	1,  // 0: bootstrap.v1.BootstrapConfig.app:type_name -> bootstrap.v1.App
@@ -230,11 +241,12 @@ var file_bootstrap_v1_bootstrap_proto_depIdxs = []int32{
 	10, // 9: bootstrap.v1.BootstrapConfig.ai:type_name -> bootstrap.v1.Ai
 	11, // 10: bootstrap.v1.BootstrapConfig.workflow:type_name -> bootstrap.v1.Workflow
 	12, // 11: bootstrap.v1.BootstrapConfig.cache:type_name -> bootstrap.v1.Cache
-	12, // [12:12] is the sub-list for method output_type
-	12, // [12:12] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	13, // 12: bootstrap.v1.BootstrapConfig.script:type_name -> bootstrap.v1.Script
+	13, // [13:13] is the sub-list for method output_type
+	13, // [13:13] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_bootstrap_v1_bootstrap_proto_init() }
@@ -254,6 +266,7 @@ func file_bootstrap_v1_bootstrap_proto_init() {
 	file_bootstrap_v1_ai_proto_init()
 	file_bootstrap_v1_workflow_proto_init()
 	file_bootstrap_v1_cache_proto_init()
+	file_bootstrap_v1_script_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

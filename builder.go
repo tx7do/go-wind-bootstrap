@@ -69,21 +69,26 @@ type WorkflowBuilder func(ctx context.Context, cfg *v1.Workflow) (any, func(), e
 // cleanup function.
 type CacheBuilder func(ctx context.Context, cfg *v1.Cache) (any, func(), error)
 
+// ScriptEngineBuilder builds a script engine instance and returns it along with
+// an optional cleanup function.
+type ScriptEngineBuilder func(ctx context.Context, cfg *v1.Script) (any, func(), error)
+
 // ---- Global registries (string keyed) ----
 
 var (
-	mu               sync.RWMutex
-	serverBuilders   = map[string]ServerBuilder{}
-	logBuilders      = map[string]LogBuilder{}
-	registryActions  = map[string]RegistryAction{}
-	configActions    = map[string]ConfigAction{}
-	tracerBuilders   = map[string]TracerBuilder{}
-	metricsBuilders  = map[string]MetricsBuilder{}
-	brokerBuilders   = map[string]BrokerBuilder{}
-	storageBuilders  = map[string]StorageBuilder{}
-	aiBuilders       = map[string]AiBuilder{}
-	workflowBuilders = map[string]WorkflowBuilder{}
-	cacheBuilders    = map[string]CacheBuilder{}
+	mu                   sync.RWMutex
+	serverBuilders       = map[string]ServerBuilder{}
+	logBuilders          = map[string]LogBuilder{}
+	registryActions      = map[string]RegistryAction{}
+	configActions        = map[string]ConfigAction{}
+	tracerBuilders       = map[string]TracerBuilder{}
+	metricsBuilders      = map[string]MetricsBuilder{}
+	brokerBuilders       = map[string]BrokerBuilder{}
+	storageBuilders      = map[string]StorageBuilder{}
+	aiBuilders           = map[string]AiBuilder{}
+	workflowBuilders     = map[string]WorkflowBuilder{}
+	cacheBuilders        = map[string]CacheBuilder{}
+	scriptEngineBuilders = map[string]ScriptEngineBuilder{}
 )
 
 // ---- Register functions ----
@@ -352,6 +357,30 @@ func MustRegisterCacheBuilder(typ string, b CacheBuilder) {
 	}
 }
 
+// RegisterScriptEngineBuilder registers a script engine builder for the given type string.
+func RegisterScriptEngineBuilder(typ string, b ScriptEngineBuilder) error {
+	if typ == "" {
+		return fmt.Errorf("bootstrap: type is empty")
+	}
+	if b == nil {
+		return fmt.Errorf("bootstrap: factory is nil")
+	}
+	mu.Lock()
+	defer mu.Unlock()
+	if _, ok := scriptEngineBuilders[typ]; ok {
+		return fmt.Errorf("bootstrap: script engine builder %q already registered", typ)
+	}
+	scriptEngineBuilders[typ] = b
+	return nil
+}
+
+// MustRegisterScriptEngineBuilder panics on error.
+func MustRegisterScriptEngineBuilder(typ string, b ScriptEngineBuilder) {
+	if err := RegisterScriptEngineBuilder(typ, b); err != nil {
+		panic(err)
+	}
+}
+
 // ---- Lookup helpers ----
 
 func getServerBuilder(typ string) (ServerBuilder, error) {
@@ -460,6 +489,16 @@ func getCacheBuilder(typ string) (CacheBuilder, error) {
 	b, ok := cacheBuilders[typ]
 	if !ok {
 		return nil, fmt.Errorf("bootstrap: no cache builder registered for %q", typ)
+	}
+	return b, nil
+}
+
+func getScriptEngineBuilder(typ string) (ScriptEngineBuilder, error) {
+	mu.RLock()
+	defer mu.RUnlock()
+	b, ok := scriptEngineBuilders[typ]
+	if !ok {
+		return nil, fmt.Errorf("bootstrap: no script engine builder registered for %q", typ)
 	}
 	return b, nil
 }
@@ -592,6 +631,18 @@ func ListCacheBuilders() []string {
 	defer mu.RUnlock()
 	names := make([]string, 0, len(cacheBuilders))
 	for k := range cacheBuilders {
+		names = append(names, k)
+	}
+	sort.Strings(names)
+	return names
+}
+
+// ListScriptEngineBuilders returns all registered script engine type names.
+func ListScriptEngineBuilders() []string {
+	mu.RLock()
+	defer mu.RUnlock()
+	names := make([]string, 0, len(scriptEngineBuilders))
+	for k := range scriptEngineBuilders {
 		names = append(names, k)
 	}
 	sort.Strings(names)
