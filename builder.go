@@ -37,8 +37,13 @@ type TracerBuilder func(cfg *v1.Tracer) (interface{}, func(), error)
 // MetricsBuilder builds a metrics backend.
 type MetricsBuilder func(cfg *v1.Metrics) (func(), error)
 
-// BrokerBuilder builds a broker instance.
-type BrokerBuilder func(ctx context.Context, cfg *v1.Broker) (func(), error)
+// BrokerBuilder builds a broker instance and returns it along with an optional
+// cleanup function. The returned instance (any) is the concrete broker object
+// that callers can use for Publish/Subscribe operations.
+//
+// The type key (e.g. "kafka", "rabbitmq") is used to look up the instance
+// via [Context.Broker] after bootstrap.
+type BrokerBuilder func(ctx context.Context, cfg *v1.Broker) (any, func(), error)
 
 // ---- Global registries (string keyed) ----
 

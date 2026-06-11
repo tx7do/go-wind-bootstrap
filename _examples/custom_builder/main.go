@@ -63,12 +63,17 @@ func main() {
 	)
 
 	// --- 5. Bootstrap ---
-	app, cleanup, err := bootstrap.Bootstrap(ctx, cfg)
+	app, brokers, cleanup, err := bootstrap.Bootstrap(ctx, cfg)
 	if err != nil {
 		slog.Error("bootstrap failed", "error", err)
 		os.Exit(1)
 	}
 	defer cleanup()
+
+	// --- 5b. 获取 broker 实例 ---
+	if b := brokers[bootstrap.BrokerTypeKafka]; b != nil {
+		slog.Info("got kafka broker instance", "broker", b)
+	}
 
 	slog.Info("application started", "id", cfg.GetApp().GetId())
 
@@ -108,10 +113,11 @@ func newPrometheusMetrics(cfg *bootstrapV1.Metrics) (func(), error) {
 	return func() { slog.Info("Prometheus metrics cleaned up") }, nil
 }
 
-func newKafkaBroker(ctx context.Context, cfg *bootstrapV1.Broker) (func(), error) {
+func newKafkaBroker(ctx context.Context, cfg *bootstrapV1.Broker) (any, func(), error) {
 	kafkaCfg := cfg.GetKafka()
 	slog.Info("building Kafka broker", "brokers", kafkaCfg.GetBrokers(), "group_id", kafkaCfg.GetGroupId())
-	return func() { slog.Info("Kafka broker cleaned up") }, nil
+	// 这里返回一个 stub broker 实例。实际使用中应返回真实的 broker 对象。
+	return struct{ Name string }{Name: "kafka-stub"}, func() { slog.Info("Kafka broker cleaned up") }, nil
 }
 
 var (

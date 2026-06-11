@@ -9,7 +9,7 @@ import (
 	v1 "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1"
 )
 
-// Context holds the application lifecycle state created by [Bootstrap] or [RunApp].
+// Context holds the application lifecycle state created by [Bootstrap] or [BootstrapWithContext].
 //
 // It is safe to read fields from multiple goroutines after Bootstrap returns.
 type Context struct {
@@ -17,15 +17,18 @@ type Context struct {
 	app    *wind.App
 	cancel context.CancelFunc
 
+	brokers map[string]any
+
 	cleanupOnce sync.Once
 	cleanup     func()
 }
 
 // newContext creates a Context from the Bootstrap results.
-func newContext(cfg *v1.BootstrapConfig, app *wind.App, cleanup func(), cancel context.CancelFunc) *Context {
+func newContext(cfg *v1.BootstrapConfig, app *wind.App, brokers map[string]any, cleanup func(), cancel context.CancelFunc) *Context {
 	return &Context{
 		cfg:     cfg,
 		app:     app,
+		brokers: brokers,
 		cleanup: cleanup,
 		cancel:  cancel,
 	}
@@ -54,4 +57,29 @@ func (c *Context) Cleanup() {
 			c.cleanup()
 		}
 	})
+}
+
+// Broker returns the broker instance for the given type name (e.g.
+// [BrokerTypeKafka], [BrokerTypeRabbitMQ]).
+// Returns nil if no broker with that name was configured.
+//
+// The caller should type-assert the result to the concrete broker type:
+//
+//	if b, ok := ctx.Broker(bootstrap.BrokerTypeKafka).(*kafka.Broker); ok {
+//	    b.Publish(ctx, msg)
+//	}
+func (c *Context) Broker(name string) any {
+	if c == nil || c.brokers == nil {
+		return nil
+	}
+	return c.brokers[name]
+}
+
+// Brokers returns all broker instances as a map keyed by type name.
+// Returns nil if no broker was configured.
+func (c *Context) Brokers() map[string]any {
+	if c == nil {
+		return nil
+	}
+	return c.brokers
 }
