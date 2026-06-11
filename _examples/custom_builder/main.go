@@ -63,7 +63,7 @@ func main() {
 	)
 
 	// --- 5. Bootstrap ---
-	app, brokers, cleanup, err := bootstrap.Bootstrap(ctx, cfg)
+	app, brokers, _, _, _, _, _, _, cleanup, err := bootstrap.Bootstrap(ctx, cfg)
 	if err != nil {
 		slog.Error("bootstrap failed", "error", err)
 		os.Exit(1)
@@ -96,7 +96,7 @@ func registerCustomBuilders() {
 // Stub Builders（需要外部服务，仅打印配置）
 // ---------------------------------------------------------------------------
 
-func newConsulRegistry(ctx context.Context, appCfg *bootstrapV1.App, endpoints []string) (func(), error) {
+func newConsulRegistry(ctx context.Context, appCfg *bootstrapV1.App, endpoints []string, cfg *bootstrapV1.Registry) (func(), error) {
 	slog.Info("building Consul registry", "app_id", appCfg.GetId(), "app_name", appCfg.GetName())
 	return func() { slog.Info("Consul registry cleaned up") }, nil
 }
@@ -122,5 +122,5 @@ func newKafkaBroker(ctx context.Context, cfg *bootstrapV1.Broker) (any, func(), 
 
 var (
 	_ wind.Option
-	_ = grpcAdapter.SetServiceRegistrar
+	_ = grpcAdapter.RegisterServiceRegistrar
 )

@@ -22,7 +22,7 @@ require (
 	github.com/tx7do/go-crud/api v0.0.7 // indirect
 	github.com/tx7do/go-crud/cache v0.0.1 // indirect
 	github.com/tx7do/go-crud/pagination v0.0.14 // indirect
-	github.com/tx7do/go-utils v1.1.39 // indirect
+	github.com/tx7do/go-utils v1.1.40 // indirect
 	github.com/tx7do/go-utils/mapper v0.0.3 // indirect
 	go.einride.tech/aip v0.86.3 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
