@@ -23,13 +23,14 @@ type Context struct {
 	workflows     map[string]any
 	caches        map[string]any
 	scriptEngines map[string]any
+	databases     map[string]any
 
 	cleanupOnce sync.Once
 	cleanup     func()
 }
 
 // newContext creates a Context from the Bootstrap results.
-func newContext(cfg *v1.BootstrapConfig, app *wind.App, brokers map[string]any, storages map[string]any, aiClients map[string]any, workflows map[string]any, caches map[string]any, scriptEngines map[string]any, cleanup func(), cancel context.CancelFunc) *Context {
+func newContext(cfg *v1.BootstrapConfig, app *wind.App, brokers map[string]any, storages map[string]any, aiClients map[string]any, workflows map[string]any, caches map[string]any, scriptEngines map[string]any, databases map[string]any, cleanup func(), cancel context.CancelFunc) *Context {
 	return &Context{
 		cfg:           cfg,
 		app:           app,
@@ -39,6 +40,7 @@ func newContext(cfg *v1.BootstrapConfig, app *wind.App, brokers map[string]any, 
 		workflows:     workflows,
 		caches:        caches,
 		scriptEngines: scriptEngines,
+		databases:     databases,
 		cleanup:       cleanup,
 		cancel:        cancel,
 	}
@@ -212,4 +214,23 @@ func (c *Context) ScriptEngines() map[string]any {
 		return nil
 	}
 	return c.scriptEngines
+}
+
+// Database returns the database client instance for the given type name (e.g.
+// [DatabaseTypeGorm], [DatabaseTypeMongodb]).
+// Returns nil if no database client with that name was configured.
+func (c *Context) Database(name string) any {
+	if c == nil || c.databases == nil {
+		return nil
+	}
+	return c.databases[name]
+}
+
+// Databases returns all database client instances as a map keyed by type name.
+// Returns nil if no database was configured.
+func (c *Context) Databases() map[string]any {
+	if c == nil {
+		return nil
+	}
+	return c.databases
 }

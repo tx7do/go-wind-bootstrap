@@ -152,3 +152,15 @@ const (
 	ScriptEngineStarlark   = "starlark"
 	ScriptEngineTcl        = "tcl"
 )
+
+// Database type 常量，用于注册 DatabaseBuilder 时的 key。
+const (
+	DatabaseTypeGorm          = "gorm"
+	DatabaseTypeMongodb       = "mongodb"
+	DatabaseTypeClickhouse    = "clickhouse"
+	DatabaseTypeDoris         = "doris"
+	DatabaseTypeElasticsearch = "elasticsearch"
+	DatabaseTypeOpensearch    = "opensearch"
+	DatabaseTypeInfluxdb      = "influxdb"
+	DatabaseTypeCassandra     = "cassandra"
+)

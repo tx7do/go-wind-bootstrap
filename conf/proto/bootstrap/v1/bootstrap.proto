@@ -15,6 +15,7 @@ import "bootstrap/v1/ai.proto";
 import "bootstrap/v1/workflow.proto";
 import "bootstrap/v1/cache.proto";
 import "bootstrap/v1/script.proto";
+import "bootstrap/v1/database.proto";
 
 option go_package = "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1";
 
@@ -60,4 +61,7 @@ message BootstrapConfig {
 
   // 脚本引擎，支持 Lua / JavaScript / Python / CEL / Expr 等。
   Script script = 13;
+
+  // 数据库，支持 GORM / MongoDB / ClickHouse / Doris / ES / OpenSearch / InfluxDB / Cassandra。
+  Database database = 14;
 }

@@ -1,0 +1,128 @@
+syntax = "proto3";
+
+package bootstrap.v1;
+
+option go_package = "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1";
+
+// Database 描述数据库配置，支持通过 optional 字段同时配置多种数据库。
+message Database {
+  // 通用 SQL 数据库配置（GORM / Ent 共用）。
+  message SQL {
+    string driver = 1;              // 驱动名（mysql / postgres / sqlite / sqlserver）
+    string source = 2;              // DSN 连接串
+    bool migrate = 3;               // 是否自动迁移
+    bool enable_trace = 4;          // 是否启用链路追踪
+    bool enable_metrics = 5;        // 是否启用指标监控
+    int32 max_idle_connections = 6;  // 最大空闲连接数
+    int32 max_open_connections = 7;  // 最大打开连接数
+    int32 connection_max_lifetime_seconds = 8; // 连接最大生命周期（秒）
+  }
+
+  // MongoDB 配置。
+  message MongoDB {
+    string uri = 1;                 // 连接 URI
+    string database = 2;            // 数据库名
+    string username = 3;            // 用户名
+    string password = 4;            // 密码
+    int32 timeout_seconds = 5;               // 操作超时（秒）
+    int32 connect_timeout_seconds = 6;       // 连接超时（秒）
+    int32 server_selection_timeout_seconds = 7; // 服务器选择超时（秒）
+    int32 heartbeat_interval_seconds = 8;    // 心跳间隔（秒）
+    int32 max_conn_idle_time_seconds = 9;    // 最大空闲时间（秒）
+  }
+
+  // ClickHouse 配置。
+  message ClickHouse {
+    string dsn = 1;                 // DSN 连接串
+    repeated string addresses = 2;  // 地址列表
+    string database = 3;            // 数据库名
+    string username = 4;            // 用户名
+    string password = 5;            // 密码
+    bool debug = 6;                 // 调试模式
+    int32 max_open_conns = 7;       // 最大打开连接数
+    int32 max_idle_conns = 8;       // 最大空闲连接数
+    string compression_method = 9;  // 压缩方法
+    int32 dial_timeout_seconds = 10;       // 拨号超时（秒）
+    int32 read_timeout_seconds = 11;       // 读取超时（秒）
+    int32 conn_max_lifetime_seconds = 12;  // 连接最大生命周期（秒）
+    string scheme = 13;             // 协议（http / https）
+  }
+
+  // Doris 配置。
+  message Doris {
+    string dsn = 1;                 // DSN 连接串
+    int32 max_idle_connections = 2;  // 最大空闲连接数
+    int32 max_open_connections = 3;  // 最大打开连接数
+    int32 connection_max_lifetime_seconds = 4; // 连接最大生命周期（秒）
+    // Stream Load 配置。
+    string stream_load_endpoint = 5;
+    string stream_load_username = 6;
+    string stream_load_password = 7;
+    int32 stream_load_timeout_seconds = 8;
+    string stream_load_method = 9;
+  }
+
+  // Elasticsearch 配置。
+  message Elasticsearch {
+    repeated string addresses = 1;  // 地址列表
+    string username = 2;            // 用户名
+    string password = 3;            // 密码
+    string cloud_id = 4;            // Elastic Cloud ID
+    string api_key = 5;             // API Key
+    string service_token = 6;       // Service Token
+    string certificate_fingerprint = 7; // 证书指纹
+    bool enable_metrics = 8;        // 启用指标
+    bool enable_debug_logger = 9;   // 启用调试日志
+    int32 max_retries = 10;         // 最大重试次数
+    bool compress_request_body = 11; // 压缩请求体
+    bool discover_nodes_on_start = 12; // 启动时发现节点
+    int32 discover_nodes_interval_seconds = 13; // 节点发现间隔（秒）
+  }
+
+  // OpenSearch 配置。
+  message OpenSearch {
+    repeated string addresses = 1;  // 地址列表
+    string username = 2;            // 用户名
+    string password = 3;            // 密码
+    bool enable_metrics = 4;        // 启用指标
+    bool enable_debug_logger = 5;   // 启用调试日志
+    int32 max_retries = 6;          // 最大重试次数
+    bool compress_request_body = 7; // 压缩请求体
+    bool discover_nodes_on_start = 8; // 启动时发现节点
+    int32 discover_nodes_interval_seconds = 9; // 节点发现间隔（秒）
+  }
+
+  // InfluxDB 配置。
+  message InfluxDB {
+    string host = 1;                // 主机地址
+    string token = 2;               // 认证 Token
+    string database = 3;            // 数据库名（Bucket）
+    string organization = 4;        // 组织
+    string auth_scheme = 5;         // 认证方案
+    int32 write_timeout_seconds = 6;        // 写入超时（秒）
+    int32 query_timeout_seconds = 7;        // 查询超时（秒）
+    int32 max_idle_connections = 8;          // 最大空闲连接数
+    int32 idle_connection_timeout_seconds = 9; // 空闲连接超时（秒）
+  }
+
+  // Cassandra 配置。
+  message Cassandra {
+    string address = 1;             // 地址
+    string username = 2;            // 用户名
+    string password = 3;            // 密码
+    string keyspace = 4;            // 键空间
+    int32 consistency = 5;          // 一致性级别
+    int32 connect_timeout_seconds = 6;      // 连接超时（秒）
+    int32 timeout_seconds = 7;              // 操作超时（秒）
+    bool disable_initial_host_lookup = 8;   // 禁止主机查找
+  }
+
+  optional SQL sql = 1;
+  optional MongoDB mongodb = 2;
+  optional ClickHouse clickhouse = 3;
+  optional Doris doris = 4;
+  optional Elasticsearch elasticsearch = 5;
+  optional OpenSearch opensearch = 6;
+  optional InfluxDB influxdb = 7;
+  optional Cassandra cassandra = 8;
+}

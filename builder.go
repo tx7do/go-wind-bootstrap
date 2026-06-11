@@ -73,6 +73,10 @@ type CacheBuilder func(ctx context.Context, cfg *v1.Cache) (any, func(), error)
 // an optional cleanup function.
 type ScriptEngineBuilder func(ctx context.Context, cfg *v1.Script) (any, func(), error)
 
+// DatabaseBuilder builds a database client instance and returns it along with
+// an optional cleanup function.
+type DatabaseBuilder func(ctx context.Context, cfg *v1.Database) (any, func(), error)
+
 // ---- Global registries (string keyed) ----
 
 var (
@@ -89,6 +93,7 @@ var (
 	workflowBuilders     = map[string]WorkflowBuilder{}
 	cacheBuilders        = map[string]CacheBuilder{}
 	scriptEngineBuilders = map[string]ScriptEngineBuilder{}
+	databaseBuilders     = map[string]DatabaseBuilder{}
 )
 
 // ---- Register functions ----
@@ -381,6 +386,30 @@ func MustRegisterScriptEngineBuilder(typ string, b ScriptEngineBuilder) {
 	}
 }
 
+// RegisterDatabaseBuilder registers a database builder for the given type string.
+func RegisterDatabaseBuilder(typ string, b DatabaseBuilder) error {
+	if typ == "" {
+		return fmt.Errorf("bootstrap: type is empty")
+	}
+	if b == nil {
+		return fmt.Errorf("bootstrap: factory is nil")
+	}
+	mu.Lock()
+	defer mu.Unlock()
+	if _, ok := databaseBuilders[typ]; ok {
+		return fmt.Errorf("bootstrap: database builder %q already registered", typ)
+	}
+	databaseBuilders[typ] = b
+	return nil
+}
+
+// MustRegisterDatabaseBuilder panics on error.
+func MustRegisterDatabaseBuilder(typ string, b DatabaseBuilder) {
+	if err := RegisterDatabaseBuilder(typ, b); err != nil {
+		panic(err)
+	}
+}
+
 // ---- Lookup helpers ----
 
 func getServerBuilder(typ string) (ServerBuilder, error) {
@@ -499,6 +528,16 @@ func getScriptEngineBuilder(typ string) (ScriptEngineBuilder, error) {
 	b, ok := scriptEngineBuilders[typ]
 	if !ok {
 		return nil, fmt.Errorf("bootstrap: no script engine builder registered for %q", typ)
+	}
+	return b, nil
+}
+
+func getDatabaseBuilder(typ string) (DatabaseBuilder, error) {
+	mu.RLock()
+	defer mu.RUnlock()
+	b, ok := databaseBuilders[typ]
+	if !ok {
+		return nil, fmt.Errorf("bootstrap: no database builder registered for %q", typ)
 	}
 	return b, nil
 }
@@ -643,6 +682,18 @@ func ListScriptEngineBuilders() []string {
 	defer mu.RUnlock()
 	names := make([]string, 0, len(scriptEngineBuilders))
 	for k := range scriptEngineBuilders {
+		names = append(names, k)
+	}
+	sort.Strings(names)
+	return names
+}
+
+// ListDatabaseBuilders returns all registered database type names.
+func ListDatabaseBuilders() []string {
+	mu.RLock()
+	defer mu.RUnlock()
+	names := make([]string, 0, len(databaseBuilders))
+	for k := range databaseBuilders {
 		names = append(names, k)
 	}
 	sort.Strings(names)

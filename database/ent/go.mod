@@ -1,0 +1,43 @@
+module github.com/tx7do/go-wind-bootstrap/database/ent
+
+go 1.26.3
+
+require (
+	entgo.io/ent v0.14.6
+	github.com/tx7do/go-crud/entgo v0.0.51
+	github.com/tx7do/go-wind-bootstrap/conf v0.0.0
+)
+
+require (
+	github.com/XSAM/otelsql v0.42.0 // indirect
+	github.com/cespare/xxhash/v2 v2.3.0 // indirect
+	github.com/go-kratos/kratos/v2 v2.9.2 // indirect
+	github.com/go-logr/logr v1.4.3 // indirect
+	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/google/gnostic v0.7.1 // indirect
+	github.com/google/gnostic-models v0.7.1 // indirect
+	github.com/google/uuid v1.6.0 // indirect
+	github.com/jinzhu/copier v0.4.0 // indirect
+	github.com/redis/go-redis/v9 v9.19.0 // indirect
+	github.com/tx7do/go-crud/api v0.0.7 // indirect
+	github.com/tx7do/go-crud/cache v0.0.1 // indirect
+	github.com/tx7do/go-crud/pagination v0.0.14 // indirect
+	github.com/tx7do/go-utils v1.1.39 // indirect
+	github.com/tx7do/go-utils/mapper v0.0.3 // indirect
+	go.einride.tech/aip v0.86.3 // indirect
+	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
+	go.opentelemetry.io/otel v1.43.0 // indirect
+	go.opentelemetry.io/otel/metric v1.43.0 // indirect
+	go.opentelemetry.io/otel/trace v1.43.0 // indirect
+	go.uber.org/atomic v1.11.0 // indirect
+	go.yaml.in/yaml/v3 v3.0.4 // indirect
+	golang.org/x/sync v0.20.0 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20260519071638-aa98bba5eb94 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260519071638-aa98bba5eb94 // indirect
+	google.golang.org/protobuf v1.36.11 // indirect
+)
+
+replace (
+	github.com/tx7do/go-wind-bootstrap => ../..
+	github.com/tx7do/go-wind-bootstrap/conf => ../../conf
+)
