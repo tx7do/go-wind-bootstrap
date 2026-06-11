@@ -49,6 +49,14 @@ type MetricsBuilder func(cfg *v1.Metrics) (func(), error)
 // via [Context.Broker] after bootstrap.
 type BrokerBuilder func(ctx context.Context, cfg *v1.Broker) (any, func(), error)
 
+// StorageBuilder builds a storage client instance and returns it along with an
+// optional cleanup function. The returned instance (any) is the concrete
+// storage client that callers can use for object operations.
+//
+// The type key (e.g. "minio", "s3") is used to look up the instance
+// via [Context.Storage] after bootstrap.
+type StorageBuilder func(ctx context.Context, cfg *v1.Storage) (any, func(), error)
+
 // ---- Global registries (string keyed) ----
 
 var (
@@ -60,6 +68,7 @@ var (
 	tracerBuilders  = map[string]TracerBuilder{}
 	metricsBuilders = map[string]MetricsBuilder{}
 	brokerBuilders  = map[string]BrokerBuilder{}
+	storageBuilders = map[string]StorageBuilder{}
 )
 
 // ---- Register functions ----
@@ -232,6 +241,30 @@ func MustRegisterBrokerBuilder(typ string, b BrokerBuilder) {
 	}
 }
 
+// RegisterStorageBuilder registers a storage builder for the given type string.
+func RegisterStorageBuilder(typ string, b StorageBuilder) error {
+	if typ == "" {
+		return fmt.Errorf("bootstrap: type is empty")
+	}
+	if b == nil {
+		return fmt.Errorf("bootstrap: factory is nil")
+	}
+	mu.Lock()
+	defer mu.Unlock()
+	if _, ok := storageBuilders[typ]; ok {
+		return fmt.Errorf("bootstrap: storage builder %q already registered", typ)
+	}
+	storageBuilders[typ] = b
+	return nil
+}
+
+// MustRegisterStorageBuilder panics on error.
+func MustRegisterStorageBuilder(typ string, b StorageBuilder) {
+	if err := RegisterStorageBuilder(typ, b); err != nil {
+		panic(err)
+	}
+}
+
 // ---- Lookup helpers ----
 
 func getServerBuilder(typ string) (ServerBuilder, error) {
@@ -300,6 +333,16 @@ func getBrokerBuilder(typ string) (BrokerBuilder, error) {
 	b, ok := brokerBuilders[typ]
 	if !ok {
 		return nil, fmt.Errorf("bootstrap: no broker builder registered for %q", typ)
+	}
+	return b, nil
+}
+
+func getStorageBuilder(typ string) (StorageBuilder, error) {
+	mu.RLock()
+	defer mu.RUnlock()
+	b, ok := storageBuilders[typ]
+	if !ok {
+		return nil, fmt.Errorf("bootstrap: no storage builder registered for %q", typ)
 	}
 	return b, nil
 }
@@ -384,6 +427,18 @@ func ListBrokerBuilders() []string {
 	defer mu.RUnlock()
 	names := make([]string, 0, len(brokerBuilders))
 	for k := range brokerBuilders {
+		names = append(names, k)
+	}
+	sort.Strings(names)
+	return names
+}
+
+// ListStorageBuilders returns all registered storage type names.
+func ListStorageBuilders() []string {
+	mu.RLock()
+	defer mu.RUnlock()
+	names := make([]string, 0, len(storageBuilders))
+	for k := range storageBuilders {
 		names = append(names, k)
 	}
 	sort.Strings(names)

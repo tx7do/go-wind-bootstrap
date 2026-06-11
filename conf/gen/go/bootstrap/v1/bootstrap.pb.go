@@ -41,7 +41,9 @@ type BootstrapConfig struct {
 	// 指标监控。
 	Metrics *Metrics `protobuf:"bytes,7,opt,name=metrics,proto3" json:"metrics,omitempty"`
 	// 消息代理，支持通过 optional 字段同时配置多种消息中间件。
-	Broker        *Broker `protobuf:"bytes,8,opt,name=broker,proto3" json:"broker,omitempty"`
+	Broker *Broker `protobuf:"bytes,8,opt,name=broker,proto3" json:"broker,omitempty"`
+	// 对象存储，支持 MinIO / S3。
+	Storage       *Storage `protobuf:"bytes,9,opt,name=storage,proto3" json:"storage,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -132,11 +134,18 @@ func (x *BootstrapConfig) GetBroker() *Broker {
 	return nil
 }
 
+func (x *BootstrapConfig) GetStorage() *Storage {
+	if x != nil {
+		return x.Storage
+	}
+	return nil
+}
+
 var File_bootstrap_v1_bootstrap_proto protoreflect.FileDescriptor
 
 const file_bootstrap_v1_bootstrap_proto_rawDesc = "" +
 	"\n" +
-	"\x1cbootstrap/v1/bootstrap.proto\x12\fbootstrap.v1\x1a\x16bootstrap/v1/app.proto\x1a\x19bootstrap/v1/server.proto\x1a\x19bootstrap/v1/config.proto\x1a\x1bbootstrap/v1/registry.proto\x1a\x16bootstrap/v1/log.proto\x1a\x19bootstrap/v1/tracer.proto\x1a\x1abootstrap/v1/metrics.proto\x1a\x19bootstrap/v1/broker.proto\"\x81\x03\n" +
+	"\x1cbootstrap/v1/bootstrap.proto\x12\fbootstrap.v1\x1a\x16bootstrap/v1/app.proto\x1a\x19bootstrap/v1/server.proto\x1a\x19bootstrap/v1/config.proto\x1a\x1bbootstrap/v1/registry.proto\x1a\x16bootstrap/v1/log.proto\x1a\x19bootstrap/v1/tracer.proto\x1a\x1abootstrap/v1/metrics.proto\x1a\x19bootstrap/v1/broker.proto\x1a\x1abootstrap/v1/storage.proto\"\xb2\x03\n" +
 	"\x0fBootstrapConfig\x12#\n" +
 	"\x03app\x18\x01 \x01(\v2\x11.bootstrap.v1.AppR\x03app\x12,\n" +
 	"\x06server\x18\x02 \x01(\v2\x14.bootstrap.v1.ServerR\x06server\x12,\n" +
@@ -145,7 +154,8 @@ const file_bootstrap_v1_bootstrap_proto_rawDesc = "" +
 	"\x06logger\x18\x05 \x01(\v2\x14.bootstrap.v1.LoggerR\x06logger\x12,\n" +
 	"\x06tracer\x18\x06 \x01(\v2\x14.bootstrap.v1.TracerR\x06tracer\x12/\n" +
 	"\ametrics\x18\a \x01(\v2\x15.bootstrap.v1.MetricsR\ametrics\x12,\n" +
-	"\x06broker\x18\b \x01(\v2\x14.bootstrap.v1.BrokerR\x06brokerB\xbc\x01\n" +
+	"\x06broker\x18\b \x01(\v2\x14.bootstrap.v1.BrokerR\x06broker\x12/\n" +
+	"\astorage\x18\t \x01(\v2\x15.bootstrap.v1.StorageR\astorageB\xbc\x01\n" +
 	"\x10com.bootstrap.v1B\x0eBootstrapProtoP\x01ZGgithub.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1;bootstrapv1\xa2\x02\x03BXX\xaa\x02\fBootstrap.V1\xca\x02\fBootstrap\\V1\xe2\x02\x18Bootstrap\\V1\\GPBMetadata\xea\x02\rBootstrap::V1b\x06proto3"
 
 var (
@@ -171,6 +181,7 @@ var file_bootstrap_v1_bootstrap_proto_goTypes = []any{
 	(*Tracer)(nil),          // 6: bootstrap.v1.Tracer
 	(*Metrics)(nil),         // 7: bootstrap.v1.Metrics
 	(*Broker)(nil),          // 8: bootstrap.v1.Broker
+	(*Storage)(nil),         // 9: bootstrap.v1.Storage
 }
 var file_bootstrap_v1_bootstrap_proto_depIdxs = []int32{
 	1, // 0: bootstrap.v1.BootstrapConfig.app:type_name -> bootstrap.v1.App
@@ -181,11 +192,12 @@ var file_bootstrap_v1_bootstrap_proto_depIdxs = []int32{
 	6, // 5: bootstrap.v1.BootstrapConfig.tracer:type_name -> bootstrap.v1.Tracer
 	7, // 6: bootstrap.v1.BootstrapConfig.metrics:type_name -> bootstrap.v1.Metrics
 	8, // 7: bootstrap.v1.BootstrapConfig.broker:type_name -> bootstrap.v1.Broker
-	8, // [8:8] is the sub-list for method output_type
-	8, // [8:8] is the sub-list for method input_type
-	8, // [8:8] is the sub-list for extension type_name
-	8, // [8:8] is the sub-list for extension extendee
-	0, // [0:8] is the sub-list for field type_name
+	9, // 8: bootstrap.v1.BootstrapConfig.storage:type_name -> bootstrap.v1.Storage
+	9, // [9:9] is the sub-list for method output_type
+	9, // [9:9] is the sub-list for method input_type
+	9, // [9:9] is the sub-list for extension type_name
+	9, // [9:9] is the sub-list for extension extendee
+	0, // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_bootstrap_v1_bootstrap_proto_init() }
@@ -201,6 +213,7 @@ func file_bootstrap_v1_bootstrap_proto_init() {
 	file_bootstrap_v1_tracer_proto_init()
 	file_bootstrap_v1_metrics_proto_init()
 	file_bootstrap_v1_broker_proto_init()
+	file_bootstrap_v1_storage_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

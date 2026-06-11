@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package bootstrap.v1;
+
+option go_package = "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1";
+
+// Storage 描述对象存储配置。
+message Storage {
+  // MinIO 对象存储。
+  message Minio {
+    // 服务端点，如 "play.min.io:9000"。
+    string endpoint = 1;
+    // 访问密钥 ID。
+    string access_key = 2;
+    // 访问密钥。
+    string secret_key = 3;
+    // 安全令牌（可选）。
+    string token = 4;
+    // 是否使用 SSL。
+    bool use_ssl = 5;
+  }
+
+  // S3 兼容对象存储（AWS S3 / Ceph / MinIO 等）。
+  message S3 {
+    // 自定义端点（留空则使用 AWS 默认端点）。
+    string endpoint = 1;
+    // AWS 区域，默认 us-east-1。
+    string region = 2;
+    // 访问密钥 ID。
+    string access_key = 3;
+    // 访问密钥。
+    string secret_key = 4;
+    // 安全令牌（可选）。
+    string token = 5;
+    // 是否使用 SSL。
+    bool use_ssl = 6;
+    // 是否强制路径风格访问。
+    bool force_path_style = 7;
+    // 默认存储桶。
+    string bucket = 8;
+  }
+
+  optional Minio minio = 1;
+  optional S3 s3 = 2;
+}

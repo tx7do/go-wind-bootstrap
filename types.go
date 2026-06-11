@@ -112,3 +112,9 @@ const (
 	BrokerTypeSTOMP    = "stomp"
 	BrokerTypeActiveMQ = "activemq"
 )
+
+// Storage type 常量，用于注册 StorageBuilder 时的 key。
+const (
+	StorageTypeMinio = "minio"
+	StorageTypeS3    = "s3"
+)

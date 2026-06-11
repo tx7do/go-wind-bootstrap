@@ -10,6 +10,7 @@ import "bootstrap/v1/log.proto";
 import "bootstrap/v1/tracer.proto";
 import "bootstrap/v1/metrics.proto";
 import "bootstrap/v1/broker.proto";
+import "bootstrap/v1/storage.proto";
 
 option go_package = "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1";
 
@@ -40,4 +41,7 @@ message BootstrapConfig {
 
   // 消息代理，支持通过 optional 字段同时配置多种消息中间件。
   Broker broker = 8;
+
+  // 对象存储，支持 MinIO / S3。
+  Storage storage = 9;
 }
