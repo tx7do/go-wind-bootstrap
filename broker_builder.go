@@ -102,6 +102,13 @@ func resolveBroker(ctx context.Context, cfg *v1.Broker) (map[string]any, func(),
 		}
 		fields = append(fields, field{name: BrokerTypeSTOMP, builder: b})
 	}
+	if cfg.GetActivemq() != nil {
+		b, err := getBrokerBuilder(BrokerTypeActiveMQ)
+		if err != nil {
+			return nil, nil, err
+		}
+		fields = append(fields, field{name: BrokerTypeActiveMQ, builder: b})
+	}
 
 	if len(fields) == 0 {
 		return nil, nil, fmt.Errorf("bootstrap: no broker specified")

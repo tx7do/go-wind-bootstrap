@@ -127,6 +127,14 @@ message Broker {
     string vhost = 4;
   }
 
+  // Apache ActiveMQ 消息代理（基于 STOMP 协议）。
+  message Activemq {
+    // 连接地址，如 stomp://127.0.0.1:61613。
+    string address = 1;
+    string username = 2;
+    string password = 3;
+  }
+
   optional Kafka kafka = 1;
   optional RabbitMQ rabbitmq = 2;
   optional Redis redis = 3;
@@ -139,4 +147,5 @@ message Broker {
   optional Rocketmq rocketmq = 10;
   optional Sqs sqs = 11;
   optional Stomp stomp = 12;
+  optional Activemq activemq = 13;
 }

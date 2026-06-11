@@ -14,6 +14,14 @@ const (
 	ServerTypeThrift       = "thrift"
 	ServerTypeTRPC         = "trpc"
 	ServerTypeWebTransport = "webtransport"
+	ServerTypeCron         = "cron"
+	ServerTypeHPTimer      = "hptimer"
+	ServerTypeMCP          = "mcp"
+	ServerTypeSignalR      = "signalr"
+	ServerTypeSocketIO     = "socketio"
+	ServerTypeWebRTC       = "webrtc"
+	ServerTypeAsynq        = "asynq"
+	ServerTypeMachinery    = "machinery"
 )
 
 // Config type 常量，用于注册 ConfigAction 时的 key。
@@ -89,4 +97,5 @@ const (
 	BrokerTypeRocketMQ = "rocketmq"
 	BrokerTypeSQS      = "sqs"
 	BrokerTypeSTOMP    = "stomp"
+	BrokerTypeActiveMQ = "activemq"
 )

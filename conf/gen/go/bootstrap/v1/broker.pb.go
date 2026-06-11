@@ -37,6 +37,7 @@ type Broker struct {
 	Rocketmq      *Broker_Rocketmq       `protobuf:"bytes,10,opt,name=rocketmq,proto3,oneof" json:"rocketmq,omitempty"`
 	Sqs           *Broker_Sqs            `protobuf:"bytes,11,opt,name=sqs,proto3,oneof" json:"sqs,omitempty"`
 	Stomp         *Broker_Stomp          `protobuf:"bytes,12,opt,name=stomp,proto3,oneof" json:"stomp,omitempty"`
+	Activemq      *Broker_Activemq       `protobuf:"bytes,13,opt,name=activemq,proto3,oneof" json:"activemq,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -151,6 +152,13 @@ func (x *Broker) GetSqs() *Broker_Sqs {
 func (x *Broker) GetStomp() *Broker_Stomp {
 	if x != nil {
 		return x.Stomp
+	}
+	return nil
+}
+
+func (x *Broker) GetActivemq() *Broker_Activemq {
+	if x != nil {
+		return x.Activemq
 	}
 	return nil
 }
@@ -1021,11 +1029,73 @@ func (x *Broker_Stomp) GetVhost() string {
 	return ""
 }
 
+// Apache ActiveMQ 消息代理（基于 STOMP 协议）。
+type Broker_Activemq struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// 连接地址，如 stomp://127.0.0.1:61613。
+	Address       string `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
+	Username      string `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	Password      string `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Broker_Activemq) Reset() {
+	*x = Broker_Activemq{}
+	mi := &file_bootstrap_v1_broker_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Broker_Activemq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Broker_Activemq) ProtoMessage() {}
+
+func (x *Broker_Activemq) ProtoReflect() protoreflect.Message {
+	mi := &file_bootstrap_v1_broker_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Broker_Activemq.ProtoReflect.Descriptor instead.
+func (*Broker_Activemq) Descriptor() ([]byte, []int) {
+	return file_bootstrap_v1_broker_proto_rawDescGZIP(), []int{0, 12}
+}
+
+func (x *Broker_Activemq) GetAddress() string {
+	if x != nil {
+		return x.Address
+	}
+	return ""
+}
+
+func (x *Broker_Activemq) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *Broker_Activemq) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
 var File_bootstrap_v1_broker_proto protoreflect.FileDescriptor
 
 const file_bootstrap_v1_broker_proto_rawDesc = "" +
 	"\n" +
-	"\x19bootstrap/v1/broker.proto\x12\fbootstrap.v1\"\x9d\x12\n" +
+	"\x19bootstrap/v1/broker.proto\x12\fbootstrap.v1\"\xc8\x13\n" +
 	"\x06Broker\x125\n" +
 	"\x05kafka\x18\x01 \x01(\v2\x1a.bootstrap.v1.Broker.KafkaH\x00R\x05kafka\x88\x01\x01\x12>\n" +
 	"\brabbitmq\x18\x02 \x01(\v2\x1d.bootstrap.v1.Broker.RabbitMQH\x01R\brabbitmq\x88\x01\x01\x125\n" +
@@ -1040,7 +1110,8 @@ const file_bootstrap_v1_broker_proto_rawDesc = "" +
 	" \x01(\v2\x1d.bootstrap.v1.Broker.RocketmqH\tR\brocketmq\x88\x01\x01\x12/\n" +
 	"\x03sqs\x18\v \x01(\v2\x18.bootstrap.v1.Broker.SqsH\n" +
 	"R\x03sqs\x88\x01\x01\x125\n" +
-	"\x05stomp\x18\f \x01(\v2\x1a.bootstrap.v1.Broker.StompH\vR\x05stomp\x88\x01\x01\x1a\x91\x01\n" +
+	"\x05stomp\x18\f \x01(\v2\x1a.bootstrap.v1.Broker.StompH\vR\x05stomp\x88\x01\x01\x12>\n" +
+	"\bactivemq\x18\r \x01(\v2\x1d.bootstrap.v1.Broker.ActivemqH\fR\bactivemq\x88\x01\x01\x1a\x91\x01\n" +
 	"\x05Kafka\x12\x18\n" +
 	"\abrokers\x18\x01 \x03(\tR\abrokers\x12\x19\n" +
 	"\bgroup_id\x18\x02 \x01(\tR\agroupId\x12\x1b\n" +
@@ -1108,7 +1179,11 @@ const file_bootstrap_v1_broker_proto_rawDesc = "" +
 	"\aaddress\x18\x01 \x01(\tR\aaddress\x12\x1a\n" +
 	"\busername\x18\x02 \x01(\tR\busername\x12\x1a\n" +
 	"\bpassword\x18\x03 \x01(\tR\bpassword\x12\x14\n" +
-	"\x05vhost\x18\x04 \x01(\tR\x05vhostB\b\n" +
+	"\x05vhost\x18\x04 \x01(\tR\x05vhost\x1a\\\n" +
+	"\bActivemq\x12\x18\n" +
+	"\aaddress\x18\x01 \x01(\tR\aaddress\x12\x1a\n" +
+	"\busername\x18\x02 \x01(\tR\busername\x12\x1a\n" +
+	"\bpassword\x18\x03 \x01(\tR\bpasswordB\b\n" +
 	"\x06_kafkaB\v\n" +
 	"\t_rabbitmqB\b\n" +
 	"\x06_redisB\a\n" +
@@ -1121,7 +1196,8 @@ const file_bootstrap_v1_broker_proto_rawDesc = "" +
 	"\x04_nsqB\v\n" +
 	"\t_rocketmqB\x06\n" +
 	"\x04_sqsB\b\n" +
-	"\x06_stompB\xb9\x01\n" +
+	"\x06_stompB\v\n" +
+	"\t_activemqB\xb9\x01\n" +
 	"\x10com.bootstrap.v1B\vBrokerProtoP\x01ZGgithub.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1;bootstrapv1\xa2\x02\x03BXX\xaa\x02\fBootstrap.V1\xca\x02\fBootstrap\\V1\xe2\x02\x18Bootstrap\\V1\\GPBMetadata\xea\x02\rBootstrap::V1b\x06proto3"
 
 var (
@@ -1136,7 +1212,7 @@ func file_bootstrap_v1_broker_proto_rawDescGZIP() []byte {
 	return file_bootstrap_v1_broker_proto_rawDescData
 }
 
-var file_bootstrap_v1_broker_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_bootstrap_v1_broker_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_bootstrap_v1_broker_proto_goTypes = []any{
 	(*Broker)(nil),          // 0: bootstrap.v1.Broker
 	(*Broker_Kafka)(nil),    // 1: bootstrap.v1.Broker.Kafka
@@ -1151,6 +1227,7 @@ var file_bootstrap_v1_broker_proto_goTypes = []any{
 	(*Broker_Rocketmq)(nil), // 10: bootstrap.v1.Broker.Rocketmq
 	(*Broker_Sqs)(nil),      // 11: bootstrap.v1.Broker.Sqs
 	(*Broker_Stomp)(nil),    // 12: bootstrap.v1.Broker.Stomp
+	(*Broker_Activemq)(nil), // 13: bootstrap.v1.Broker.Activemq
 }
 var file_bootstrap_v1_broker_proto_depIdxs = []int32{
 	1,  // 0: bootstrap.v1.Broker.kafka:type_name -> bootstrap.v1.Broker.Kafka
@@ -1165,11 +1242,12 @@ var file_bootstrap_v1_broker_proto_depIdxs = []int32{
 	10, // 9: bootstrap.v1.Broker.rocketmq:type_name -> bootstrap.v1.Broker.Rocketmq
 	11, // 10: bootstrap.v1.Broker.sqs:type_name -> bootstrap.v1.Broker.Sqs
 	12, // 11: bootstrap.v1.Broker.stomp:type_name -> bootstrap.v1.Broker.Stomp
-	12, // [12:12] is the sub-list for method output_type
-	12, // [12:12] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	13, // 12: bootstrap.v1.Broker.activemq:type_name -> bootstrap.v1.Broker.Activemq
+	13, // [13:13] is the sub-list for method output_type
+	13, // [13:13] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_bootstrap_v1_broker_proto_init() }
@@ -1184,7 +1262,7 @@ func file_bootstrap_v1_broker_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_bootstrap_v1_broker_proto_rawDesc), len(file_bootstrap_v1_broker_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   13,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

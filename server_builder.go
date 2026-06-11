@@ -32,6 +32,14 @@ func resolveServer(cfg *v1.Server) ([]transport.Server, func(), error) {
 		{"thrift", serverTypeThrift, cfg.GetThrift() != nil},
 		{"trpc", serverTypeTRPC, cfg.GetTrpc() != nil},
 		{"webtransport", serverTypeWebtransport, cfg.GetWebtransport() != nil},
+		{"cron", serverTypeCron, cfg.GetCron() != nil},
+		{"hptimer", serverTypeHPTimer, cfg.GetHptimer() != nil},
+		{"mcp", serverTypeMCP, cfg.GetMcp() != nil},
+		{"signalr", serverTypeSignalR, cfg.GetSignalr() != nil},
+		{"socketio", serverTypeSocketIO, cfg.GetSocketio() != nil},
+		{"webrtc", serverTypeWebRTC, cfg.GetWebrtc() != nil},
+		{"asynq", serverTypeAsynq, cfg.GetAsynq() != nil},
+		{"machinery", serverTypeMachinery, cfg.GetMachinery() != nil},
 	}
 
 	for _, f := range fields {
@@ -68,4 +76,12 @@ const (
 	serverTypeThrift       = "thrift"
 	serverTypeTRPC         = "trpc"
 	serverTypeWebtransport = "webtransport"
+	serverTypeCron         = "cron"
+	serverTypeHPTimer      = "hptimer"
+	serverTypeMCP          = "mcp"
+	serverTypeSignalR      = "signalr"
+	serverTypeSocketIO     = "socketio"
+	serverTypeWebRTC       = "webrtc"
+	serverTypeAsynq        = "asynq"
+	serverTypeMachinery    = "machinery"
 )

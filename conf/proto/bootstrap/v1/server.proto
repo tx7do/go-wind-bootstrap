@@ -220,6 +220,85 @@ message Server {
     TLS tls = 2;
   }
 
+  // Cron 定时任务调度器。
+  message Cron {
+    // 是否启用秒级精度。默认 false。
+    bool seconds = 1;
+  }
+
+  // 高精度定时器。
+  message Hptimer {
+    // 是否优雅关闭。默认 false。
+    bool gracefully_shutdown = 1;
+  }
+
+  // MCP (Model Context Protocol) 传输层。
+  message Mcp {
+    // 服务名称。
+    string name = 1;
+    // 服务版本。
+    string version = 2;
+    // 监听地址。
+    string address = 3;
+  }
+
+  // SignalR 传输层。
+  message Signalr {
+    // 监听地址，如 ":8080"。
+    string addr = 1;
+    // 网络类型，如 "tcp"。
+    string network = 2;
+    TLS tls = 3;
+    // 编解码器：json / proto。
+    string codec = 4;
+  }
+
+  // Socket.IO 传输层。
+  message Socketio {
+    // 监听地址，如 ":8080"。
+    string addr = 1;
+    // 网络类型，如 "tcp"。
+    string network = 2;
+    TLS tls = 3;
+    // 编解码器：json / proto。
+    string codec = 4;
+    // Socket.IO 路径，默认 "/socket.io/"。
+    string path = 5;
+  }
+
+  // WebRTC 传输层。
+  message Webrtc {
+    // 监听地址，如 ":8080"。
+    string addr = 1;
+    // 网络类型，如 "tcp"。
+    string network = 2;
+    TLS tls = 3;
+    // 编解码器。
+    string codec = 4;
+    // WebSocket 路径。
+    string path = 5;
+  }
+
+  // Asynq 任务队列（基于 Redis）。
+  message Asynq {
+    // Redis 连接地址。
+    string redis_address = 1;
+    string redis_password = 2;
+    int32 redis_db = 3;
+  }
+
+  // Machinery 分布式任务队列。
+  message Machinery {
+    // Broker 地址。
+    string broker_address = 1;
+    // Result backend 地址。
+    string result_backend_address = 2;
+    // Broker 类型：redis / amqp / sqs。默认 redis。
+    string broker_type = 3;
+    // DB 编号（用于 Redis）。
+    int32 db = 4;
+  }
+
   optional Http http = 1;
   optional Http3 http3 = 2;
   optional Grpc grpc = 3;
@@ -232,4 +311,12 @@ message Server {
   optional Thrift thrift = 10;
   optional Trpc trpc = 11;
   optional Webtransport webtransport = 12;
+  optional Cron cron = 13;
+  optional Hptimer hptimer = 14;
+  optional Mcp mcp = 15;
+  optional Signalr signalr = 16;
+  optional Socketio socketio = 17;
+  optional Webrtc webrtc = 18;
+  optional Asynq asynq = 19;
+  optional Machinery machinery = 20;
 }
