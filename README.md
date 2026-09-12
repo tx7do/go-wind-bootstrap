@@ -1,16 +1,12 @@
-<p align="center">
-  <h1 align="center">GoWind Bootstrap · 声明式应用引导框架</h1>
-  <p align="center">
-    配置即应用 · 一行代码启动微服务
-  </p>
-  <p align="center">
-    <em>用一份声明式配置，组装完整微服务应用——传输层、配置中心、注册发现、日志、追踪、指标、消息代理，一气呵成</em>
-  </p>
-</p>
+<div align="center">
 
-<p align="center">
-  <a href="README.md">中文</a> · <a href="README_en.md">English</a> · <a href="README_ja.md">日本語</a>
-</p>
+<img src="docs/brand/vortex-tile.svg" width="120" alt="GoWind Bootstrap · 声明式应用引导框架" />
+
+# GoWind Bootstrap · 声明式应用引导框架
+
+[English](./README_en.md) | **中文** | [日本語](./README_ja.md)
+
+</div>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Go-1.22+-00ADD8?style=flat-square&logo=Go" alt="Go Version" />

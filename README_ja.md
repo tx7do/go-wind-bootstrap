@@ -1,16 +1,12 @@
-<p align="center">
-  <h1 align="center">GoWind Bootstrap · 宣言型アプリケーションブートストラップフレームワーク</h1>
-  <p align="center">
-    設定即アプリ · ワンライナーでマイクロサービスを起動
-  </p>
-  <p align="center">
-    <em>一枚の宣言型設定で、完全なマイクロサービスアプリケーションを組み立て — トランスポート、構成センター、サービスディスカバリ、ロギング、トレーシング、メトリクス、メッセージブローカーを一気に</em>
-  </p>
-</p>
+<div align="center">
 
-<p align="center">
-  <a href="README.md">中文</a> · <a href="README_en.md">English</a> · <a href="README_ja.md">日本語</a>
-</p>
+<img src="docs/brand/vortex-tile.svg" width="120" alt="GoWind Bootstrap · 宣言型アプリケーションブートストラップフレームワーク" />
+
+# GoWind Bootstrap · 宣言型アプリケーションブートストラップフレームワーク
+
+[English](./README_en.md) | [中文](./README.md) | **日本語**
+
+</div>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Go-1.22+-00ADD8?style=flat-square&logo=Go" alt="Go Version" />

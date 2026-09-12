@@ -1,16 +1,12 @@
-<p align="center">
-  <h1 align="center">GoWind Bootstrap · Declarative Application Bootstrapper</h1>
-  <p align="center">
-    Configuration-as-Application · Launch Microservices in One Line
-  </p>
-  <p align="center">
-    <em>Assemble a complete microservice application from a single declarative config — transport, config center, service discovery, logging, tracing, metrics, message broker, all at once</em>
-  </p>
-</p>
+<div align="center">
 
-<p align="center">
-  <a href="README.md">中文</a> · <a href="README_en.md">English</a> · <a href="README_ja.md">日本語</a>
-</p>
+<img src="docs/brand/vortex-tile.svg" width="120" alt="GoWind Bootstrap · Declarative Application Bootstrapper" />
+
+# GoWind Bootstrap · Declarative Application Bootstrapper
+
+**English** | [中文](./README.md) | [日本語](./README_ja.md)
+
+</div>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Go-1.22+-00ADD8?style=flat-square&logo=Go" alt="Go Version" />
