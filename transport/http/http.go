@@ -191,6 +191,15 @@ func (d *stdDriver) Handle(method, path string, handler http.HandlerFunc) {
 	})
 }
 
+// HandlePrefix 在 std 驱动上按前缀挂载 handler。
+// net/http ServeMux 的语义：以 "/" 结尾的 pattern 匹配整个子树，
+// 其余 pattern 精确匹配——调用方传入的前缀原样透传，不做改写。
+// 与 [stdDriver.Handle] 一致，此处不做方法过滤；中间件由上层
+// Server 决定是否注入（HandlePrefix 路径不经过 Server.Use 链）。
+func (d *stdDriver) HandlePrefix(prefix string, h http.Handler) {
+	d.mux.Handle(prefix, h)
+}
+
 func (d *stdDriver) Start(ctx context.Context, ln net.Listener) error {
 	d.server = &http.Server{Handler: d.mux}
 	errChan := make(chan error, 1)

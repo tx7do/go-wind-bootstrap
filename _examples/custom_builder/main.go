@@ -63,7 +63,7 @@ func main() {
 	)
 
 	// --- 5. Bootstrap ---
-	app, brokers, _, _, _, _, _, _, cleanup, err := bootstrap.Bootstrap(ctx, cfg)
+	app, brokers, _, _, _, _, _, _, _, _, cleanup, err := bootstrap.Bootstrap(ctx, cfg)
 	if err != nil {
 		slog.Error("bootstrap failed", "error", err)
 		os.Exit(1)

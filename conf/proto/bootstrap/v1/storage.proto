@@ -18,6 +18,13 @@ message Storage {
     string token = 4;
     // 是否使用 SSL。
     bool use_ssl = 5;
+
+    // 上传链接的主机名。生成上传对象的对外 URL 时，
+    // 用于替换 SDK 返回 URL 中的端点主机（内网端点 → 对外域名）。
+    // 留空则不做替换，直接使用端点主机。
+    string upload_host = 20;
+    // 下载链接的主机名。语义同 upload_host，用于下载 URL 的主机替换。
+    string download_host = 21;
   }
 
   // S3 兼容对象存储（AWS S3 / Ceph / MinIO 等）。

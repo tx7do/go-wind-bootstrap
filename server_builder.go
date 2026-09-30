@@ -10,8 +10,11 @@ import (
 
 // resolveServer 检查 Server 配置中每个 optional 字段，
 // 对已设置的传输层类型分别调用对应 builder 创建实例。
-func resolveServer(cfg *v1.Server) ([]transport.Server, func(), error) {
+// 返回实例切片（供 wind.WithServer 使用）与按类型名键控的实例映射
+// （供 Context.Server 访问器使用），两者引用同一批实例。
+func resolveServer(cfg *v1.Server) ([]transport.Server, map[string]any, func(), error) {
 	var servers []transport.Server
+	var serverMap map[string]any
 
 	// 按字段依次检查，调用对应 builder。
 	type fieldBuilder struct {
@@ -61,18 +64,22 @@ func resolveServer(cfg *v1.Server) ([]transport.Server, func(), error) {
 		}
 		b, err := getServerBuilder(f.typ)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, nil, err
 		}
 		srv, err := b(cfg)
 		if err != nil {
-			return nil, nil, fmt.Errorf("bootstrap: build server %q: %w", f.name, err)
+			return nil, nil, nil, fmt.Errorf("bootstrap: build server %q: %w", f.name, err)
 		}
 		if srv != nil {
 			servers = append(servers, srv)
+			if serverMap == nil {
+				serverMap = make(map[string]any)
+			}
+			serverMap[f.typ] = srv
 		}
 	}
 
-	return servers, func() {}, nil
+	return servers, serverMap, func() {}, nil
 }
 
 // 内部常量，用于 server builder 注册的 key。

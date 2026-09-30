@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	wind "github.com/tx7do/go-wind"
+	"github.com/tx7do/go-wind/log"
 
 	v1 "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1"
 )
@@ -15,6 +16,7 @@ import (
 type Context struct {
 	cfg    *v1.BootstrapConfig
 	app    *wind.App
+	logger log.Logger
 	cancel context.CancelFunc
 
 	brokers       map[string]any
@@ -24,16 +26,18 @@ type Context struct {
 	caches        map[string]any
 	scriptEngines map[string]any
 	databases     map[string]any
+	servers       map[string]any
 
 	cleanupOnce sync.Once
 	cleanup     func()
 }
 
 // newContext creates a Context from the Bootstrap results.
-func newContext(cfg *v1.BootstrapConfig, app *wind.App, brokers map[string]any, storages map[string]any, aiClients map[string]any, workflows map[string]any, caches map[string]any, scriptEngines map[string]any, databases map[string]any, cleanup func(), cancel context.CancelFunc) *Context {
+func newContext(cfg *v1.BootstrapConfig, app *wind.App, logger log.Logger, brokers map[string]any, storages map[string]any, aiClients map[string]any, workflows map[string]any, caches map[string]any, scriptEngines map[string]any, databases map[string]any, servers map[string]any, cleanup func(), cancel context.CancelFunc) *Context {
 	return &Context{
 		cfg:           cfg,
 		app:           app,
+		logger:        logger,
 		brokers:       brokers,
 		storages:      storages,
 		aiClients:     aiClients,
@@ -41,6 +45,7 @@ func newContext(cfg *v1.BootstrapConfig, app *wind.App, brokers map[string]any, 
 		caches:        caches,
 		scriptEngines: scriptEngines,
 		databases:     databases,
+		servers:       servers,
 		cleanup:       cleanup,
 		cancel:        cancel,
 	}
@@ -233,4 +238,59 @@ func (c *Context) Databases() map[string]any {
 		return nil
 	}
 	return c.databases
+}
+
+// Logger returns the application logger resolved from the BootstrapConfig
+// logger section. Returns nil if no logger was configured.
+func (c *Context) Logger() log.Logger {
+	if c == nil {
+		return nil
+	}
+	return c.logger
+}
+
+// NewModuleLogger returns a child logger tagged with the given module name.
+// It is the recommended way for subsystems (data layer, servers, workers) to
+// obtain a logger: each subsystem logs with its own module tag, and the sink
+// can filter on it. Returns nil if no logger was configured.
+func (c *Context) NewModuleLogger(module string) log.Logger {
+	if c == nil || c.logger == nil {
+		return nil
+	}
+	return c.logger.With("module", module)
+}
+
+// Server returns the server instance for the given type name (e.g.
+// [ServerTypeHTTP], [ServerTypeSSE]).
+// Returns nil if no server with that name was configured.
+//
+// The caller should type-assert the result to the concrete server type
+// exposed by the corresponding adapter package:
+//
+//	srv, ok := ctx.Server(bootstrap.ServerTypeHTTP).(*httpAdapter.Server)
+//	if ok {
+//	    // Register application middleware and routes here, BEFORE app.Run.
+//	    srv.Use(myAuthMiddleware)
+//	    srv.GET("/api/thing", myHandler)
+//	}
+//
+// Ordering contract: middleware added via Server.Use only applies to routes
+// registered AFTER the Use call. The BootstrapConfig-driven middleware are
+// attached first, during server construction; application middleware must be
+// Use'd before any route registration (e.g. the generated
+// RegisterXxxHTTPServer functions) so they take effect.
+func (c *Context) Server(name string) any {
+	if c == nil || c.servers == nil {
+		return nil
+	}
+	return c.servers[name]
+}
+
+// Servers returns all server instances as a map keyed by type name.
+// Returns nil if no server was configured.
+func (c *Context) Servers() map[string]any {
+	if c == nil {
+		return nil
+	}
+	return c.servers
 }
