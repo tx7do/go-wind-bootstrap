@@ -281,10 +281,46 @@ message Server {
 
   // Asynq 任务队列（基于 Redis）。
   message Asynq {
-    // Redis 连接地址。
+    // Redis 连接地址（与 redis_uri 二选一；离散字段方式）。
     string redis_address = 1;
     string redis_password = 2;
     int32 redis_db = 3;
+    // Redis URI，优先于离散字段（如 redis://:pass@host:6379/1）。
+    optional string redis_uri = 4;
+    // Redis 登录用户名（离散字段方式可选）。
+    optional string redis_username = 5;
+    // Redis 连接池大小（离散字段方式可选）。
+    optional int32 redis_pool_size = 6;
+    // 编解码器：json / xml / yaml / proto。
+    optional string codec = 7;
+    // 并发 worker 数。
+    optional int32 concurrency = 8;
+    // 时区名（如 Asia/Shanghai），影响周期任务表达式解析。
+    optional string location = 9;
+    // 队列优先级表（如 critical:10 / default:5 / low:1）。
+    map<string, int32> queues = 10;
+    // 优雅关闭。
+    optional bool enable_gracefully_shutdown = 11;
+    // 严格按队列优先级取任务。
+    optional bool enable_strict_priority = 12;
+    // 优雅关闭等待时长（秒）。
+    optional int32 shutdown_timeout_seconds = 13;
+    // 健康检查间隔（秒）。
+    optional int32 health_check_interval_seconds = 14;
+    // 任务检查间隔（秒）。
+    optional int32 task_check_interval_seconds = 15;
+    // 延迟任务检查间隔（秒）。
+    optional int32 delayed_task_check_interval_seconds = 16;
+    // 聚合任务：组宽限期（秒）。
+    optional int32 group_grace_period_seconds = 17;
+    // 聚合任务：组最大延迟（秒）。
+    optional int32 group_max_delay_seconds = 18;
+    // 聚合任务：组最大大小。
+    optional int32 group_max_size = 19;
+    // 聚合任务：清扫器间隔（秒）。
+    optional int32 janitor_interval_seconds = 20;
+    // 聚合任务：清扫器批量大小。
+    optional int32 janitor_batch_size = 21;
   }
 
   // Machinery 分布式任务队列。
