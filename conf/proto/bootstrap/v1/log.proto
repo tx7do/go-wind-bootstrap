@@ -31,6 +31,17 @@ message Logger {
     string format = 2;
     string output_path = 3;
     string error_output_path = 4;
+    // 输出目标：stdout、stderr、file，默认 stdout。
+    // 为 file 时取 output_path 作为文件路径。
+    string writer = 5;
+    // 滚动日志单文件最大体积（MB）。配置滚动参数后文件输出走 lumberjack。
+    int32 max_size_mb = 6;
+    // 滚动日志最大保留天数。
+    int32 max_age_days = 7;
+    // 滚动日志最大备份数。
+    int32 max_backups = 8;
+    // 是否压缩滚动的历史日志。
+    optional bool compress = 9;
   }
 
   // Zerolog 日志配置。
@@ -38,6 +49,14 @@ message Logger {
     string level = 1;
     string format = 2;
     string output_path = 3;
+    // 滚动日志单文件最大体积（MB）。配置滚动参数后文件输出走 lumberjack。
+    int32 max_size_mb = 4;
+    // 滚动日志最大保留天数。
+    int32 max_age_days = 5;
+    // 滚动日志最大备份数。
+    int32 max_backups = 6;
+    // 是否压缩滚动的历史日志。
+    optional bool compress = 7;
   }
 
   // Slog（Go 标准库）日志配置。

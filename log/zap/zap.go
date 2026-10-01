@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/natefinch/lumberjack"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -52,12 +53,29 @@ func newBuilder(cfg *v1.Logger) (windLog.Logger, func(), error) {
 
 	// Writer.
 	writer := zapcore.AddSync(os.Stdout)
-	if path := c.GetOutputPath(); path != "" && path != "stdout" && path != "stderr" {
-		f, err := os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-		if err != nil {
-			return nil, nil, fmt.Errorf("zap: open %s: %w", path, err)
+	switch c.GetWriter() {
+	case "stdout", "":
+		if c.GetWriter() == "" {
+			if path := c.GetOutputPath(); path != "" && path != "stdout" && path != "stderr" {
+				w, err := newFileWriter(c)
+				if err != nil {
+					return nil, nil, err
+				}
+				writer = w
+			}
 		}
-		writer = zapcore.AddSync(f)
+	case "stderr":
+		writer = zapcore.AddSync(os.Stderr)
+	case "file":
+		if path := c.GetOutputPath(); path != "" {
+			w, err := newFileWriter(c)
+			if err != nil {
+				return nil, nil, err
+			}
+			writer = w
+		}
+	default:
+		return nil, nil, fmt.Errorf("zap: unknown writer %q (want stdout/stderr/file)", c.GetWriter())
 	}
 
 	core := zapcore.NewCore(encoder, writer, zapLevel)
@@ -67,4 +85,27 @@ func newBuilder(cfg *v1.Logger) (windLog.Logger, func(), error) {
 	cleanup := func() { _ = logger.Sync() }
 
 	return logger, cleanup, nil
+}
+
+// newFileWriter builds the file writer: lumberjack rolling when rolling
+// params are configured, a plain append-only file otherwise.
+func newFileWriter(c *v1.Logger_Zap) (zapcore.WriteSyncer, error) {
+	path := c.GetOutputPath()
+	if path == "" {
+		return nil, fmt.Errorf("zap: writer=file requires output_path")
+	}
+	if c.GetMaxSizeMb() > 0 || c.GetMaxAgeDays() > 0 || c.GetMaxBackups() > 0 {
+		return zapcore.AddSync(&lumberjack.Logger{
+			Filename:   path,
+			MaxSize:    int(c.GetMaxSizeMb()),
+			MaxAge:     int(c.GetMaxAgeDays()),
+			MaxBackups: int(c.GetMaxBackups()),
+			Compress:   c.GetCompress(),
+		}), nil
+	}
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+	if err != nil {
+		return nil, fmt.Errorf("zap: open %s: %w", path, err)
+	}
+	return zapcore.AddSync(f), nil
 }

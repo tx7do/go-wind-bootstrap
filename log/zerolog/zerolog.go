@@ -50,11 +50,17 @@ func newBuilder(cfg *v1.Logger) (windLog.Logger, func(), error) {
 	case "stderr":
 		writer = zerolog.SyncWriter(os.Stderr)
 	default:
-		f, err := os.OpenFile(c.GetOutputPath(), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
-		if err != nil {
-			return nil, nil, fmt.Errorf("zerolog: open %s: %w", c.GetOutputPath(), err)
+		if c.GetMaxSizeMb() > 0 || c.GetMaxAgeDays() > 0 || c.GetMaxBackups() > 0 {
+			// 配置了滚动参数时走 lumberjack 滚动写入。
+			writer = zerologPlugin.NewLumberjackWriter(c.GetOutputPath(),
+				int(c.GetMaxSizeMb()), int(c.GetMaxBackups()), int(c.GetMaxAgeDays()), c.GetCompress())
+		} else {
+			f, err := os.OpenFile(c.GetOutputPath(), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+			if err != nil {
+				return nil, nil, fmt.Errorf("zerolog: open %s: %w", c.GetOutputPath(), err)
+			}
+			writer = f
 		}
-		writer = f
 	}
 
 	// Format.

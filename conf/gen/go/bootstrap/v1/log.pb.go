@@ -272,8 +272,19 @@ type Logger_Zap struct {
 	Format          string                 `protobuf:"bytes,2,opt,name=format,proto3" json:"format,omitempty"`
 	OutputPath      string                 `protobuf:"bytes,3,opt,name=output_path,json=outputPath,proto3" json:"output_path,omitempty"`
 	ErrorOutputPath string                 `protobuf:"bytes,4,opt,name=error_output_path,json=errorOutputPath,proto3" json:"error_output_path,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// 输出目标：stdout、stderr、file，默认 stdout。
+	// 为 file 时取 output_path 作为文件路径。
+	Writer string `protobuf:"bytes,5,opt,name=writer,proto3" json:"writer,omitempty"`
+	// 滚动日志单文件最大体积（MB）。配置滚动参数后文件输出走 lumberjack。
+	MaxSizeMb int32 `protobuf:"varint,6,opt,name=max_size_mb,json=maxSizeMb,proto3" json:"max_size_mb,omitempty"`
+	// 滚动日志最大保留天数。
+	MaxAgeDays int32 `protobuf:"varint,7,opt,name=max_age_days,json=maxAgeDays,proto3" json:"max_age_days,omitempty"`
+	// 滚动日志最大备份数。
+	MaxBackups int32 `protobuf:"varint,8,opt,name=max_backups,json=maxBackups,proto3" json:"max_backups,omitempty"`
+	// 是否压缩滚动的历史日志。
+	Compress      *bool `protobuf:"varint,9,opt,name=compress,proto3,oneof" json:"compress,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Logger_Zap) Reset() {
@@ -334,12 +345,55 @@ func (x *Logger_Zap) GetErrorOutputPath() string {
 	return ""
 }
 
+func (x *Logger_Zap) GetWriter() string {
+	if x != nil {
+		return x.Writer
+	}
+	return ""
+}
+
+func (x *Logger_Zap) GetMaxSizeMb() int32 {
+	if x != nil {
+		return x.MaxSizeMb
+	}
+	return 0
+}
+
+func (x *Logger_Zap) GetMaxAgeDays() int32 {
+	if x != nil {
+		return x.MaxAgeDays
+	}
+	return 0
+}
+
+func (x *Logger_Zap) GetMaxBackups() int32 {
+	if x != nil {
+		return x.MaxBackups
+	}
+	return 0
+}
+
+func (x *Logger_Zap) GetCompress() bool {
+	if x != nil && x.Compress != nil {
+		return *x.Compress
+	}
+	return false
+}
+
 // Zerolog 日志配置。
 type Logger_Zerolog struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Level         string                 `protobuf:"bytes,1,opt,name=level,proto3" json:"level,omitempty"`
-	Format        string                 `protobuf:"bytes,2,opt,name=format,proto3" json:"format,omitempty"`
-	OutputPath    string                 `protobuf:"bytes,3,opt,name=output_path,json=outputPath,proto3" json:"output_path,omitempty"`
+	state      protoimpl.MessageState `protogen:"open.v1"`
+	Level      string                 `protobuf:"bytes,1,opt,name=level,proto3" json:"level,omitempty"`
+	Format     string                 `protobuf:"bytes,2,opt,name=format,proto3" json:"format,omitempty"`
+	OutputPath string                 `protobuf:"bytes,3,opt,name=output_path,json=outputPath,proto3" json:"output_path,omitempty"`
+	// 滚动日志单文件最大体积（MB）。配置滚动参数后文件输出走 lumberjack。
+	MaxSizeMb int32 `protobuf:"varint,4,opt,name=max_size_mb,json=maxSizeMb,proto3" json:"max_size_mb,omitempty"`
+	// 滚动日志最大保留天数。
+	MaxAgeDays int32 `protobuf:"varint,5,opt,name=max_age_days,json=maxAgeDays,proto3" json:"max_age_days,omitempty"`
+	// 滚动日志最大备份数。
+	MaxBackups int32 `protobuf:"varint,6,opt,name=max_backups,json=maxBackups,proto3" json:"max_backups,omitempty"`
+	// 是否压缩滚动的历史日志。
+	Compress      *bool `protobuf:"varint,7,opt,name=compress,proto3,oneof" json:"compress,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -393,6 +447,34 @@ func (x *Logger_Zerolog) GetOutputPath() string {
 		return x.OutputPath
 	}
 	return ""
+}
+
+func (x *Logger_Zerolog) GetMaxSizeMb() int32 {
+	if x != nil {
+		return x.MaxSizeMb
+	}
+	return 0
+}
+
+func (x *Logger_Zerolog) GetMaxAgeDays() int32 {
+	if x != nil {
+		return x.MaxAgeDays
+	}
+	return 0
+}
+
+func (x *Logger_Zerolog) GetMaxBackups() int32 {
+	if x != nil {
+		return x.MaxBackups
+	}
+	return 0
+}
+
+func (x *Logger_Zerolog) GetCompress() bool {
+	if x != nil && x.Compress != nil {
+		return *x.Compress
+	}
+	return false
 }
 
 // Slog（Go 标准库）日志配置。
@@ -1316,7 +1398,7 @@ var File_bootstrap_v1_log_proto protoreflect.FileDescriptor
 
 const file_bootstrap_v1_log_proto_rawDesc = "" +
 	"\n" +
-	"\x16bootstrap/v1/log.proto\x12\fbootstrap.v1\"\xf0\x18\n" +
+	"\x16bootstrap/v1/log.proto\x12\fbootstrap.v1\"\xab\x1b\n" +
 	"\x06Logger\x12\x12\n" +
 	"\x04type\x18\x01 \x01(\tR\x04type\x12/\n" +
 	"\x03zap\x18\x02 \x01(\v2\x18.bootstrap.v1.Logger.ZapH\x00R\x03zap\x88\x01\x01\x12;\n" +
@@ -1336,18 +1418,33 @@ const file_bootstrap_v1_log_proto_rawDesc = "" +
 	"\atencent\x18\x0e \x01(\v2\x1c.bootstrap.v1.Logger.TencentH\fR\atencent\x88\x01\x01\x12D\n" +
 	"\n" +
 	"cloudwatch\x18\x0f \x01(\v2\x1f.bootstrap.v1.Logger.CloudwatchH\rR\n" +
-	"cloudwatch\x88\x01\x01\x1a\x80\x01\n" +
+	"cloudwatch\x88\x01\x01\x1a\xa9\x02\n" +
 	"\x03Zap\x12\x14\n" +
 	"\x05level\x18\x01 \x01(\tR\x05level\x12\x16\n" +
 	"\x06format\x18\x02 \x01(\tR\x06format\x12\x1f\n" +
 	"\voutput_path\x18\x03 \x01(\tR\n" +
 	"outputPath\x12*\n" +
-	"\x11error_output_path\x18\x04 \x01(\tR\x0ferrorOutputPath\x1aX\n" +
+	"\x11error_output_path\x18\x04 \x01(\tR\x0ferrorOutputPath\x12\x16\n" +
+	"\x06writer\x18\x05 \x01(\tR\x06writer\x12\x1e\n" +
+	"\vmax_size_mb\x18\x06 \x01(\x05R\tmaxSizeMb\x12 \n" +
+	"\fmax_age_days\x18\a \x01(\x05R\n" +
+	"maxAgeDays\x12\x1f\n" +
+	"\vmax_backups\x18\b \x01(\x05R\n" +
+	"maxBackups\x12\x1f\n" +
+	"\bcompress\x18\t \x01(\bH\x00R\bcompress\x88\x01\x01B\v\n" +
+	"\t_compress\x1a\xe9\x01\n" +
 	"\aZerolog\x12\x14\n" +
 	"\x05level\x18\x01 \x01(\tR\x05level\x12\x16\n" +
 	"\x06format\x18\x02 \x01(\tR\x06format\x12\x1f\n" +
 	"\voutput_path\x18\x03 \x01(\tR\n" +
-	"outputPath\x1aU\n" +
+	"outputPath\x12\x1e\n" +
+	"\vmax_size_mb\x18\x04 \x01(\x05R\tmaxSizeMb\x12 \n" +
+	"\fmax_age_days\x18\x05 \x01(\x05R\n" +
+	"maxAgeDays\x12\x1f\n" +
+	"\vmax_backups\x18\x06 \x01(\x05R\n" +
+	"maxBackups\x12\x1f\n" +
+	"\bcompress\x18\a \x01(\bH\x00R\bcompress\x88\x01\x01B\v\n" +
+	"\t_compress\x1aU\n" +
 	"\x04Slog\x12\x14\n" +
 	"\x05level\x18\x01 \x01(\tR\x05level\x12\x16\n" +
 	"\x06format\x18\x02 \x01(\tR\x06format\x12\x1f\n" +
@@ -1470,8 +1567,7 @@ const file_bootstrap_v1_log_proto_rawDesc = "" +
 	"\a_aliyunB\n" +
 	"\n" +
 	"\b_tencentB\r\n" +
-	"\v_cloudwatchB\xb6\x01\n" +
-	"\x10com.bootstrap.v1B\bLogProtoP\x01ZGgithub.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1;bootstrapv1\xa2\x02\x03BXX\xaa\x02\fBootstrap.V1\xca\x02\fBootstrap\\V1\xe2\x02\x18Bootstrap\\V1\\GPBMetadata\xea\x02\rBootstrap::V1b\x06proto3"
+	"\v_cloudwatchB=Z;github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1b\x06proto3"
 
 var (
 	file_bootstrap_v1_log_proto_rawDescOnce sync.Once
@@ -1535,6 +1631,8 @@ func file_bootstrap_v1_log_proto_init() {
 		return
 	}
 	file_bootstrap_v1_log_proto_msgTypes[0].OneofWrappers = []any{}
+	file_bootstrap_v1_log_proto_msgTypes[1].OneofWrappers = []any{}
+	file_bootstrap_v1_log_proto_msgTypes[2].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
