@@ -48,12 +48,13 @@ require (
 	github.com/spf13/cobra v1.10.2 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/theparanoids/crypki v1.21.0 // indirect
-	github.com/tx7do/go-wind v0.0.1 // indirect
+	github.com/tx7do/go-wind v0.0.3 // indirect
 	github.com/tx7do/go-wind-plugins/broker v0.0.1 // indirect
 	github.com/tx7do/go-wind-plugins/broker/pulsar v0.0.1 // indirect
 	github.com/tx7do/go-wind-plugins/encoding v0.0.1 // indirect
 	github.com/tx7do/go-wind-plugins/encoding/json v0.0.1 // indirect
 	github.com/tx7do/go-wind-plugins/encoding/proto v0.0.1 // indirect
+	github.com/tx7do/go-wind-plugins/registry v0.0.1 // indirect
 	github.com/tx7do/go-wind-plugins/tracer/otlp v0.0.1 // indirect
 	github.com/tx7do/go-wind-plugins/transport v0.0.1 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
@@ -75,7 +76,7 @@ require (
 	golang.org/x/mod v0.35.0 // indirect
 	golang.org/x/net v0.55.0 // indirect
 	golang.org/x/oauth2 v0.36.0 // indirect
-	golang.org/x/sync v0.20.0 // indirect
+	golang.org/x/sync v0.22.0 // indirect
 	golang.org/x/sys v0.45.0 // indirect
 	golang.org/x/text v0.37.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20260526163538-3dc84a4a5aaa // indirect

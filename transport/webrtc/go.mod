@@ -3,7 +3,7 @@ module github.com/tx7do/go-wind-bootstrap/transport/webrtc
 go 1.26.3
 
 require (
-	github.com/tx7do/go-wind v0.0.1
+	github.com/tx7do/go-wind v0.0.3
 	github.com/tx7do/go-wind-bootstrap v0.0.0
 	github.com/tx7do/go-wind-bootstrap/conf v0.0.0
 	github.com/tx7do/go-wind-plugins/transport/webrtc v0.0.0-20260611060538-877fa5c566fc
@@ -47,6 +47,7 @@ require (
 	github.com/tx7do/go-wind-plugins/encoding/json v0.0.1 // indirect
 	github.com/tx7do/go-wind-plugins/encoding/proto v0.0.1 // indirect
 	github.com/tx7do/go-wind-plugins/metrics v0.0.1 // indirect
+	github.com/tx7do/go-wind-plugins/registry v0.0.1 // indirect
 	github.com/tx7do/go-wind-plugins/tracer/otlp v0.0.1 // indirect
 	github.com/wlynxg/anet v0.0.5 // indirect
 	go.mongodb.org/mongo-driver/v2 v2.6.0 // indirect
@@ -62,7 +63,7 @@ require (
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
 	golang.org/x/crypto v0.51.0 // indirect
 	golang.org/x/net v0.54.0 // indirect
-	golang.org/x/sync v0.20.0 // indirect
+	golang.org/x/sync v0.22.0 // indirect
 	golang.org/x/sys v0.44.0 // indirect
 	golang.org/x/text v0.37.0 // indirect
 	golang.org/x/time v0.15.0 // indirect

@@ -3,7 +3,7 @@ module github.com/tx7do/go-wind-bootstrap/transport/pulsar
 go 1.26.3
 
 require (
-	github.com/tx7do/go-wind v0.0.1
+	github.com/tx7do/go-wind v0.0.3
 	github.com/tx7do/go-wind-bootstrap v0.0.0
 	github.com/tx7do/go-wind-bootstrap/conf v0.0.0
 	github.com/tx7do/go-wind-plugins/transport/pulsar v0.0.0-20260611060538-877fa5c566fc
@@ -55,6 +55,7 @@ require (
 	github.com/tx7do/go-wind-plugins/encoding/json v0.0.1 // indirect
 	github.com/tx7do/go-wind-plugins/encoding/proto v0.0.1 // indirect
 	github.com/tx7do/go-wind-plugins/metrics v0.0.1 // indirect
+	github.com/tx7do/go-wind-plugins/registry v0.0.1 // indirect
 	github.com/tx7do/go-wind-plugins/tracer/otlp v0.0.1 // indirect
 	github.com/tx7do/go-wind-plugins/transport v0.0.1 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
@@ -76,7 +77,7 @@ require (
 	golang.org/x/mod v0.35.0 // indirect
 	golang.org/x/net v0.55.0 // indirect
 	golang.org/x/oauth2 v0.36.0 // indirect
-	golang.org/x/sync v0.20.0 // indirect
+	golang.org/x/sync v0.22.0 // indirect
 	golang.org/x/sys v0.45.0 // indirect
 	golang.org/x/text v0.37.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20260526163538-3dc84a4a5aaa // indirect

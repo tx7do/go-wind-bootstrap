@@ -76,7 +76,8 @@ require (
 	github.com/tx7do/go-crud/pagination v0.0.14 // indirect
 	github.com/tx7do/go-utils v1.1.40 // indirect
 	github.com/tx7do/go-utils/mapper v0.0.3 // indirect
-	github.com/tx7do/go-wind v0.0.1 // indirect
+	github.com/tx7do/go-wind v0.0.3 // indirect
+	github.com/tx7do/go-wind-plugins/registry v0.0.1 // indirect
 	github.com/zeebo/xxh3 v1.1.0 // indirect
 	go.einride.tech/aip v0.84.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
@@ -92,7 +93,7 @@ require (
 	golang.org/x/mod v0.35.0 // indirect
 	golang.org/x/net v0.53.0 // indirect
 	golang.org/x/oauth2 v0.36.0 // indirect
-	golang.org/x/sync v0.20.0 // indirect
+	golang.org/x/sync v0.22.0 // indirect
 	golang.org/x/sys v0.43.0 // indirect
 	golang.org/x/telemetry v0.0.0-20260428171046-76f71b9afea0 // indirect
 	golang.org/x/text v0.36.0 // indirect

@@ -97,8 +97,8 @@ github.com/stretchr/testify v1.8.0/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO
 github.com/stretchr/testify v1.8.1/go.mod h1:w2LPCIKwWwSfY2zedu0+kehJoqGctiVI29o6fzry7u4=
 github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu7U=
 github.com/stretchr/testify v1.11.1/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
-github.com/tx7do/go-wind v0.0.1 h1:D7UdMqCQPNWDwoC2PFFWV87y0n4apxZ3Zg+2mHrulL0=
-github.com/tx7do/go-wind v0.0.1/go.mod h1:hV4pLNXbNZThZf44JqG73xhDEmkujyN5VM1oX56c+ig=
+github.com/tx7do/go-wind v0.0.3 h1:w28QBX73mG8oGlPQ6kIsC84QL7AUy4xmR0IlVWZNfFI=
+github.com/tx7do/go-wind v0.0.3/go.mod h1:BgeqjCLtGfTlT709176kd2KuLq7I1Am9tqQBrzYssc0=
 github.com/tx7do/go-wind-plugins/broker v0.0.1 h1:Gca038gmS0Z0Y0C3RTofCANkThfTTv1ES0nMTXRntJQ=
 github.com/tx7do/go-wind-plugins/broker v0.0.1/go.mod h1:uVSzeKIh/t4coe2ch0Oe5KB+G6b6NyMtr0C12daWPpA=
 github.com/tx7do/go-wind-plugins/broker/gcpubsub v0.0.1 h1:/GftLK3ruJ74zBJFHFnJoQT2+OyG0ZT/KdKOFfCiGd4=
@@ -111,6 +111,8 @@ github.com/tx7do/go-wind-plugins/encoding/proto v0.0.1 h1:VTnkMn6531C9romJ1J+iJm
 github.com/tx7do/go-wind-plugins/encoding/proto v0.0.1/go.mod h1:80pLv7R34nLjQEcUGbeHQVHPSzo3I9sjIaGgfsqjkvQ=
 github.com/tx7do/go-wind-plugins/metrics v0.0.1 h1:lshFzZUhDGVFSCf0PQT7/XKMSRgP1JdGeIQY38yFIp4=
 github.com/tx7do/go-wind-plugins/metrics v0.0.1/go.mod h1:6SKBMZzuxkCtoCL+R5LZduuCcdEdk+gDqSIg2IPLeyk=
+github.com/tx7do/go-wind-plugins/registry v0.0.1 h1:SjZNsBREDwHKfvQASoogxGqnMpeElifVW7anghjwAXg=
+github.com/tx7do/go-wind-plugins/registry v0.0.1/go.mod h1:ZAgXDNyODonS1903n5cFg0sGdNCcqnsb0XIp1rvoBSE=
 github.com/tx7do/go-wind-plugins/tracer/otlp v0.0.1 h1:oKc0aEESIEMf4yT0FZRyQSEYgYURvX3JCb1fyQHsfT0=
 github.com/tx7do/go-wind-plugins/tracer/otlp v0.0.1/go.mod h1:pD82ze3ztAu/wNlNmjqihy0CfhYqyXFl/oZu5CtoqxM=
 github.com/tx7do/go-wind-plugins/transport/gcpubsub v0.0.0-20260611052838-738797fa9b83 h1:FsG1CtNaIBa7sI2he+3w5iFhdgqWk2+vOe1GW6A7fWc=
@@ -171,8 +173,8 @@ golang.org/x/oauth2 v0.36.0/go.mod h1:YDBUJMTkDnJS+A4BP4eZBjCqtokkg1hODuPjwiGPO7
 golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sync v0.0.0-20181108010431-42b317875d0f/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sync v0.0.0-20190423024810-112230192c58/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
-golang.org/x/sync v0.20.0 h1:e0PTpb7pjO8GAtTs2dQ6jYa5BWYlMuX047Dco/pItO4=
-golang.org/x/sync v0.20.0/go.mod h1:9xrNwdLfx4jkKbNva9FpL6vEN7evnE43NNNJQ2LF3+0=
+golang.org/x/sync v0.22.0 h1:SZjpbeLmrCk4xhRSZFNZW5gFUeCeFgjekvI/+gfScek=
+golang.org/x/sync v0.22.0/go.mod h1:9xrNwdLfx4jkKbNva9FpL6vEN7evnE43NNNJQ2LF3+0=
 golang.org/x/sys v0.0.0-20180830151530-49385e6e1522/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
 golang.org/x/sys v0.0.0-20190215142949-d0b11bdaac8a/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
 golang.org/x/sys v0.0.0-20190412213103-97732733099d/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
