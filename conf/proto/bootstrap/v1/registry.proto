@@ -34,6 +34,27 @@ message Registry {
     // 服务注销临界时间（秒）。
     int32 deregister_critical_service_after = 8;
     string datacenter = 9;
+    // ACL Token 文件路径。
+    string token_file = 10;
+    // 命名空间（Consul 企业版）。
+    string namespace = 11;
+    // 管理分区（Consul 企业版）。
+    string partition = 12;
+    // API 路径前缀。
+    string path_prefix = 13;
+    // HTTP Basic 认证。
+    BasicAuth basic_auth = 14;
+    // Watch 阻塞等待的最长时间（秒）。
+    int32 wait_time = 15;
+    // 服务发现超时（秒）。
+    int32 discovery_timeout = 16;
+    // TLS 配置。
+    TLS tls = 17;
+
+    message BasicAuth {
+      string username = 1;
+      string password = 2;
+    }
   }
 
   message Etcd {
@@ -46,6 +67,20 @@ message Registry {
     int32 ttl = 5;
     // 最大重试次数。
     int32 max_retry = 6;
+    // 连接超时（秒）。
+    int32 dial_timeout = 7;
+    // 集群成员自动同步间隔（秒），0 禁用。
+    int32 auto_sync_interval = 8;
+    // keepalive 探测间隔（秒）。
+    int32 dial_keep_alive_time = 9;
+    // keepalive 探测等待响应的超时（秒）。
+    int32 dial_keep_alive_timeout = 10;
+    // 拒绝连接过期集群。
+    bool reject_old_cluster = 11;
+    // 没有活动流时也允许发送 keepalive。
+    bool permit_without_stream = 12;
+    // TLS 配置。
+    TLS tls = 13;
   }
 
   message Nacos {
@@ -58,6 +93,38 @@ message Registry {
     string prefix = 6;
     // 默认服务类型。
     string default_kind = 7;
+    // 网络协议：http、https，默认 http。
+    string scheme = 8;
+    // gRPC 长连接端口，默认 port+1000。
+    uint64 grpc_port = 9;
+    // 上下文路径。
+    string context_path = 10;
+    // 地址服务器 endpoint，用于获取服务端地址列表。
+    string endpoint = 11;
+    // 认证用户名。
+    string username = 12;
+    // 认证密码。
+    string password = 13;
+    // 请求服务端超时（毫秒）。
+    int32 timeout_ms = 14;
+    // 心跳间隔（毫秒）。
+    int32 beat_interval_ms = 15;
+    // 访问密钥（KMS）。
+    string access_key = 16;
+    // 安全密钥（KMS）。
+    string secret_key = 17;
+    // 启动时不读取本地缓存数据。
+    bool not_load_cache_at_start = 18;
+    // 服务列表为空时是否更新本地缓存。
+    bool update_cache_when_empty = 19;
+    // 请求服务端失败时禁用本地快照兜底。
+    bool disable_use_snap_shot = 20;
+    // 日志是否追加输出到标准输出。
+    bool append_to_stdout = 21;
+    // 是否开启异步订阅更新服务列表。
+    bool async_update_service = 22;
+    // TLS 配置（仅支持文件路径）。
+    TLS tls = 23;
   }
 
   message Zookeeper {
@@ -83,17 +150,19 @@ message Registry {
     // 优先级，值越小优先级越低。
     int32 priority = 7;
     // 是否健康。
-    bool healthy = 8;
+    optional bool healthy = 8;
     // 是否隔离。
-    bool isolate = 9;
+    optional bool isolate = 9;
     // 心跳 TTL（秒）。
     int32 ttl = 10;
-    // 是否启用心跳。
-    bool heartbeat = 11;
+    // 是否启用心跳，默认开启。
+    optional bool heartbeat = 11;
     // 单次查询超时（毫秒）。
     int32 timeout = 12;
     // 重试次数。
     int32 retry_count = 13;
+    // SDK 配置文件路径，默认使用系统默认配置。
+    string config_file = 14;
   }
 
   message Eureka {
@@ -109,6 +178,10 @@ message Registry {
 
   message Kubernetes {
     string namespace = 1;
+    // kubeconfig 文件路径，留空使用 ~/.kube/config 或集群内配置。
+    string kubeconfig = 2;
+    // 是否强制使用集群内（InCluster）配置。
+    optional bool in_cluster = 3;
   }
 
   message ServiceComb {
@@ -116,6 +189,43 @@ message Registry {
     string app_id = 2;
     string service_name = 3;
     string version = 4;
+    // 启用 SSL。
+    bool enable_ssl = 5;
+    // 请求超时（秒）。
+    int32 timeout = 6;
+    // 启用认证。
+    bool enable_auth = 7;
+    // 认证用户名。
+    string username = 8;
+    // 认证密码。
+    string password = 9;
+    // Token 有效期（秒）。
+    int32 token_expiration = 10;
+    // 输出详细日志。
+    bool verbose = 11;
+    // 压缩请求。
+    bool compressed = 12;
+    // TLS 配置。
+    TLS tls = 13;
+  }
+
+  // TLS 通用的客户端 TLS 配置：文件路径或 PEM 内容二选一，同时提供时 PEM 优先。
+  message TLS {
+    message File {
+      optional string cert_path = 1;
+      optional string key_path = 2;
+      optional string ca_path = 3;
+    }
+    message Config {
+      optional bytes cert_pem = 1;
+      optional bytes key_pem = 2;
+      optional bytes ca_pem = 3;
+    }
+
+    optional File file = 1;
+    optional Config config = 2;
+
+    bool insecure_skip_verify = 3;
   }
 
   string type = 1;
