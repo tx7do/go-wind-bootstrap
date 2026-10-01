@@ -13,6 +13,7 @@ import (
 
 	bootstrap "github.com/tx7do/go-wind-bootstrap"
 	v1 "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1"
+	"github.com/tx7do/go-wind-bootstrap/tlsutil"
 )
 
 func init() {
@@ -26,11 +27,18 @@ func newBuilder(ctx context.Context, cfg *v1.Storage) (any, func(), error) {
 	}
 
 	pluginCfg := &minioPlugin.Config{
-		Endpoint:  c.GetEndpoint(),
-		AccessKey: c.GetAccessKey(),
-		SecretKey: c.GetSecretKey(),
-		Token:     c.GetToken(),
-		UseSsl:    c.GetUseSsl(),
+		Endpoint:       c.GetEndpoint(),
+		AccessKey:      c.GetAccessKey(),
+		SecretKey:      c.GetSecretKey(),
+		Token:          c.GetToken(),
+		UseSsl:         c.GetUseSsl(),
+		Region:         c.GetRegion(),
+		ForcePathStyle: c.GetForcePathStyle(),
+	}
+	if tlsCfg, err := tlsutil.ClientTLS(c.GetTls()); err != nil {
+		return nil, nil, fmt.Errorf("minio: load tls: %w", err)
+	} else if tlsCfg != nil {
+		pluginCfg.TLSClientConfig = tlsCfg
 	}
 
 	storage := minioPlugin.NewStorage(pluginCfg)

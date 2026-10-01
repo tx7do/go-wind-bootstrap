@@ -13,6 +13,7 @@ import (
 
 	bootstrap "github.com/tx7do/go-wind-bootstrap"
 	v1 "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1"
+	"github.com/tx7do/go-wind-bootstrap/tlsutil"
 )
 
 func init() {
@@ -34,6 +35,12 @@ func newBuilder(ctx context.Context, cfg *v1.Storage) (any, func(), error) {
 		UseSsl:         c.GetUseSsl(),
 		ForcePathStyle: c.GetForcePathStyle(),
 		Bucket:         c.GetBucket(),
+		MaxAttempts:    int(c.GetMaxAttempts()),
+	}
+	if tlsCfg, err := tlsutil.ClientTLS(c.GetTls()); err != nil {
+		return nil, nil, fmt.Errorf("s3: load tls: %w", err)
+	} else if tlsCfg != nil {
+		pluginCfg.TLSClientConfig = tlsCfg
 	}
 
 	client := s3Plugin.NewClient(pluginCfg)
