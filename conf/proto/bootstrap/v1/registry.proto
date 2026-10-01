@@ -4,6 +4,8 @@ package bootstrap.v1;
 
 option go_package = "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1";
 
+import "bootstrap/v1/tls.proto";
+
 // Registry 描述服务注册中心配置。
 message Registry {
   enum Type {
@@ -49,7 +51,7 @@ message Registry {
     // 服务发现超时（秒）。
     int32 discovery_timeout = 16;
     // TLS 配置。
-    TLS tls = 17;
+    bootstrap.v1.TLS tls = 17;
 
     message BasicAuth {
       string username = 1;
@@ -80,7 +82,7 @@ message Registry {
     // 没有活动流时也允许发送 keepalive。
     bool permit_without_stream = 12;
     // TLS 配置。
-    TLS tls = 13;
+    bootstrap.v1.TLS tls = 13;
   }
 
   message Nacos {
@@ -124,7 +126,7 @@ message Registry {
     // 是否开启异步订阅更新服务列表。
     bool async_update_service = 22;
     // TLS 配置（仅支持文件路径）。
-    TLS tls = 23;
+    bootstrap.v1.TLS tls = 23;
   }
 
   message Zookeeper {
@@ -206,26 +208,7 @@ message Registry {
     // 压缩请求。
     bool compressed = 12;
     // TLS 配置。
-    TLS tls = 13;
-  }
-
-  // TLS 通用的客户端 TLS 配置：文件路径或 PEM 内容二选一，同时提供时 PEM 优先。
-  message TLS {
-    message File {
-      optional string cert_path = 1;
-      optional string key_path = 2;
-      optional string ca_path = 3;
-    }
-    message Config {
-      optional bytes cert_pem = 1;
-      optional bytes key_pem = 2;
-      optional bytes ca_pem = 3;
-    }
-
-    optional File file = 1;
-    optional Config config = 2;
-
-    bool insecure_skip_verify = 3;
+    bootstrap.v1.TLS tls = 13;
   }
 
   string type = 1;

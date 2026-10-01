@@ -291,9 +291,17 @@ type Config_Etcd struct {
 	Username string `protobuf:"bytes,3,opt,name=username,proto3" json:"username,omitempty"`
 	Password string `protobuf:"bytes,4,opt,name=password,proto3" json:"password,omitempty"`
 	// 是否使用前缀模式（监听一个目录而非单个键）。
-	Prefix        bool `protobuf:"varint,5,opt,name=prefix,proto3" json:"prefix,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Prefix bool `protobuf:"varint,5,opt,name=prefix,proto3" json:"prefix,omitempty"`
+	// TLS 配置。
+	Tls *TLS `protobuf:"bytes,6,opt,name=tls,proto3" json:"tls,omitempty"`
+	// 连接超时（秒）。
+	DialTimeout int32 `protobuf:"varint,7,opt,name=dial_timeout,json=dialTimeout,proto3" json:"dial_timeout,omitempty"`
+	// keepalive 探测间隔（秒）。
+	DialKeepAliveTime int32 `protobuf:"varint,8,opt,name=dial_keep_alive_time,json=dialKeepAliveTime,proto3" json:"dial_keep_alive_time,omitempty"`
+	// keepalive 探测等待响应的超时（秒）。
+	DialKeepAliveTimeout int32 `protobuf:"varint,9,opt,name=dial_keep_alive_timeout,json=dialKeepAliveTimeout,proto3" json:"dial_keep_alive_timeout,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *Config_Etcd) Reset() {
@@ -361,14 +369,58 @@ func (x *Config_Etcd) GetPrefix() bool {
 	return false
 }
 
+func (x *Config_Etcd) GetTls() *TLS {
+	if x != nil {
+		return x.Tls
+	}
+	return nil
+}
+
+func (x *Config_Etcd) GetDialTimeout() int32 {
+	if x != nil {
+		return x.DialTimeout
+	}
+	return 0
+}
+
+func (x *Config_Etcd) GetDialKeepAliveTime() int32 {
+	if x != nil {
+		return x.DialKeepAliveTime
+	}
+	return 0
+}
+
+func (x *Config_Etcd) GetDialKeepAliveTimeout() int32 {
+	if x != nil {
+		return x.DialKeepAliveTimeout
+	}
+	return 0
+}
+
 // Nacos 配置源。
 type Config_Nacos struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ServerAddrs   []string               `protobuf:"bytes,1,rep,name=server_addrs,json=serverAddrs,proto3" json:"server_addrs,omitempty"`
-	Namespace     string                 `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	Group         string                 `protobuf:"bytes,3,opt,name=group,proto3" json:"group,omitempty"`
-	DataId        string                 `protobuf:"bytes,4,opt,name=data_id,json=dataId,proto3" json:"data_id,omitempty"`
-	Format        string                 `protobuf:"bytes,5,opt,name=format,proto3" json:"format,omitempty"`
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	ServerAddrs []string               `protobuf:"bytes,1,rep,name=server_addrs,json=serverAddrs,proto3" json:"server_addrs,omitempty"`
+	Namespace   string                 `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`
+	Group       string                 `protobuf:"bytes,3,opt,name=group,proto3" json:"group,omitempty"`
+	DataId      string                 `protobuf:"bytes,4,opt,name=data_id,json=dataId,proto3" json:"data_id,omitempty"`
+	Format      string                 `protobuf:"bytes,5,opt,name=format,proto3" json:"format,omitempty"`
+	// 网络协议：http、https，默认 http。
+	Scheme string `protobuf:"bytes,6,opt,name=scheme,proto3" json:"scheme,omitempty"`
+	// gRPC 长连接端口，默认 port+1000。
+	GrpcPort uint64 `protobuf:"varint,7,opt,name=grpc_port,json=grpcPort,proto3" json:"grpc_port,omitempty"`
+	// 上下文路径。
+	ContextPath string `protobuf:"bytes,8,opt,name=context_path,json=contextPath,proto3" json:"context_path,omitempty"`
+	// 地址服务器 endpoint。
+	Endpoint string `protobuf:"bytes,9,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
+	// 认证用户名。
+	Username string `protobuf:"bytes,10,opt,name=username,proto3" json:"username,omitempty"`
+	// 认证密码。
+	Password string `protobuf:"bytes,11,opt,name=password,proto3" json:"password,omitempty"`
+	// 请求服务端超时（毫秒）。
+	TimeoutMs int32 `protobuf:"varint,12,opt,name=timeout_ms,json=timeoutMs,proto3" json:"timeout_ms,omitempty"`
+	// TLS 配置（仅支持文件路径）。
+	Tls           *TLS `protobuf:"bytes,13,opt,name=tls,proto3" json:"tls,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -438,14 +490,76 @@ func (x *Config_Nacos) GetFormat() string {
 	return ""
 }
 
+func (x *Config_Nacos) GetScheme() string {
+	if x != nil {
+		return x.Scheme
+	}
+	return ""
+}
+
+func (x *Config_Nacos) GetGrpcPort() uint64 {
+	if x != nil {
+		return x.GrpcPort
+	}
+	return 0
+}
+
+func (x *Config_Nacos) GetContextPath() string {
+	if x != nil {
+		return x.ContextPath
+	}
+	return ""
+}
+
+func (x *Config_Nacos) GetEndpoint() string {
+	if x != nil {
+		return x.Endpoint
+	}
+	return ""
+}
+
+func (x *Config_Nacos) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *Config_Nacos) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+func (x *Config_Nacos) GetTimeoutMs() int32 {
+	if x != nil {
+		return x.TimeoutMs
+	}
+	return 0
+}
+
+func (x *Config_Nacos) GetTls() *TLS {
+	if x != nil {
+		return x.Tls
+	}
+	return nil
+}
+
 // Consul 配置源。
 type Config_Consul struct {
 	state   protoimpl.MessageState `protogen:"open.v1"`
 	Address string                 `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
 	// 配置键路径。
-	Path          string `protobuf:"bytes,2,opt,name=path,proto3" json:"path,omitempty"`
-	Token         string `protobuf:"bytes,3,opt,name=token,proto3" json:"token,omitempty"`
-	Scheme        string `protobuf:"bytes,4,opt,name=scheme,proto3" json:"scheme,omitempty"`
+	Path   string `protobuf:"bytes,2,opt,name=path,proto3" json:"path,omitempty"`
+	Token  string `protobuf:"bytes,3,opt,name=token,proto3" json:"token,omitempty"`
+	Scheme string `protobuf:"bytes,4,opt,name=scheme,proto3" json:"scheme,omitempty"`
+	// 数据中心。
+	Datacenter string `protobuf:"bytes,5,opt,name=datacenter,proto3" json:"datacenter,omitempty"`
+	// 命名空间（Consul 企业版）。
+	Namespace string `protobuf:"bytes,6,opt,name=namespace,proto3" json:"namespace,omitempty"`
+	// TLS 配置。
+	Tls           *TLS `protobuf:"bytes,7,opt,name=tls,proto3" json:"tls,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -506,6 +620,27 @@ func (x *Config_Consul) GetScheme() string {
 		return x.Scheme
 	}
 	return ""
+}
+
+func (x *Config_Consul) GetDatacenter() string {
+	if x != nil {
+		return x.Datacenter
+	}
+	return ""
+}
+
+func (x *Config_Consul) GetNamespace() string {
+	if x != nil {
+		return x.Namespace
+	}
+	return ""
+}
+
+func (x *Config_Consul) GetTls() *TLS {
+	if x != nil {
+		return x.Tls
+	}
+	return nil
 }
 
 // Apollo 配置源。
@@ -1225,7 +1360,7 @@ var File_bootstrap_v1_config_proto protoreflect.FileDescriptor
 
 const file_bootstrap_v1_config_proto_rawDesc = "" +
 	"\n" +
-	"\x19bootstrap/v1/config.proto\x12\fbootstrap.v1\"\xa5\x16\n" +
+	"\x19bootstrap/v1/config.proto\x12\fbootstrap.v1\x1a\x16bootstrap/v1/tls.proto\"\xa9\x1a\n" +
 	"\x06Config\x122\n" +
 	"\x04file\x18\x01 \x01(\v2\x19.bootstrap.v1.Config.FileH\x00R\x04file\x88\x01\x01\x12,\n" +
 	"\x02fs\x18\x02 \x01(\v2\x17.bootstrap.v1.Config.FsH\x01R\x02fs\x88\x01\x01\x122\n" +
@@ -1250,24 +1385,43 @@ const file_bootstrap_v1_config_proto_rawDesc = "" +
 	"\x06format\x18\x02 \x01(\tR\x06format\x12\x14\n" +
 	"\x05watch\x18\x03 \x01(\bR\x05watch\x1a\x18\n" +
 	"\x02Fs\x12\x12\n" +
-	"\x04path\x18\x01 \x01(\tR\x04path\x1a\x88\x01\n" +
+	"\x04path\x18\x01 \x01(\tR\x04path\x1a\xb8\x02\n" +
 	"\x04Etcd\x12\x1c\n" +
 	"\tendpoints\x18\x01 \x03(\tR\tendpoints\x12\x12\n" +
 	"\x04path\x18\x02 \x01(\tR\x04path\x12\x1a\n" +
 	"\busername\x18\x03 \x01(\tR\busername\x12\x1a\n" +
 	"\bpassword\x18\x04 \x01(\tR\bpassword\x12\x16\n" +
-	"\x06prefix\x18\x05 \x01(\bR\x06prefix\x1a\x8f\x01\n" +
+	"\x06prefix\x18\x05 \x01(\bR\x06prefix\x12#\n" +
+	"\x03tls\x18\x06 \x01(\v2\x11.bootstrap.v1.TLSR\x03tls\x12!\n" +
+	"\fdial_timeout\x18\a \x01(\x05R\vdialTimeout\x12/\n" +
+	"\x14dial_keep_alive_time\x18\b \x01(\x05R\x11dialKeepAliveTime\x125\n" +
+	"\x17dial_keep_alive_timeout\x18\t \x01(\x05R\x14dialKeepAliveTimeout\x1a\xff\x02\n" +
 	"\x05Nacos\x12!\n" +
 	"\fserver_addrs\x18\x01 \x03(\tR\vserverAddrs\x12\x1c\n" +
 	"\tnamespace\x18\x02 \x01(\tR\tnamespace\x12\x14\n" +
 	"\x05group\x18\x03 \x01(\tR\x05group\x12\x17\n" +
 	"\adata_id\x18\x04 \x01(\tR\x06dataId\x12\x16\n" +
-	"\x06format\x18\x05 \x01(\tR\x06format\x1ad\n" +
+	"\x06format\x18\x05 \x01(\tR\x06format\x12\x16\n" +
+	"\x06scheme\x18\x06 \x01(\tR\x06scheme\x12\x1b\n" +
+	"\tgrpc_port\x18\a \x01(\x04R\bgrpcPort\x12!\n" +
+	"\fcontext_path\x18\b \x01(\tR\vcontextPath\x12\x1a\n" +
+	"\bendpoint\x18\t \x01(\tR\bendpoint\x12\x1a\n" +
+	"\busername\x18\n" +
+	" \x01(\tR\busername\x12\x1a\n" +
+	"\bpassword\x18\v \x01(\tR\bpassword\x12\x1d\n" +
+	"\n" +
+	"timeout_ms\x18\f \x01(\x05R\ttimeoutMs\x12#\n" +
+	"\x03tls\x18\r \x01(\v2\x11.bootstrap.v1.TLSR\x03tls\x1a\xc7\x01\n" +
 	"\x06Consul\x12\x18\n" +
 	"\aaddress\x18\x01 \x01(\tR\aaddress\x12\x12\n" +
 	"\x04path\x18\x02 \x01(\tR\x04path\x12\x14\n" +
 	"\x05token\x18\x03 \x01(\tR\x05token\x12\x16\n" +
-	"\x06scheme\x18\x04 \x01(\tR\x06scheme\x1a\xe6\x01\n" +
+	"\x06scheme\x18\x04 \x01(\tR\x06scheme\x12\x1e\n" +
+	"\n" +
+	"datacenter\x18\x05 \x01(\tR\n" +
+	"datacenter\x12\x1c\n" +
+	"\tnamespace\x18\x06 \x01(\tR\tnamespace\x12#\n" +
+	"\x03tls\x18\a \x01(\v2\x11.bootstrap.v1.TLSR\x03tls\x1a\xe6\x01\n" +
 	"\x06Apollo\x12\x15\n" +
 	"\x06app_id\x18\x01 \x01(\tR\x05appId\x12\x18\n" +
 	"\acluster\x18\x02 \x01(\tR\acluster\x12\x1c\n" +
@@ -1344,8 +1498,7 @@ const file_bootstrap_v1_config_proto_rawDesc = "" +
 	"\x04_envB\x06\n" +
 	"\x04_ossB\n" +
 	"\n" +
-	"\b_polarisB\xb9\x01\n" +
-	"\x10com.bootstrap.v1B\vConfigProtoP\x01ZGgithub.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1;bootstrapv1\xa2\x02\x03BXX\xaa\x02\fBootstrap.V1\xca\x02\fBootstrap\\V1\xe2\x02\x18Bootstrap\\V1\\GPBMetadata\xea\x02\rBootstrap::V1b\x06proto3"
+	"\b_polarisB=Z;github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1b\x06proto3"
 
 var (
 	file_bootstrap_v1_config_proto_rawDescOnce sync.Once
@@ -1377,6 +1530,7 @@ var file_bootstrap_v1_config_proto_goTypes = []any{
 	(*Config_Oss)(nil),        // 13: bootstrap.v1.Config.Oss
 	(*Config_Polaris)(nil),    // 14: bootstrap.v1.Config.Polaris
 	nil,                       // 15: bootstrap.v1.Config.Http.HeadersEntry
+	(*TLS)(nil),               // 16: bootstrap.v1.TLS
 }
 var file_bootstrap_v1_config_proto_depIdxs = []int32{
 	1,  // 0: bootstrap.v1.Config.file:type_name -> bootstrap.v1.Config.File
@@ -1393,12 +1547,15 @@ var file_bootstrap_v1_config_proto_depIdxs = []int32{
 	12, // 11: bootstrap.v1.Config.env:type_name -> bootstrap.v1.Config.Env
 	13, // 12: bootstrap.v1.Config.oss:type_name -> bootstrap.v1.Config.Oss
 	14, // 13: bootstrap.v1.Config.polaris:type_name -> bootstrap.v1.Config.Polaris
-	15, // 14: bootstrap.v1.Config.Http.headers:type_name -> bootstrap.v1.Config.Http.HeadersEntry
-	15, // [15:15] is the sub-list for method output_type
-	15, // [15:15] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	16, // 14: bootstrap.v1.Config.Etcd.tls:type_name -> bootstrap.v1.TLS
+	16, // 15: bootstrap.v1.Config.Nacos.tls:type_name -> bootstrap.v1.TLS
+	16, // 16: bootstrap.v1.Config.Consul.tls:type_name -> bootstrap.v1.TLS
+	15, // 17: bootstrap.v1.Config.Http.headers:type_name -> bootstrap.v1.Config.Http.HeadersEntry
+	18, // [18:18] is the sub-list for method output_type
+	18, // [18:18] is the sub-list for method input_type
+	18, // [18:18] is the sub-list for extension type_name
+	18, // [18:18] is the sub-list for extension extendee
+	0,  // [0:18] is the sub-list for field type_name
 }
 
 func init() { file_bootstrap_v1_config_proto_init() }
@@ -1406,6 +1563,7 @@ func file_bootstrap_v1_config_proto_init() {
 	if File_bootstrap_v1_config_proto != nil {
 		return
 	}
+	file_bootstrap_v1_tls_proto_init()
 	file_bootstrap_v1_config_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

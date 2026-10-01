@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package bootstrap.v1;
+
+option go_package = "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1";
+
+// TLS 通用的客户端 TLS 配置：文件路径或 PEM 内容二选一，同时提供时 PEM 优先。
+// 由 tlsutil 包解析为 *tls.Config，registry/cache/storage 等模块复用。
+message TLS {
+  message File {
+    optional string cert_path = 1;
+    optional string key_path = 2;
+    optional string ca_path = 3;
+  }
+  message Config {
+    optional bytes cert_pem = 1;
+    optional bytes key_pem = 2;
+    optional bytes ca_pem = 3;
+  }
+
+  optional File file = 1;
+  optional Config config = 2;
+
+  bool insecure_skip_verify = 3;
+}

@@ -132,9 +132,15 @@ type Tracer_Otlp struct {
 	// 采样策略：always_on / always_off / trace_id_ratio / parent_based。
 	Sampler string `protobuf:"bytes,4,opt,name=sampler,proto3" json:"sampler,omitempty"`
 	// trace_id_ratio 模式下的采样比率 (0.0 ~ 1.0)。
-	SampleRatio   float64 `protobuf:"fixed64,5,opt,name=sample_ratio,json=sampleRatio,proto3" json:"sample_ratio,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	SampleRatio float64 `protobuf:"fixed64,5,opt,name=sample_ratio,json=sampleRatio,proto3" json:"sample_ratio,omitempty"`
+	// 使用 HTTP（collector 的 http 端口）而非 gRPC 上报。
+	UseHttp bool `protobuf:"varint,6,opt,name=use_http,json=useHttp,proto3" json:"use_http,omitempty"`
+	// 批处理延迟（毫秒），默认 5000。
+	BatchTimeoutMs int32 `protobuf:"varint,7,opt,name=batch_timeout_ms,json=batchTimeoutMs,proto3" json:"batch_timeout_ms,omitempty"`
+	// 导出请求超时（毫秒），默认 5000。
+	ExportTimeoutMs int32 `protobuf:"varint,8,opt,name=export_timeout_ms,json=exportTimeoutMs,proto3" json:"export_timeout_ms,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *Tracer_Otlp) Reset() {
@@ -202,28 +208,51 @@ func (x *Tracer_Otlp) GetSampleRatio() float64 {
 	return 0
 }
 
+func (x *Tracer_Otlp) GetUseHttp() bool {
+	if x != nil {
+		return x.UseHttp
+	}
+	return false
+}
+
+func (x *Tracer_Otlp) GetBatchTimeoutMs() int32 {
+	if x != nil {
+		return x.BatchTimeoutMs
+	}
+	return 0
+}
+
+func (x *Tracer_Otlp) GetExportTimeoutMs() int32 {
+	if x != nil {
+		return x.ExportTimeoutMs
+	}
+	return 0
+}
+
 var File_bootstrap_v1_tracer_proto protoreflect.FileDescriptor
 
 const file_bootstrap_v1_tracer_proto_rawDesc = "" +
 	"\n" +
-	"\x19bootstrap/v1/tracer.proto\x12\fbootstrap.v1\"\xfd\x02\n" +
+	"\x19bootstrap/v1/tracer.proto\x12\fbootstrap.v1\"\xee\x03\n" +
 	"\x06Tracer\x12\x12\n" +
 	"\x04type\x18\x01 \x01(\tR\x04type\x122\n" +
-	"\x04otlp\x18\x02 \x01(\v2\x19.bootstrap.v1.Tracer.OtlpH\x00R\x04otlp\x88\x01\x01\x1a\xf9\x01\n" +
+	"\x04otlp\x18\x02 \x01(\v2\x19.bootstrap.v1.Tracer.OtlpH\x00R\x04otlp\x88\x01\x01\x1a\xea\x02\n" +
 	"\x04Otlp\x12\x1a\n" +
 	"\bendpoint\x18\x01 \x01(\tR\bendpoint\x12\x1a\n" +
 	"\binsecure\x18\x02 \x01(\bR\binsecure\x12@\n" +
 	"\aheaders\x18\x03 \x03(\v2&.bootstrap.v1.Tracer.Otlp.HeadersEntryR\aheaders\x12\x18\n" +
 	"\asampler\x18\x04 \x01(\tR\asampler\x12!\n" +
-	"\fsample_ratio\x18\x05 \x01(\x01R\vsampleRatio\x1a:\n" +
+	"\fsample_ratio\x18\x05 \x01(\x01R\vsampleRatio\x12\x19\n" +
+	"\buse_http\x18\x06 \x01(\bR\auseHttp\x12(\n" +
+	"\x10batch_timeout_ms\x18\a \x01(\x05R\x0ebatchTimeoutMs\x12*\n" +
+	"\x11export_timeout_ms\x18\b \x01(\x05R\x0fexportTimeoutMs\x1a:\n" +
 	"\fHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"&\n" +
 	"\x04Type\x12\x14\n" +
 	"\x10TYPE_UNSPECIFIED\x10\x00\x12\b\n" +
 	"\x04OTLP\x10\x01B\a\n" +
-	"\x05_otlpB\xb9\x01\n" +
-	"\x10com.bootstrap.v1B\vTracerProtoP\x01ZGgithub.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1;bootstrapv1\xa2\x02\x03BXX\xaa\x02\fBootstrap.V1\xca\x02\fBootstrap\\V1\xe2\x02\x18Bootstrap\\V1\\GPBMetadata\xea\x02\rBootstrap::V1b\x06proto3"
+	"\x05_otlpB=Z;github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1b\x06proto3"
 
 var (
 	file_bootstrap_v1_tracer_proto_rawDescOnce sync.Once

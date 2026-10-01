@@ -138,6 +138,20 @@ message Server {
     TLS tls = 3;
     // 中间件配置。
     Middleware middleware = 4;
+    // keepalive 探测间隔（秒），0 使用 gRPC 默认值。
+    int32 keepalive_time = 5;
+    // keepalive 探测等待响应的超时（秒），0 使用 gRPC 默认值。
+    int32 keepalive_timeout = 6;
+    // 请求级连接超时（秒），0 表示不启用。
+    int32 connection_timeout = 7;
+    // 最大接收消息大小（字节），0 使用 gRPC 默认值（4MB）。
+    int32 max_recv_msg_size = 8;
+    // 最大发送消息大小（字节），0 使用 gRPC 默认值（4MB）。
+    int32 max_send_msg_size = 9;
+    // 最大并发流数量，0 使用 gRPC 默认值。
+    int32 max_concurrent_streams = 10;
+    // 允许客户端每 N 秒至少发送一次 keepalive 探测（秒），0 使用 gRPC 默认值。
+    int32 keepalive_min_time = 11;
   }
 
   // GraphQL 传输层（基于 gqlgen，运行在 HTTP 之上）。

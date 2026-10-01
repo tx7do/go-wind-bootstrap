@@ -228,7 +228,7 @@ type Registry_Consul struct {
 	// 服务发现超时（秒）。
 	DiscoveryTimeout int32 `protobuf:"varint,16,opt,name=discovery_timeout,json=discoveryTimeout,proto3" json:"discovery_timeout,omitempty"`
 	// TLS 配置。
-	Tls           *Registry_TLS `protobuf:"bytes,17,opt,name=tls,proto3" json:"tls,omitempty"`
+	Tls           *TLS `protobuf:"bytes,17,opt,name=tls,proto3" json:"tls,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -375,7 +375,7 @@ func (x *Registry_Consul) GetDiscoveryTimeout() int32 {
 	return 0
 }
 
-func (x *Registry_Consul) GetTls() *Registry_TLS {
+func (x *Registry_Consul) GetTls() *TLS {
 	if x != nil {
 		return x.Tls
 	}
@@ -406,7 +406,7 @@ type Registry_Etcd struct {
 	// 没有活动流时也允许发送 keepalive。
 	PermitWithoutStream bool `protobuf:"varint,12,opt,name=permit_without_stream,json=permitWithoutStream,proto3" json:"permit_without_stream,omitempty"`
 	// TLS 配置。
-	Tls           *Registry_TLS `protobuf:"bytes,13,opt,name=tls,proto3" json:"tls,omitempty"`
+	Tls           *TLS `protobuf:"bytes,13,opt,name=tls,proto3" json:"tls,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -525,7 +525,7 @@ func (x *Registry_Etcd) GetPermitWithoutStream() bool {
 	return false
 }
 
-func (x *Registry_Etcd) GetTls() *Registry_TLS {
+func (x *Registry_Etcd) GetTls() *TLS {
 	if x != nil {
 		return x.Tls
 	}
@@ -574,7 +574,7 @@ type Registry_Nacos struct {
 	// 是否开启异步订阅更新服务列表。
 	AsyncUpdateService bool `protobuf:"varint,22,opt,name=async_update_service,json=asyncUpdateService,proto3" json:"async_update_service,omitempty"`
 	// TLS 配置（仅支持文件路径）。
-	Tls           *Registry_TLS `protobuf:"bytes,23,opt,name=tls,proto3" json:"tls,omitempty"`
+	Tls           *TLS `protobuf:"bytes,23,opt,name=tls,proto3" json:"tls,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -763,7 +763,7 @@ func (x *Registry_Nacos) GetAsyncUpdateService() bool {
 	return false
 }
 
-func (x *Registry_Nacos) GetTls() *Registry_TLS {
+func (x *Registry_Nacos) GetTls() *TLS {
 	if x != nil {
 		return x.Tls
 	}
@@ -1171,7 +1171,7 @@ type Registry_ServiceComb struct {
 	// 压缩请求。
 	Compressed bool `protobuf:"varint,12,opt,name=compressed,proto3" json:"compressed,omitempty"`
 	// TLS 配置。
-	Tls           *Registry_TLS `protobuf:"bytes,13,opt,name=tls,proto3" json:"tls,omitempty"`
+	Tls           *TLS `protobuf:"bytes,13,opt,name=tls,proto3" json:"tls,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1290,72 +1290,11 @@ func (x *Registry_ServiceComb) GetCompressed() bool {
 	return false
 }
 
-func (x *Registry_ServiceComb) GetTls() *Registry_TLS {
+func (x *Registry_ServiceComb) GetTls() *TLS {
 	if x != nil {
 		return x.Tls
 	}
 	return nil
-}
-
-// TLS 通用的客户端 TLS 配置：文件路径或 PEM 内容二选一，同时提供时 PEM 优先。
-type Registry_TLS struct {
-	state              protoimpl.MessageState `protogen:"open.v1"`
-	File               *Registry_TLS_File     `protobuf:"bytes,1,opt,name=file,proto3,oneof" json:"file,omitempty"`
-	Config             *Registry_TLS_Config   `protobuf:"bytes,2,opt,name=config,proto3,oneof" json:"config,omitempty"`
-	InsecureSkipVerify bool                   `protobuf:"varint,3,opt,name=insecure_skip_verify,json=insecureSkipVerify,proto3" json:"insecure_skip_verify,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
-}
-
-func (x *Registry_TLS) Reset() {
-	*x = Registry_TLS{}
-	mi := &file_bootstrap_v1_registry_proto_msgTypes[9]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Registry_TLS) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Registry_TLS) ProtoMessage() {}
-
-func (x *Registry_TLS) ProtoReflect() protoreflect.Message {
-	mi := &file_bootstrap_v1_registry_proto_msgTypes[9]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Registry_TLS.ProtoReflect.Descriptor instead.
-func (*Registry_TLS) Descriptor() ([]byte, []int) {
-	return file_bootstrap_v1_registry_proto_rawDescGZIP(), []int{0, 8}
-}
-
-func (x *Registry_TLS) GetFile() *Registry_TLS_File {
-	if x != nil {
-		return x.File
-	}
-	return nil
-}
-
-func (x *Registry_TLS) GetConfig() *Registry_TLS_Config {
-	if x != nil {
-		return x.Config
-	}
-	return nil
-}
-
-func (x *Registry_TLS) GetInsecureSkipVerify() bool {
-	if x != nil {
-		return x.InsecureSkipVerify
-	}
-	return false
 }
 
 type Registry_Consul_BasicAuth struct {
@@ -1368,7 +1307,7 @@ type Registry_Consul_BasicAuth struct {
 
 func (x *Registry_Consul_BasicAuth) Reset() {
 	*x = Registry_Consul_BasicAuth{}
-	mi := &file_bootstrap_v1_registry_proto_msgTypes[10]
+	mi := &file_bootstrap_v1_registry_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1380,7 +1319,7 @@ func (x *Registry_Consul_BasicAuth) String() string {
 func (*Registry_Consul_BasicAuth) ProtoMessage() {}
 
 func (x *Registry_Consul_BasicAuth) ProtoReflect() protoreflect.Message {
-	mi := &file_bootstrap_v1_registry_proto_msgTypes[10]
+	mi := &file_bootstrap_v1_registry_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1410,131 +1349,11 @@ func (x *Registry_Consul_BasicAuth) GetPassword() string {
 	return ""
 }
 
-type Registry_TLS_File struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	CertPath      *string                `protobuf:"bytes,1,opt,name=cert_path,json=certPath,proto3,oneof" json:"cert_path,omitempty"`
-	KeyPath       *string                `protobuf:"bytes,2,opt,name=key_path,json=keyPath,proto3,oneof" json:"key_path,omitempty"`
-	CaPath        *string                `protobuf:"bytes,3,opt,name=ca_path,json=caPath,proto3,oneof" json:"ca_path,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Registry_TLS_File) Reset() {
-	*x = Registry_TLS_File{}
-	mi := &file_bootstrap_v1_registry_proto_msgTypes[11]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Registry_TLS_File) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Registry_TLS_File) ProtoMessage() {}
-
-func (x *Registry_TLS_File) ProtoReflect() protoreflect.Message {
-	mi := &file_bootstrap_v1_registry_proto_msgTypes[11]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Registry_TLS_File.ProtoReflect.Descriptor instead.
-func (*Registry_TLS_File) Descriptor() ([]byte, []int) {
-	return file_bootstrap_v1_registry_proto_rawDescGZIP(), []int{0, 8, 0}
-}
-
-func (x *Registry_TLS_File) GetCertPath() string {
-	if x != nil && x.CertPath != nil {
-		return *x.CertPath
-	}
-	return ""
-}
-
-func (x *Registry_TLS_File) GetKeyPath() string {
-	if x != nil && x.KeyPath != nil {
-		return *x.KeyPath
-	}
-	return ""
-}
-
-func (x *Registry_TLS_File) GetCaPath() string {
-	if x != nil && x.CaPath != nil {
-		return *x.CaPath
-	}
-	return ""
-}
-
-type Registry_TLS_Config struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	CertPem       []byte                 `protobuf:"bytes,1,opt,name=cert_pem,json=certPem,proto3,oneof" json:"cert_pem,omitempty"`
-	KeyPem        []byte                 `protobuf:"bytes,2,opt,name=key_pem,json=keyPem,proto3,oneof" json:"key_pem,omitempty"`
-	CaPem         []byte                 `protobuf:"bytes,3,opt,name=ca_pem,json=caPem,proto3,oneof" json:"ca_pem,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Registry_TLS_Config) Reset() {
-	*x = Registry_TLS_Config{}
-	mi := &file_bootstrap_v1_registry_proto_msgTypes[12]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Registry_TLS_Config) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Registry_TLS_Config) ProtoMessage() {}
-
-func (x *Registry_TLS_Config) ProtoReflect() protoreflect.Message {
-	mi := &file_bootstrap_v1_registry_proto_msgTypes[12]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Registry_TLS_Config.ProtoReflect.Descriptor instead.
-func (*Registry_TLS_Config) Descriptor() ([]byte, []int) {
-	return file_bootstrap_v1_registry_proto_rawDescGZIP(), []int{0, 8, 1}
-}
-
-func (x *Registry_TLS_Config) GetCertPem() []byte {
-	if x != nil {
-		return x.CertPem
-	}
-	return nil
-}
-
-func (x *Registry_TLS_Config) GetKeyPem() []byte {
-	if x != nil {
-		return x.KeyPem
-	}
-	return nil
-}
-
-func (x *Registry_TLS_Config) GetCaPem() []byte {
-	if x != nil {
-		return x.CaPem
-	}
-	return nil
-}
-
 var File_bootstrap_v1_registry_proto protoreflect.FileDescriptor
 
 const file_bootstrap_v1_registry_proto_rawDesc = "" +
 	"\n" +
-	"\x1bbootstrap/v1/registry.proto\x12\fbootstrap.v1\"\xc9$\n" +
+	"\x1bbootstrap/v1/registry.proto\x12\fbootstrap.v1\x1a\x16bootstrap/v1/tls.proto\"\xc4 \n" +
 	"\bRegistry\x12\x12\n" +
 	"\x04type\x18\x01 \x01(\tR\x04type\x12:\n" +
 	"\x06consul\x18\x02 \x01(\v2\x1d.bootstrap.v1.Registry.ConsulH\x00R\x06consul\x88\x01\x01\x124\n" +
@@ -1546,7 +1365,7 @@ const file_bootstrap_v1_registry_proto_rawDesc = "" +
 	"\n" +
 	"kubernetes\x18\b \x01(\v2!.bootstrap.v1.Registry.KubernetesH\x06R\n" +
 	"kubernetes\x88\x01\x01\x12J\n" +
-	"\fservice_comb\x18\t \x01(\v2\".bootstrap.v1.Registry.ServiceCombH\aR\vserviceComb\x88\x01\x01\x1a\xf0\x05\n" +
+	"\fservice_comb\x18\t \x01(\v2\".bootstrap.v1.Registry.ServiceCombH\aR\vserviceComb\x88\x01\x01\x1a\xe7\x05\n" +
 	"\x06Consul\x12\x18\n" +
 	"\aaddress\x18\x01 \x01(\tR\aaddress\x12\x16\n" +
 	"\x06scheme\x18\x02 \x01(\tR\x06scheme\x12\x14\n" +
@@ -1569,11 +1388,11 @@ const file_bootstrap_v1_registry_proto_rawDesc = "" +
 	"\n" +
 	"basic_auth\x18\x0e \x01(\v2'.bootstrap.v1.Registry.Consul.BasicAuthR\tbasicAuth\x12\x1b\n" +
 	"\twait_time\x18\x0f \x01(\x05R\bwaitTime\x12+\n" +
-	"\x11discovery_timeout\x18\x10 \x01(\x05R\x10discoveryTimeout\x12,\n" +
-	"\x03tls\x18\x11 \x01(\v2\x1a.bootstrap.v1.Registry.TLSR\x03tls\x1aC\n" +
+	"\x11discovery_timeout\x18\x10 \x01(\x05R\x10discoveryTimeout\x12#\n" +
+	"\x03tls\x18\x11 \x01(\v2\x11.bootstrap.v1.TLSR\x03tls\x1aC\n" +
 	"\tBasicAuth\x12\x1a\n" +
 	"\busername\x18\x01 \x01(\tR\busername\x12\x1a\n" +
-	"\bpassword\x18\x02 \x01(\tR\bpassword\x1a\xec\x03\n" +
+	"\bpassword\x18\x02 \x01(\tR\bpassword\x1a\xe3\x03\n" +
 	"\x04Etcd\x12\x1c\n" +
 	"\tendpoints\x18\x01 \x03(\tR\tendpoints\x12\x1a\n" +
 	"\busername\x18\x02 \x01(\tR\busername\x12\x1a\n" +
@@ -1587,8 +1406,8 @@ const file_bootstrap_v1_registry_proto_rawDesc = "" +
 	"\x17dial_keep_alive_timeout\x18\n" +
 	" \x01(\x05R\x14dialKeepAliveTimeout\x12,\n" +
 	"\x12reject_old_cluster\x18\v \x01(\bR\x10rejectOldCluster\x122\n" +
-	"\x15permit_without_stream\x18\f \x01(\bR\x13permitWithoutStream\x12,\n" +
-	"\x03tls\x18\r \x01(\v2\x1a.bootstrap.v1.Registry.TLSR\x03tls\x1a\xb1\x06\n" +
+	"\x15permit_without_stream\x18\f \x01(\bR\x13permitWithoutStream\x12#\n" +
+	"\x03tls\x18\r \x01(\v2\x11.bootstrap.v1.TLSR\x03tls\x1a\xa8\x06\n" +
 	"\x05Nacos\x12!\n" +
 	"\fserver_addrs\x18\x01 \x03(\tR\vserverAddrs\x12\x1c\n" +
 	"\tnamespace\x18\x02 \x01(\tR\tnamespace\x12\x14\n" +
@@ -1615,8 +1434,8 @@ const file_bootstrap_v1_registry_proto_rawDesc = "" +
 	"\x17update_cache_when_empty\x18\x13 \x01(\bR\x14updateCacheWhenEmpty\x121\n" +
 	"\x15disable_use_snap_shot\x18\x14 \x01(\bR\x12disableUseSnapShot\x12(\n" +
 	"\x10append_to_stdout\x18\x15 \x01(\bR\x0eappendToStdout\x120\n" +
-	"\x14async_update_service\x18\x16 \x01(\bR\x12asyncUpdateService\x12,\n" +
-	"\x03tls\x18\x17 \x01(\v2\x1a.bootstrap.v1.Registry.TLSR\x03tls\x1a\xa7\x01\n" +
+	"\x14async_update_service\x18\x16 \x01(\bR\x12asyncUpdateService\x12#\n" +
+	"\x03tls\x18\x17 \x01(\v2\x11.bootstrap.v1.TLSR\x03tls\x1a\xa7\x01\n" +
 	"\tZookeeper\x12\x1c\n" +
 	"\tendpoints\x18\x01 \x03(\tR\tendpoints\x12\x1b\n" +
 	"\troot_path\x18\x02 \x01(\tR\brootPath\x12'\n" +
@@ -1662,7 +1481,7 @@ const file_bootstrap_v1_registry_proto_rawDesc = "" +
 	"kubeconfig\x12\"\n" +
 	"\n" +
 	"in_cluster\x18\x03 \x01(\bH\x00R\tinCluster\x88\x01\x01B\r\n" +
-	"\v_in_cluster\x1a\xa4\x03\n" +
+	"\v_in_cluster\x1a\x9b\x03\n" +
 	"\vServiceComb\x12\x1c\n" +
 	"\tendpoints\x18\x01 \x03(\tR\tendpoints\x12\x15\n" +
 	"\x06app_id\x18\x02 \x01(\tR\x05appId\x12!\n" +
@@ -1680,31 +1499,8 @@ const file_bootstrap_v1_registry_proto_rawDesc = "" +
 	"\averbose\x18\v \x01(\bR\averbose\x12\x1e\n" +
 	"\n" +
 	"compressed\x18\f \x01(\bR\n" +
-	"compressed\x12,\n" +
-	"\x03tls\x18\r \x01(\v2\x1a.bootstrap.v1.Registry.TLSR\x03tls\x1a\xde\x03\n" +
-	"\x03TLS\x128\n" +
-	"\x04file\x18\x01 \x01(\v2\x1f.bootstrap.v1.Registry.TLS.FileH\x00R\x04file\x88\x01\x01\x12>\n" +
-	"\x06config\x18\x02 \x01(\v2!.bootstrap.v1.Registry.TLS.ConfigH\x01R\x06config\x88\x01\x01\x120\n" +
-	"\x14insecure_skip_verify\x18\x03 \x01(\bR\x12insecureSkipVerify\x1a\x8d\x01\n" +
-	"\x04File\x12 \n" +
-	"\tcert_path\x18\x01 \x01(\tH\x00R\bcertPath\x88\x01\x01\x12\x1e\n" +
-	"\bkey_path\x18\x02 \x01(\tH\x01R\akeyPath\x88\x01\x01\x12\x1c\n" +
-	"\aca_path\x18\x03 \x01(\tH\x02R\x06caPath\x88\x01\x01B\f\n" +
-	"\n" +
-	"_cert_pathB\v\n" +
-	"\t_key_pathB\n" +
-	"\n" +
-	"\b_ca_path\x1a\x86\x01\n" +
-	"\x06Config\x12\x1e\n" +
-	"\bcert_pem\x18\x01 \x01(\fH\x00R\acertPem\x88\x01\x01\x12\x1c\n" +
-	"\akey_pem\x18\x02 \x01(\fH\x01R\x06keyPem\x88\x01\x01\x12\x1a\n" +
-	"\x06ca_pem\x18\x03 \x01(\fH\x02R\x05caPem\x88\x01\x01B\v\n" +
-	"\t_cert_pemB\n" +
-	"\n" +
-	"\b_key_pemB\t\n" +
-	"\a_ca_pemB\a\n" +
-	"\x05_fileB\t\n" +
-	"\a_config\"\x87\x01\n" +
+	"compressed\x12#\n" +
+	"\x03tls\x18\r \x01(\v2\x11.bootstrap.v1.TLSR\x03tls\"\x87\x01\n" +
 	"\x04Type\x12\x14\n" +
 	"\x10TYPE_UNSPECIFIED\x10\x00\x12\n" +
 	"\n" +
@@ -1742,7 +1538,7 @@ func file_bootstrap_v1_registry_proto_rawDescGZIP() []byte {
 }
 
 var file_bootstrap_v1_registry_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_bootstrap_v1_registry_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_bootstrap_v1_registry_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_bootstrap_v1_registry_proto_goTypes = []any{
 	(Registry_Type)(0),                // 0: bootstrap.v1.Registry.Type
 	(*Registry)(nil),                  // 1: bootstrap.v1.Registry
@@ -1754,10 +1550,8 @@ var file_bootstrap_v1_registry_proto_goTypes = []any{
 	(*Registry_Eureka)(nil),           // 7: bootstrap.v1.Registry.Eureka
 	(*Registry_Kubernetes)(nil),       // 8: bootstrap.v1.Registry.Kubernetes
 	(*Registry_ServiceComb)(nil),      // 9: bootstrap.v1.Registry.ServiceComb
-	(*Registry_TLS)(nil),              // 10: bootstrap.v1.Registry.TLS
-	(*Registry_Consul_BasicAuth)(nil), // 11: bootstrap.v1.Registry.Consul.BasicAuth
-	(*Registry_TLS_File)(nil),         // 12: bootstrap.v1.Registry.TLS.File
-	(*Registry_TLS_Config)(nil),       // 13: bootstrap.v1.Registry.TLS.Config
+	(*Registry_Consul_BasicAuth)(nil), // 10: bootstrap.v1.Registry.Consul.BasicAuth
+	(*TLS)(nil),                       // 11: bootstrap.v1.TLS
 }
 var file_bootstrap_v1_registry_proto_depIdxs = []int32{
 	2,  // 0: bootstrap.v1.Registry.consul:type_name -> bootstrap.v1.Registry.Consul
@@ -1768,18 +1562,16 @@ var file_bootstrap_v1_registry_proto_depIdxs = []int32{
 	7,  // 5: bootstrap.v1.Registry.eureka:type_name -> bootstrap.v1.Registry.Eureka
 	8,  // 6: bootstrap.v1.Registry.kubernetes:type_name -> bootstrap.v1.Registry.Kubernetes
 	9,  // 7: bootstrap.v1.Registry.service_comb:type_name -> bootstrap.v1.Registry.ServiceComb
-	11, // 8: bootstrap.v1.Registry.Consul.basic_auth:type_name -> bootstrap.v1.Registry.Consul.BasicAuth
-	10, // 9: bootstrap.v1.Registry.Consul.tls:type_name -> bootstrap.v1.Registry.TLS
-	10, // 10: bootstrap.v1.Registry.Etcd.tls:type_name -> bootstrap.v1.Registry.TLS
-	10, // 11: bootstrap.v1.Registry.Nacos.tls:type_name -> bootstrap.v1.Registry.TLS
-	10, // 12: bootstrap.v1.Registry.ServiceComb.tls:type_name -> bootstrap.v1.Registry.TLS
-	12, // 13: bootstrap.v1.Registry.TLS.file:type_name -> bootstrap.v1.Registry.TLS.File
-	13, // 14: bootstrap.v1.Registry.TLS.config:type_name -> bootstrap.v1.Registry.TLS.Config
-	15, // [15:15] is the sub-list for method output_type
-	15, // [15:15] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	10, // 8: bootstrap.v1.Registry.Consul.basic_auth:type_name -> bootstrap.v1.Registry.Consul.BasicAuth
+	11, // 9: bootstrap.v1.Registry.Consul.tls:type_name -> bootstrap.v1.TLS
+	11, // 10: bootstrap.v1.Registry.Etcd.tls:type_name -> bootstrap.v1.TLS
+	11, // 11: bootstrap.v1.Registry.Nacos.tls:type_name -> bootstrap.v1.TLS
+	11, // 12: bootstrap.v1.Registry.ServiceComb.tls:type_name -> bootstrap.v1.TLS
+	13, // [13:13] is the sub-list for method output_type
+	13, // [13:13] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_bootstrap_v1_registry_proto_init() }
@@ -1787,19 +1579,17 @@ func file_bootstrap_v1_registry_proto_init() {
 	if File_bootstrap_v1_registry_proto != nil {
 		return
 	}
+	file_bootstrap_v1_tls_proto_init()
 	file_bootstrap_v1_registry_proto_msgTypes[0].OneofWrappers = []any{}
 	file_bootstrap_v1_registry_proto_msgTypes[5].OneofWrappers = []any{}
 	file_bootstrap_v1_registry_proto_msgTypes[7].OneofWrappers = []any{}
-	file_bootstrap_v1_registry_proto_msgTypes[9].OneofWrappers = []any{}
-	file_bootstrap_v1_registry_proto_msgTypes[11].OneofWrappers = []any{}
-	file_bootstrap_v1_registry_proto_msgTypes[12].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_bootstrap_v1_registry_proto_rawDesc), len(file_bootstrap_v1_registry_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   13,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

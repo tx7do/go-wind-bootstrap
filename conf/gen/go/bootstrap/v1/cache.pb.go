@@ -129,17 +129,56 @@ func (x *Cache_Local) GetDefaultTtlSeconds() int32 {
 	return 0
 }
 
-// Redis 缓存。
+// Redis 缓存。客户端模式（standalone/cluster/sentinel）按字段自动推断：
+// 配置 master_name 即 sentinel，配置 addrs（多于一个或配合 mode）即 cluster。
 type Cache_Redis struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Redis 服务地址，如 "localhost:6379"。
-	Addr string `protobuf:"bytes,1,opt,name=addr,proto3" json:"addr,omitempty"`
+	// 网络类型，默认 tcp。
+	Network string `protobuf:"bytes,1,opt,name=network,proto3" json:"network,omitempty"`
+	// Redis 服务地址（standalone 模式），如 "localhost:6379"。
+	Addr string `protobuf:"bytes,2,opt,name=addr,proto3" json:"addr,omitempty"`
 	// Redis 密码。
-	Password string `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	Password string `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
 	// Redis 数据库编号，默认 0。
-	Db int32 `protobuf:"varint,3,opt,name=db,proto3" json:"db,omitempty"`
+	Db int32 `protobuf:"varint,4,opt,name=db,proto3" json:"db,omitempty"`
+	// 用户名（Redis 6 ACL）。
+	Username string `protobuf:"bytes,5,opt,name=username,proto3" json:"username,omitempty"`
+	// TLS 配置。
+	Tls *TLS `protobuf:"bytes,6,opt,name=tls,proto3" json:"tls,omitempty"`
+	// 客户端模式：standalone、cluster、sentinel，默认 standalone。
+	Mode string `protobuf:"bytes,7,opt,name=mode,proto3" json:"mode,omitempty"`
+	// Sentinel 主节点名称（mode=sentinel 时必填）。
+	MasterName string `protobuf:"bytes,8,opt,name=master_name,json=masterName,proto3" json:"master_name,omitempty"`
+	// 服务端地址列表（mode=cluster/sentinel 时使用）。
+	Addrs []string `protobuf:"bytes,9,rep,name=addrs,proto3" json:"addrs,omitempty"`
+	// Sentinel 登录用户名。
+	SentinelUsername string `protobuf:"bytes,10,opt,name=sentinel_username,json=sentinelUsername,proto3" json:"sentinel_username,omitempty"`
+	// Sentinel 登录密码。
+	SentinelPassword string `protobuf:"bytes,11,opt,name=sentinel_password,json=sentinelPassword,proto3" json:"sentinel_password,omitempty"`
+	// 连接超时（秒）。
+	DialTimeout int32 `protobuf:"varint,50,opt,name=dial_timeout,json=dialTimeout,proto3" json:"dial_timeout,omitempty"`
+	// 读取超时（秒）。
+	ReadTimeout int32 `protobuf:"varint,51,opt,name=read_timeout,json=readTimeout,proto3" json:"read_timeout,omitempty"`
+	// 写入超时（秒）。
+	WriteTimeout int32 `protobuf:"varint,52,opt,name=write_timeout,json=writeTimeout,proto3" json:"write_timeout,omitempty"`
+	// 连接池获取连接超时（秒）。
+	PoolTimeout int32 `protobuf:"varint,53,opt,name=pool_timeout,json=poolTimeout,proto3" json:"pool_timeout,omitempty"`
+	// 连接最大空闲时间（秒）。
+	ConnMaxIdleTime int32 `protobuf:"varint,54,opt,name=conn_max_idle_time,json=connMaxIdleTime,proto3" json:"conn_max_idle_time,omitempty"`
+	// 连接最大存活时间（秒）。
+	ConnMaxLifetime int32 `protobuf:"varint,55,opt,name=conn_max_lifetime,json=connMaxLifetime,proto3" json:"conn_max_lifetime,omitempty"`
+	// 重试最小退避（毫秒）。
+	MinRetryBackoffMs int32 `protobuf:"varint,56,opt,name=min_retry_backoff_ms,json=minRetryBackoffMs,proto3" json:"min_retry_backoff_ms,omitempty"`
+	// 重试最大退避（毫秒）。
+	MaxRetryBackoffMs int32 `protobuf:"varint,57,opt,name=max_retry_backoff_ms,json=maxRetryBackoffMs,proto3" json:"max_retry_backoff_ms,omitempty"`
+	// 连接池大小。
+	PoolSize *int32 `protobuf:"varint,60,opt,name=pool_size,json=poolSize,proto3,oneof" json:"pool_size,omitempty"`
+	// 连接池最小空闲连接数。
+	MinIdleConns *int32 `protobuf:"varint,61,opt,name=min_idle_conns,json=minIdleConns,proto3,oneof" json:"min_idle_conns,omitempty"`
+	// 命令失败最大重试次数。
+	MaxRetries *int32 `protobuf:"varint,62,opt,name=max_retries,json=maxRetries,proto3,oneof" json:"max_retries,omitempty"`
 	// 键前缀，用于命名空间隔离。
-	KeyPrefix     string `protobuf:"bytes,4,opt,name=key_prefix,json=keyPrefix,proto3" json:"key_prefix,omitempty"`
+	KeyPrefix     string `protobuf:"bytes,100,opt,name=key_prefix,json=keyPrefix,proto3" json:"key_prefix,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -174,6 +213,13 @@ func (*Cache_Redis) Descriptor() ([]byte, []int) {
 	return file_bootstrap_v1_cache_proto_rawDescGZIP(), []int{0, 1}
 }
 
+func (x *Cache_Redis) GetNetwork() string {
+	if x != nil {
+		return x.Network
+	}
+	return ""
+}
+
 func (x *Cache_Redis) GetAddr() string {
 	if x != nil {
 		return x.Addr
@@ -195,6 +241,132 @@ func (x *Cache_Redis) GetDb() int32 {
 	return 0
 }
 
+func (x *Cache_Redis) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *Cache_Redis) GetTls() *TLS {
+	if x != nil {
+		return x.Tls
+	}
+	return nil
+}
+
+func (x *Cache_Redis) GetMode() string {
+	if x != nil {
+		return x.Mode
+	}
+	return ""
+}
+
+func (x *Cache_Redis) GetMasterName() string {
+	if x != nil {
+		return x.MasterName
+	}
+	return ""
+}
+
+func (x *Cache_Redis) GetAddrs() []string {
+	if x != nil {
+		return x.Addrs
+	}
+	return nil
+}
+
+func (x *Cache_Redis) GetSentinelUsername() string {
+	if x != nil {
+		return x.SentinelUsername
+	}
+	return ""
+}
+
+func (x *Cache_Redis) GetSentinelPassword() string {
+	if x != nil {
+		return x.SentinelPassword
+	}
+	return ""
+}
+
+func (x *Cache_Redis) GetDialTimeout() int32 {
+	if x != nil {
+		return x.DialTimeout
+	}
+	return 0
+}
+
+func (x *Cache_Redis) GetReadTimeout() int32 {
+	if x != nil {
+		return x.ReadTimeout
+	}
+	return 0
+}
+
+func (x *Cache_Redis) GetWriteTimeout() int32 {
+	if x != nil {
+		return x.WriteTimeout
+	}
+	return 0
+}
+
+func (x *Cache_Redis) GetPoolTimeout() int32 {
+	if x != nil {
+		return x.PoolTimeout
+	}
+	return 0
+}
+
+func (x *Cache_Redis) GetConnMaxIdleTime() int32 {
+	if x != nil {
+		return x.ConnMaxIdleTime
+	}
+	return 0
+}
+
+func (x *Cache_Redis) GetConnMaxLifetime() int32 {
+	if x != nil {
+		return x.ConnMaxLifetime
+	}
+	return 0
+}
+
+func (x *Cache_Redis) GetMinRetryBackoffMs() int32 {
+	if x != nil {
+		return x.MinRetryBackoffMs
+	}
+	return 0
+}
+
+func (x *Cache_Redis) GetMaxRetryBackoffMs() int32 {
+	if x != nil {
+		return x.MaxRetryBackoffMs
+	}
+	return 0
+}
+
+func (x *Cache_Redis) GetPoolSize() int32 {
+	if x != nil && x.PoolSize != nil {
+		return *x.PoolSize
+	}
+	return 0
+}
+
+func (x *Cache_Redis) GetMinIdleConns() int32 {
+	if x != nil && x.MinIdleConns != nil {
+		return *x.MinIdleConns
+	}
+	return 0
+}
+
+func (x *Cache_Redis) GetMaxRetries() int32 {
+	if x != nil && x.MaxRetries != nil {
+		return *x.MaxRetries
+	}
+	return 0
+}
+
 func (x *Cache_Redis) GetKeyPrefix() string {
 	if x != nil {
 		return x.KeyPrefix
@@ -206,23 +378,47 @@ var File_bootstrap_v1_cache_proto protoreflect.FileDescriptor
 
 const file_bootstrap_v1_cache_proto_rawDesc = "" +
 	"\n" +
-	"\x18bootstrap/v1/cache.proto\x12\fbootstrap.v1\"\xbc\x02\n" +
+	"\x18bootstrap/v1/cache.proto\x12\fbootstrap.v1\x1a\x16bootstrap/v1/tls.proto\"\xaa\b\n" +
 	"\x05Cache\x124\n" +
 	"\x05local\x18\x01 \x01(\v2\x19.bootstrap.v1.Cache.LocalH\x00R\x05local\x88\x01\x01\x124\n" +
 	"\x05redis\x18\x02 \x01(\v2\x19.bootstrap.v1.Cache.RedisH\x01R\x05redis\x88\x01\x01\x1aK\n" +
 	"\x05Local\x12\x12\n" +
 	"\x04size\x18\x01 \x01(\x05R\x04size\x12.\n" +
-	"\x13default_ttl_seconds\x18\x02 \x01(\x05R\x11defaultTtlSeconds\x1af\n" +
-	"\x05Redis\x12\x12\n" +
-	"\x04addr\x18\x01 \x01(\tR\x04addr\x12\x1a\n" +
-	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x0e\n" +
-	"\x02db\x18\x03 \x01(\x05R\x02db\x12\x1d\n" +
+	"\x13default_ttl_seconds\x18\x02 \x01(\x05R\x11defaultTtlSeconds\x1a\xd3\x06\n" +
+	"\x05Redis\x12\x18\n" +
+	"\anetwork\x18\x01 \x01(\tR\anetwork\x12\x12\n" +
+	"\x04addr\x18\x02 \x01(\tR\x04addr\x12\x1a\n" +
+	"\bpassword\x18\x03 \x01(\tR\bpassword\x12\x0e\n" +
+	"\x02db\x18\x04 \x01(\x05R\x02db\x12\x1a\n" +
+	"\busername\x18\x05 \x01(\tR\busername\x12#\n" +
+	"\x03tls\x18\x06 \x01(\v2\x11.bootstrap.v1.TLSR\x03tls\x12\x12\n" +
+	"\x04mode\x18\a \x01(\tR\x04mode\x12\x1f\n" +
+	"\vmaster_name\x18\b \x01(\tR\n" +
+	"masterName\x12\x14\n" +
+	"\x05addrs\x18\t \x03(\tR\x05addrs\x12+\n" +
+	"\x11sentinel_username\x18\n" +
+	" \x01(\tR\x10sentinelUsername\x12+\n" +
+	"\x11sentinel_password\x18\v \x01(\tR\x10sentinelPassword\x12!\n" +
+	"\fdial_timeout\x182 \x01(\x05R\vdialTimeout\x12!\n" +
+	"\fread_timeout\x183 \x01(\x05R\vreadTimeout\x12#\n" +
+	"\rwrite_timeout\x184 \x01(\x05R\fwriteTimeout\x12!\n" +
+	"\fpool_timeout\x185 \x01(\x05R\vpoolTimeout\x12+\n" +
+	"\x12conn_max_idle_time\x186 \x01(\x05R\x0fconnMaxIdleTime\x12*\n" +
+	"\x11conn_max_lifetime\x187 \x01(\x05R\x0fconnMaxLifetime\x12/\n" +
+	"\x14min_retry_backoff_ms\x188 \x01(\x05R\x11minRetryBackoffMs\x12/\n" +
+	"\x14max_retry_backoff_ms\x189 \x01(\x05R\x11maxRetryBackoffMs\x12 \n" +
+	"\tpool_size\x18< \x01(\x05H\x00R\bpoolSize\x88\x01\x01\x12)\n" +
+	"\x0emin_idle_conns\x18= \x01(\x05H\x01R\fminIdleConns\x88\x01\x01\x12$\n" +
+	"\vmax_retries\x18> \x01(\x05H\x02R\n" +
+	"maxRetries\x88\x01\x01\x12\x1d\n" +
 	"\n" +
-	"key_prefix\x18\x04 \x01(\tR\tkeyPrefixB\b\n" +
+	"key_prefix\x18d \x01(\tR\tkeyPrefixB\f\n" +
+	"\n" +
+	"_pool_sizeB\x11\n" +
+	"\x0f_min_idle_connsB\x0e\n" +
+	"\f_max_retriesB\b\n" +
 	"\x06_localB\b\n" +
-	"\x06_redisB\xb8\x01\n" +
-	"\x10com.bootstrap.v1B\n" +
-	"CacheProtoP\x01ZGgithub.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1;bootstrapv1\xa2\x02\x03BXX\xaa\x02\fBootstrap.V1\xca\x02\fBootstrap\\V1\xe2\x02\x18Bootstrap\\V1\\GPBMetadata\xea\x02\rBootstrap::V1b\x06proto3"
+	"\x06_redisB=Z;github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1b\x06proto3"
 
 var (
 	file_bootstrap_v1_cache_proto_rawDescOnce sync.Once
@@ -241,15 +437,17 @@ var file_bootstrap_v1_cache_proto_goTypes = []any{
 	(*Cache)(nil),       // 0: bootstrap.v1.Cache
 	(*Cache_Local)(nil), // 1: bootstrap.v1.Cache.Local
 	(*Cache_Redis)(nil), // 2: bootstrap.v1.Cache.Redis
+	(*TLS)(nil),         // 3: bootstrap.v1.TLS
 }
 var file_bootstrap_v1_cache_proto_depIdxs = []int32{
 	1, // 0: bootstrap.v1.Cache.local:type_name -> bootstrap.v1.Cache.Local
 	2, // 1: bootstrap.v1.Cache.redis:type_name -> bootstrap.v1.Cache.Redis
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	3, // 2: bootstrap.v1.Cache.Redis.tls:type_name -> bootstrap.v1.TLS
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_bootstrap_v1_cache_proto_init() }
@@ -257,7 +455,9 @@ func file_bootstrap_v1_cache_proto_init() {
 	if File_bootstrap_v1_cache_proto != nil {
 		return
 	}
+	file_bootstrap_v1_tls_proto_init()
 	file_bootstrap_v1_cache_proto_msgTypes[0].OneofWrappers = []any{}
+	file_bootstrap_v1_cache_proto_msgTypes[2].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

@@ -23,6 +23,12 @@ message Tracer {
     string sampler = 4;
     // trace_id_ratio 模式下的采样比率 (0.0 ~ 1.0)。
     double sample_ratio = 5;
+    // 使用 HTTP（collector 的 http 端口）而非 gRPC 上报。
+    bool use_http = 6;
+    // 批处理延迟（毫秒），默认 5000。
+    int32 batch_timeout_ms = 7;
+    // 导出请求超时（毫秒），默认 5000。
+    int32 export_timeout_ms = 8;
   }
 
   string type = 1;

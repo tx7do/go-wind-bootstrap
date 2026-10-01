@@ -4,6 +4,8 @@ package bootstrap.v1;
 
 option go_package = "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1";
 
+import "bootstrap/v1/tls.proto";
+
 // Config 描述配置中心来源。
 // 配置可以混合使用，同一 Config 中可同时设置多种配置源。
 message Config {
@@ -33,6 +35,14 @@ message Config {
     string password = 4;
     // 是否使用前缀模式（监听一个目录而非单个键）。
     bool prefix = 5;
+    // TLS 配置。
+    bootstrap.v1.TLS tls = 6;
+    // 连接超时（秒）。
+    int32 dial_timeout = 7;
+    // keepalive 探测间隔（秒）。
+    int32 dial_keep_alive_time = 8;
+    // keepalive 探测等待响应的超时（秒）。
+    int32 dial_keep_alive_timeout = 9;
   }
 
   // Nacos 配置源。
@@ -42,6 +52,22 @@ message Config {
     string group = 3;
     string data_id = 4;
     string format = 5;
+    // 网络协议：http、https，默认 http。
+    string scheme = 6;
+    // gRPC 长连接端口，默认 port+1000。
+    uint64 grpc_port = 7;
+    // 上下文路径。
+    string context_path = 8;
+    // 地址服务器 endpoint。
+    string endpoint = 9;
+    // 认证用户名。
+    string username = 10;
+    // 认证密码。
+    string password = 11;
+    // 请求服务端超时（毫秒）。
+    int32 timeout_ms = 12;
+    // TLS 配置（仅支持文件路径）。
+    bootstrap.v1.TLS tls = 13;
   }
 
   // Consul 配置源。
@@ -51,6 +77,12 @@ message Config {
     string path = 2;
     string token = 3;
     string scheme = 4;
+    // 数据中心。
+    string datacenter = 5;
+    // 命名空间（Consul 企业版）。
+    string namespace = 6;
+    // TLS 配置。
+    bootstrap.v1.TLS tls = 7;
   }
 
   // Apollo 配置源。

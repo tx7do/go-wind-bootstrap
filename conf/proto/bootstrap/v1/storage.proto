@@ -4,6 +4,8 @@ package bootstrap.v1;
 
 option go_package = "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1";
 
+import "bootstrap/v1/tls.proto";
+
 // Storage 描述对象存储配置。
 message Storage {
   // MinIO 对象存储。
@@ -18,6 +20,12 @@ message Storage {
     string token = 4;
     // 是否使用 SSL。
     bool use_ssl = 5;
+    // 区域（部分 S3 兼容存储签名 v4 必需）。
+    string region = 6;
+    // 是否强制路径风格访问。
+    bool force_path_style = 7;
+    // TLS 配置。
+    bootstrap.v1.TLS tls = 8;
 
     // 上传链接的主机名。生成上传对象的对外 URL 时，
     // 用于替换 SDK 返回 URL 中的端点主机（内网端点 → 对外域名）。
@@ -45,6 +53,10 @@ message Storage {
     bool force_path_style = 7;
     // 默认存储桶。
     string bucket = 8;
+    // TLS 配置。
+    bootstrap.v1.TLS tls = 9;
+    // 命令失败最大重试次数。
+    optional int32 max_attempts = 10;
   }
 
   optional Minio minio = 1;
