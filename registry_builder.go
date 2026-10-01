@@ -9,7 +9,8 @@ import (
 
 // resolveRegistry 检查 Registry 配置中每个 optional 字段，
 // 对已设置的注册中心类型分别调用对应 action。
-func resolveRegistry(ctx context.Context, cfg *v1.Registry, appCfg *v1.App) (func(), error) {
+// endpoints 为已解析的服务器监听端点，用于实例注册。
+func resolveRegistry(ctx context.Context, cfg *v1.Registry, appCfg *v1.App, endpoints []string) (func(), error) {
 	type field struct {
 		name   string
 		action RegistryAction
@@ -80,7 +81,6 @@ func resolveRegistry(ctx context.Context, cfg *v1.Registry, appCfg *v1.App) (fun
 
 	var cleanups []func()
 	for _, f := range fields {
-		var endpoints []string
 		cleanup, err := f.action(ctx, appCfg, endpoints, cfg)
 		if err != nil {
 			for _, c := range cleanups {

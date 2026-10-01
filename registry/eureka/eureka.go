@@ -46,7 +46,10 @@ func newAction(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.
 	if err != nil {
 		return nil, fmt.Errorf("eureka: create registry: %w", err)
 	}
-	_ = reg
 
-	return func() {}, nil
+	regCleanup, err := bootstrap.RegisterInstance(ctx, reg, appCfg, endpoints)
+	if err != nil {
+		return nil, err
+	}
+	return regCleanup, nil
 }

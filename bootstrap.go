@@ -60,6 +60,8 @@ func Bootstrap(ctx context.Context, cfg *v1.BootstrapConfig) (*wind.App, map[str
 		caches        map[string]any
 		scriptEngines map[string]any
 		databases     map[string]any
+
+		serverEndpoints []string
 	)
 
 	// 1. App metadata.
@@ -92,6 +94,14 @@ func Bootstrap(ctx context.Context, cfg *v1.BootstrapConfig) (*wind.App, map[str
 		servers = srvMap
 		if len(srvs) > 0 {
 			opts = append(opts, wind.WithServer(srvs...))
+			// 收集各服务器端点，供注册中心实例注册使用。
+			// 注意：服务器尚未 Start，Endpoint() 返回配置的监听地址；
+			// 绑定 ":0" 这类随机端口的服务无法在此处获知实际端口。
+			for _, srv := range srvs {
+				if ep := srv.Endpoint(); ep != "" {
+					serverEndpoints = append(serverEndpoints, ep)
+				}
+			}
 		}
 		if srvCleanup != nil {
 			prev := cleanup
@@ -99,9 +109,9 @@ func Bootstrap(ctx context.Context, cfg *v1.BootstrapConfig) (*wind.App, map[str
 		}
 	}
 
-	// 4. Registry — wire BeforeStop for deregistration.
+	// 4. Registry — 注册应用实例，cleanup 时注销。
 	if regCfg := cfg.GetRegistry(); regCfg != nil {
-		regCleanup, err := resolveRegistry(ctx, regCfg, cfg.GetApp())
+		regCleanup, err := resolveRegistry(ctx, regCfg, cfg.GetApp(), serverEndpoints)
 		if err != nil {
 			return nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, fmt.Errorf("bootstrap: resolve registry: %w", err)
 		}

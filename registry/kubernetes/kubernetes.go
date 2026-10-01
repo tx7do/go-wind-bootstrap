@@ -10,6 +10,7 @@ import (
 	"fmt"
 
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
 	kubernetesPlugin "github.com/tx7do/go-wind-plugins/registry/kubernetes"
@@ -28,7 +29,16 @@ func newAction(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.
 		return nil, fmt.Errorf("kubernetes: config is nil")
 	}
 
-	config, err := clientcmd.BuildConfigFromFlags("", "")
+	var config *rest.Config
+	var err error
+	switch {
+	case c.InCluster != nil && c.GetInCluster():
+		config, err = rest.InClusterConfig()
+	case c.GetKubeconfig() != "":
+		config, err = clientcmd.BuildConfigFromFlags("", c.GetKubeconfig())
+	default:
+		config, err = clientcmd.BuildConfigFromFlags("", "")
+	}
 	if err != nil {
 		return nil, fmt.Errorf("kubernetes: build config: %w", err)
 	}
@@ -43,7 +53,10 @@ func newAction(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.
 	}
 
 	reg := kubernetesPlugin.New(clientSet, namespace)
-	_ = reg
 
-	return func() {}, nil
+	regCleanup, err := bootstrap.RegisterInstance(ctx, reg, appCfg, endpoints)
+	if err != nil {
+		return nil, err
+	}
+	return regCleanup, nil
 }

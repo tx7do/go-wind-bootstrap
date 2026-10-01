@@ -34,13 +34,74 @@ func newAction(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.
 		return nil, fmt.Errorf("nacos: no server_addrs")
 	}
 
+	serverCfg := constant.ServerConfig{ContextPath: "/nacos"}
+	if scheme := c.GetScheme(); scheme != "" {
+		serverCfg.Scheme = scheme
+	}
+	if contextPath := c.GetContextPath(); contextPath != "" {
+		serverCfg.ContextPath = contextPath
+	}
+	if grpcPort := c.GetGrpcPort(); grpcPort > 0 {
+		serverCfg.GrpcPort = grpcPort
+	}
+
 	var serverConfigs []constant.ServerConfig
 	for _, addr := range addrs {
-		serverConfigs = append(serverConfigs, constant.ServerConfig{ContextPath: "/nacos", IpAddr: addr})
+		sc := serverCfg
+		sc.IpAddr = addr
+		serverConfigs = append(serverConfigs, sc)
 	}
 
 	clientConfig := constant.ClientConfig{
 		NamespaceId: c.GetNamespace(),
+	}
+	if endpoint := c.GetEndpoint(); endpoint != "" {
+		clientConfig.Endpoint = endpoint
+	}
+	if username := c.GetUsername(); username != "" {
+		clientConfig.Username = username
+	}
+	if password := c.GetPassword(); password != "" {
+		clientConfig.Password = password
+	}
+	if timeoutMs := c.GetTimeoutMs(); timeoutMs > 0 {
+		clientConfig.TimeoutMs = uint64(timeoutMs)
+	}
+	if beatInterval := c.GetBeatIntervalMs(); beatInterval > 0 {
+		clientConfig.BeatInterval = int64(beatInterval)
+	}
+	if accessKey := c.GetAccessKey(); accessKey != "" {
+		clientConfig.AccessKey = accessKey
+	}
+	if secretKey := c.GetSecretKey(); secretKey != "" {
+		clientConfig.SecretKey = secretKey
+	}
+	if c.GetNotLoadCacheAtStart() {
+		clientConfig.NotLoadCacheAtStart = true
+	}
+	if c.GetUpdateCacheWhenEmpty() {
+		clientConfig.UpdateCacheWhenEmpty = true
+	}
+	if c.GetDisableUseSnapShot() {
+		clientConfig.DisableUseSnapShot = true
+	}
+	if c.GetAppendToStdout() {
+		clientConfig.AppendToStdout = true
+	}
+	if c.GetAsyncUpdateService() {
+		clientConfig.AsyncUpdateService = true
+	}
+	// nacos SDK 的 TLS 仅支持文件路径。
+	if tlsCfg := c.GetTls(); tlsCfg != nil {
+		clientConfig.TLSCfg = constant.TLSConfig{
+			Enable:   true,
+			TrustAll: tlsCfg.GetInsecureSkipVerify(),
+		}
+		if f := tlsCfg.GetFile(); f != nil {
+			clientConfig.TLSCfg.CertFile = f.GetCertPath()
+			clientConfig.TLSCfg.KeyFile = f.GetKeyPath()
+			clientConfig.TLSCfg.CaFile = f.GetCaPath()
+		}
 	}
 
 	nc := nacos_client.NacosClient{}
@@ -69,9 +130,15 @@ func newAction(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.
 	if prefix := c.GetPrefix(); prefix != "" {
 		opts = append(opts, nacosPlugin.WithPrefix(prefix))
 	}
+	if kind := c.GetDefaultKind(); kind != "" {
+		opts = append(opts, nacosPlugin.WithDefaultKind(kind))
+	}
 
 	reg := nacosPlugin.New(client, opts...)
-	_ = reg
 
-	return func() {}, nil
+	regCleanup, err := bootstrap.RegisterInstance(ctx, reg, appCfg, endpoints)
+	if err != nil {
+		return nil, err
+	}
+	return regCleanup, nil
 }

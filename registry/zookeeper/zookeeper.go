@@ -33,7 +33,11 @@ func newAction(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.
 		return nil, fmt.Errorf("zookeeper: no endpoints")
 	}
 
-	conn, _, err := zk.Connect(eps, 5*time.Second)
+	sessionTimeout := 5 * time.Second
+	if t := c.GetSessionTimeout(); t > 0 {
+		sessionTimeout = time.Duration(t) * time.Second
+	}
+	conn, _, err := zk.Connect(eps, sessionTimeout)
 	if err != nil {
 		return nil, fmt.Errorf("zookeeper: connect: %w", err)
 	}
@@ -47,9 +51,15 @@ func newAction(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.
 	}
 
 	reg := zkPlugin.New(conn, opts...)
-	_ = reg
+
+	regCleanup, err := bootstrap.RegisterInstance(ctx, reg, appCfg, endpoints)
+	if err != nil {
+		conn.Close()
+		return nil, err
+	}
 
 	cleanup := func() {
+		regCleanup()
 		conn.Close()
 	}
 	return cleanup, nil
