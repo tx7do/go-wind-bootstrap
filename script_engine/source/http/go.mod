@@ -3,7 +3,7 @@ module github.com/tx7do/go-wind-bootstrap/script_engine/source/http
 go 1.26.3
 
 require (
-	github.com/tx7do/go-scripts v0.0.6
+	github.com/tx7do/go-scripts v0.0.8
 	github.com/tx7do/go-scripts/source/http v0.0.0-00010101000000-000000000000
 	github.com/tx7do/go-wind-bootstrap/conf v0.0.0
 	github.com/tx7do/go-wind-bootstrap/script_engine v0.0.0
