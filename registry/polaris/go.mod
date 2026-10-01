@@ -6,7 +6,7 @@ require (
 	github.com/polarismesh/polaris-go v1.7.0
 	github.com/tx7do/go-wind-bootstrap v0.0.0
 	github.com/tx7do/go-wind-bootstrap/conf v0.0.0
-	github.com/tx7do/go-wind-plugins/registry/polaris v0.0.1
+	github.com/tx7do/go-wind-plugins/registry/polaris v0.0.2
 )
 
 require (

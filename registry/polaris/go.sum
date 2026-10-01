@@ -454,8 +454,8 @@ github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu
 github.com/stretchr/testify v1.11.1/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
 github.com/tx7do/go-wind v0.0.1 h1:D7UdMqCQPNWDwoC2PFFWV87y0n4apxZ3Zg+2mHrulL0=
 github.com/tx7do/go-wind v0.0.1/go.mod h1:hV4pLNXbNZThZf44JqG73xhDEmkujyN5VM1oX56c+ig=
-github.com/tx7do/go-wind-plugins/registry/polaris v0.0.1 h1:p5osa3bMsPkLz1EptFVZuo7qTCAmWbADufMueCii7RM=
-github.com/tx7do/go-wind-plugins/registry/polaris v0.0.1/go.mod h1:XiOJfI1mh3x+ZfO2sBmeLP3jC4EEr20hPlJcWjgIa3M=
+github.com/tx7do/go-wind-plugins/registry/polaris v0.0.2 h1:Ft31vkr6Tf9J+xZr1Vn5VjZXFonX6Jw0q7i6oKLsQp8=
+github.com/tx7do/go-wind-plugins/registry/polaris v0.0.2/go.mod h1:XiOJfI1mh3x+ZfO2sBmeLP3jC4EEr20hPlJcWjgIa3M=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=

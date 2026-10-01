@@ -5,7 +5,7 @@ go 1.26.3
 require (
 	github.com/tx7do/go-wind-bootstrap v0.0.0
 	github.com/tx7do/go-wind-bootstrap/conf v0.0.0
-	github.com/tx7do/go-wind-plugins/registry/etcd v0.0.1
+	github.com/tx7do/go-wind-plugins/registry/etcd v0.0.2
 	go.etcd.io/etcd/client/v3 v3.6.10
 )
 

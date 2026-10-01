@@ -37,8 +37,8 @@ github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu
 github.com/stretchr/testify v1.11.1/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
 github.com/tx7do/go-wind v0.0.1 h1:D7UdMqCQPNWDwoC2PFFWV87y0n4apxZ3Zg+2mHrulL0=
 github.com/tx7do/go-wind v0.0.1/go.mod h1:hV4pLNXbNZThZf44JqG73xhDEmkujyN5VM1oX56c+ig=
-github.com/tx7do/go-wind-plugins/registry/etcd v0.0.1 h1:1E89q86trNQKAW0DETghgtKie/APWRw1s7UD4dMyeAw=
-github.com/tx7do/go-wind-plugins/registry/etcd v0.0.1/go.mod h1:KWobxRMKYpQHP6OHaEbvzQZdCSnUihlu2t4drPl49Zg=
+github.com/tx7do/go-wind-plugins/registry/etcd v0.0.2 h1:h3LBbTLkN2zqFm3uTK4Ndw8QoGFArau5bR1WaVsq6ak=
+github.com/tx7do/go-wind-plugins/registry/etcd v0.0.2/go.mod h1:KWobxRMKYpQHP6OHaEbvzQZdCSnUihlu2t4drPl49Zg=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 go.etcd.io/etcd/api/v3 v3.6.10 h1:jlwjtELjA8yi2VWpOFH+0w0lGr3K6mVDyn0RDB9aaAY=
