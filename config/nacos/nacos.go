@@ -34,13 +34,50 @@ func newAction(ctx context.Context, cfg *v1.Config) (func(), error) {
 		return nil, fmt.Errorf("nacos: no server_addrs")
 	}
 
+	serverCfg := constant.ServerConfig{ContextPath: "/nacos"}
+	if scheme := c.GetScheme(); scheme != "" {
+		serverCfg.Scheme = scheme
+	}
+	if contextPath := c.GetContextPath(); contextPath != "" {
+		serverCfg.ContextPath = contextPath
+	}
+	if grpcPort := c.GetGrpcPort(); grpcPort > 0 {
+		serverCfg.GrpcPort = grpcPort
+	}
+
 	var serverConfigs []constant.ServerConfig
 	for _, addr := range addrs {
-		serverConfigs = append(serverConfigs, constant.ServerConfig{ContextPath: "/nacos", IpAddr: addr})
+		sc := serverCfg
+		sc.IpAddr = addr
+		serverConfigs = append(serverConfigs, sc)
 	}
 
 	clientConfig := constant.ClientConfig{
 		NamespaceId: c.GetNamespace(),
+	}
+	if endpoint := c.GetEndpoint(); endpoint != "" {
+		clientConfig.Endpoint = endpoint
+	}
+	if username := c.GetUsername(); username != "" {
+		clientConfig.Username = username
+	}
+	if password := c.GetPassword(); password != "" {
+		clientConfig.Password = password
+	}
+	if timeoutMs := c.GetTimeoutMs(); timeoutMs > 0 {
+		clientConfig.TimeoutMs = uint64(timeoutMs)
+	}
+	// nacos SDK 的 TLS 仅支持文件路径。
+	if tlsCfg := c.GetTls(); tlsCfg != nil {
+		clientConfig.TLSCfg = constant.TLSConfig{
+			Enable:   true,
+			TrustAll: tlsCfg.GetInsecureSkipVerify(),
+		}
+		if f := tlsCfg.GetFile(); f != nil {
+			clientConfig.TLSCfg.CertFile = f.GetCertPath()
+			clientConfig.TLSCfg.KeyFile = f.GetKeyPath()
+			clientConfig.TLSCfg.CaFile = f.GetCaPath()
+		}
 	}
 
 	nc := nacos_client.NacosClient{}

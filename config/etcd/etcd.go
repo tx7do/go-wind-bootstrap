@@ -8,6 +8,7 @@ package etcd
 import (
 	"context"
 	"fmt"
+	"time"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
 
@@ -15,6 +16,7 @@ import (
 
 	bootstrap "github.com/tx7do/go-wind-bootstrap"
 	v1 "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1"
+	"github.com/tx7do/go-wind-bootstrap/tlsutil"
 )
 
 func init() {
@@ -35,6 +37,20 @@ func newAction(ctx context.Context, cfg *v1.Config) (func(), error) {
 	}
 	if password := c.GetPassword(); password != "" {
 		clientCfg.Password = password
+	}
+	if dialTimeout := c.GetDialTimeout(); dialTimeout > 0 {
+		clientCfg.DialTimeout = time.Duration(dialTimeout) * time.Second
+	}
+	if keepAliveTime := c.GetDialKeepAliveTime(); keepAliveTime > 0 {
+		clientCfg.DialKeepAliveTime = time.Duration(keepAliveTime) * time.Second
+	}
+	if keepAliveTimeout := c.GetDialKeepAliveTimeout(); keepAliveTimeout > 0 {
+		clientCfg.DialKeepAliveTimeout = time.Duration(keepAliveTimeout) * time.Second
+	}
+	if tlsCfg, err := tlsutil.ClientTLS(c.GetTls()); err != nil {
+		return nil, fmt.Errorf("etcd: load tls: %w", err)
+	} else if tlsCfg != nil {
+		clientCfg.TLS = tlsCfg
 	}
 
 	client, err := clientv3.New(clientCfg)

@@ -37,6 +37,27 @@ func newAction(ctx context.Context, cfg *v1.Config) (func(), error) {
 	if scheme := c.GetScheme(); scheme != "" {
 		consulCfg.Scheme = scheme
 	}
+	if dc := c.GetDatacenter(); dc != "" {
+		consulCfg.Datacenter = dc
+	}
+	if ns := c.GetNamespace(); ns != "" {
+		consulCfg.Namespace = ns
+	}
+	if tlsCfg := c.GetTls(); tlsCfg != nil {
+		consulCfg.TLSConfig = api.TLSConfig{
+			InsecureSkipVerify: tlsCfg.GetInsecureSkipVerify(),
+		}
+		if f := tlsCfg.GetFile(); f != nil {
+			consulCfg.TLSConfig.CertFile = f.GetCertPath()
+			consulCfg.TLSConfig.KeyFile = f.GetKeyPath()
+			consulCfg.TLSConfig.CAFile = f.GetCaPath()
+		}
+		if cf := tlsCfg.GetConfig(); cf != nil {
+			consulCfg.TLSConfig.CertPEM = cf.GetCertPem()
+			consulCfg.TLSConfig.KeyPEM = cf.GetKeyPem()
+			consulCfg.TLSConfig.CAPem = cf.GetCaPem()
+		}
+	}
 
 	client, err := api.NewClient(consulCfg)
 	if err != nil {
