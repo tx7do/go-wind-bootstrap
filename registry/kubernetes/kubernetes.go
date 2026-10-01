@@ -23,10 +23,10 @@ func init() {
 	bootstrap.MustRegisterRegistryAction(bootstrap.RegistryTypeKubernetes, newAction)
 }
 
-func newAction(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.Registry) (func(), error) {
+func newAction(ctx context.Context, cfg *v1.Registry) (bootstrap.Registry, func(), error) {
 	c := cfg.GetKubernetes()
 	if c == nil {
-		return nil, fmt.Errorf("kubernetes: config is nil")
+		return nil, nil, fmt.Errorf("kubernetes: config is nil")
 	}
 
 	var config *rest.Config
@@ -40,11 +40,11 @@ func newAction(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.
 		config, err = clientcmd.BuildConfigFromFlags("", "")
 	}
 	if err != nil {
-		return nil, fmt.Errorf("kubernetes: build config: %w", err)
+		return nil, nil, fmt.Errorf("kubernetes: build config: %w", err)
 	}
 	clientSet, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		return nil, fmt.Errorf("kubernetes: create client: %w", err)
+		return nil, nil, fmt.Errorf("kubernetes: create client: %w", err)
 	}
 
 	namespace := c.GetNamespace()
@@ -54,9 +54,5 @@ func newAction(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.
 
 	reg := kubernetesPlugin.New(clientSet, namespace)
 
-	regCleanup, err := bootstrap.RegisterInstance(ctx, reg, appCfg, endpoints)
-	if err != nil {
-		return nil, err
-	}
-	return regCleanup, nil
+	return reg, nil, nil
 }

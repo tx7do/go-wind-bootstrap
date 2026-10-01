@@ -23,10 +23,10 @@ func init() {
 	bootstrap.MustRegisterRegistryAction(bootstrap.RegistryTypeEtcd, newAction)
 }
 
-func newAction(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.Registry) (func(), error) {
+func newAction(ctx context.Context, cfg *v1.Registry) (bootstrap.Registry, func(), error) {
 	c := cfg.GetEtcd()
 	if c == nil {
-		return nil, fmt.Errorf("etcd: config is nil")
+		return nil, nil, fmt.Errorf("etcd: config is nil")
 	}
 
 	clientCfg := clientv3.Config{
@@ -57,14 +57,14 @@ func newAction(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.
 		clientCfg.PermitWithoutStream = true
 	}
 	if tlsCfg, err := tlsutil.ClientTLS(c.GetTls()); err != nil {
-		return nil, fmt.Errorf("etcd: load tls: %w", err)
+		return nil, nil, fmt.Errorf("etcd: load tls: %w", err)
 	} else if tlsCfg != nil {
 		clientCfg.TLS = tlsCfg
 	}
 
 	client, err := clientv3.New(clientCfg)
 	if err != nil {
-		return nil, fmt.Errorf("etcd: create client: %w", err)
+		return nil, nil, fmt.Errorf("etcd: create client: %w", err)
 	}
 
 	var opts []etcdPlugin.Option
@@ -80,15 +80,5 @@ func newAction(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.
 
 	reg := etcdPlugin.New(client, opts...)
 
-	regCleanup, err := bootstrap.RegisterInstance(ctx, reg, appCfg, endpoints)
-	if err != nil {
-		_ = client.Close()
-		return nil, err
-	}
-
-	cleanup := func() {
-		regCleanup()
-		_ = client.Close()
-	}
-	return cleanup, nil
+	return reg, func() { _ = client.Close() }, nil
 }

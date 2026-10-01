@@ -27,13 +27,14 @@ type Context struct {
 	scriptEngines map[string]any
 	databases     map[string]any
 	servers       map[string]any
+	registries    map[string]Registry
 
 	cleanupOnce sync.Once
 	cleanup     func()
 }
 
 // newContext creates a Context from the Bootstrap results.
-func newContext(cfg *v1.BootstrapConfig, app *wind.App, logger log.Logger, brokers map[string]any, storages map[string]any, aiClients map[string]any, workflows map[string]any, caches map[string]any, scriptEngines map[string]any, databases map[string]any, servers map[string]any, cleanup func(), cancel context.CancelFunc) *Context {
+func newContext(cfg *v1.BootstrapConfig, app *wind.App, logger log.Logger, brokers map[string]any, storages map[string]any, aiClients map[string]any, workflows map[string]any, caches map[string]any, scriptEngines map[string]any, databases map[string]any, servers map[string]any, registries map[string]Registry, cleanup func(), cancel context.CancelFunc) *Context {
 	return &Context{
 		cfg:           cfg,
 		app:           app,
@@ -46,6 +47,7 @@ func newContext(cfg *v1.BootstrapConfig, app *wind.App, logger log.Logger, broke
 		scriptEngines: scriptEngines,
 		databases:     databases,
 		servers:       servers,
+		registries:    registries,
 		cleanup:       cleanup,
 		cancel:        cancel,
 	}
@@ -293,4 +295,25 @@ func (c *Context) Servers() map[string]any {
 		return nil
 	}
 	return c.servers
+}
+
+// Registry returns the registry instance for the given type name (e.g.
+// [RegistryTypeEtcd], [RegistryTypeConsul]) for client-side discovery
+// (GetService/Watch). Instance registration/deregistration is handled
+// automatically by the bootstrap layer around app start/stop.
+// Returns nil if the registry type was not configured.
+func (c *Context) Registry(name string) Registry {
+	if c == nil || c.registries == nil {
+		return nil
+	}
+	return c.registries[name]
+}
+
+// Registries returns all registry instances as a map keyed by type name.
+// Returns nil if no registry was configured.
+func (c *Context) Registries() map[string]Registry {
+	if c == nil {
+		return nil
+	}
+	return c.registries
 }

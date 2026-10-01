@@ -22,10 +22,10 @@ func init() {
 	bootstrap.MustRegisterRegistryAction(bootstrap.RegistryTypeConsul, newAction)
 }
 
-func newAction(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.Registry) (func(), error) {
+func newAction(ctx context.Context, cfg *v1.Registry) (bootstrap.Registry, func(), error) {
 	c := cfg.GetConsul()
 	if c == nil {
-		return nil, fmt.Errorf("consul: config is nil")
+		return nil, nil, fmt.Errorf("consul: config is nil")
 	}
 
 	consulCfg := api.DefaultConfig()
@@ -77,7 +77,7 @@ func newAction(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.
 
 	client, err := api.NewClient(consulCfg)
 	if err != nil {
-		return nil, fmt.Errorf("consul: create client: %w", err)
+		return nil, nil, fmt.Errorf("consul: create client: %w", err)
 	}
 
 	var opts []consulPlugin.Option
@@ -105,9 +105,5 @@ func newAction(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.
 
 	reg := consulPlugin.New(client, opts...)
 
-	regCleanup, err := bootstrap.RegisterInstance(ctx, reg, appCfg, endpoints)
-	if err != nil {
-		return nil, err
-	}
-	return regCleanup, nil
+	return reg, nil, nil
 }

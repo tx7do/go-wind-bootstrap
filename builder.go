@@ -25,12 +25,14 @@ type ServerBuilder func(cfg *v1.Server) (transport.Server, error)
 // LogBuilder builds a [log.Logger] from a [Logger] config.
 type LogBuilder func(cfg *v1.Logger) (log.Logger, func(), error)
 
-// RegistryAction performs registration/deregistration lifecycle.
+// RegistryAction builds a [Registry] instance from a [Registry] config.
 //
-// The cfg parameter carries the full registry configuration so that
-// the action can extract its own sub-configuration.
-// Deprecated: Use RegisterRegistryAction with the new signature instead.
-type RegistryAction func(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.Registry) (func(), error)
+// The action only creates the underlying client and registry object; instance
+// registration/deregistration is driven by the bootstrap layer around app
+// start/stop (AfterStart/BeforeStop hooks), and discovery (GetService/Watch)
+// is available to the caller via [Context.Registry]. The returned cleanup
+// releases the underlying client resources.
+type RegistryAction func(ctx context.Context, cfg *v1.Registry) (Registry, func(), error)
 
 // ConfigAction performs config source loading/watching.
 type ConfigAction func(ctx context.Context, cfg *v1.Config) (func(), error)

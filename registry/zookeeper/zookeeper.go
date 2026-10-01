@@ -22,15 +22,15 @@ func init() {
 	bootstrap.MustRegisterRegistryAction(bootstrap.RegistryTypeZookeeper, newAction)
 }
 
-func newAction(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.Registry) (func(), error) {
+func newAction(ctx context.Context, cfg *v1.Registry) (bootstrap.Registry, func(), error) {
 	c := cfg.GetZookeeper()
 	if c == nil {
-		return nil, fmt.Errorf("zookeeper: config is nil")
+		return nil, nil, fmt.Errorf("zookeeper: config is nil")
 	}
 
 	eps := c.GetEndpoints()
 	if len(eps) == 0 {
-		return nil, fmt.Errorf("zookeeper: no endpoints")
+		return nil, nil, fmt.Errorf("zookeeper: no endpoints")
 	}
 
 	sessionTimeout := 5 * time.Second
@@ -39,7 +39,7 @@ func newAction(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.
 	}
 	conn, _, err := zk.Connect(eps, sessionTimeout)
 	if err != nil {
-		return nil, fmt.Errorf("zookeeper: connect: %w", err)
+		return nil, nil, fmt.Errorf("zookeeper: connect: %w", err)
 	}
 
 	var opts []zkPlugin.Option
@@ -52,15 +52,5 @@ func newAction(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.
 
 	reg := zkPlugin.New(conn, opts...)
 
-	regCleanup, err := bootstrap.RegisterInstance(ctx, reg, appCfg, endpoints)
-	if err != nil {
-		conn.Close()
-		return nil, err
-	}
-
-	cleanup := func() {
-		regCleanup()
-		conn.Close()
-	}
-	return cleanup, nil
+	return reg, conn.Close, nil
 }

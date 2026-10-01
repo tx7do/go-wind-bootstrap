@@ -23,15 +23,15 @@ func init() {
 	bootstrap.MustRegisterRegistryAction(bootstrap.RegistryTypeNacos, newAction)
 }
 
-func newAction(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.Registry) (func(), error) {
+func newAction(ctx context.Context, cfg *v1.Registry) (bootstrap.Registry, func(), error) {
 	c := cfg.GetNacos()
 	if c == nil {
-		return nil, fmt.Errorf("nacos: config is nil")
+		return nil, nil, fmt.Errorf("nacos: config is nil")
 	}
 
 	addrs := c.GetServerAddrs()
 	if len(addrs) == 0 {
-		return nil, fmt.Errorf("nacos: no server_addrs")
+		return nil, nil, fmt.Errorf("nacos: no server_addrs")
 	}
 
 	serverCfg := constant.ServerConfig{ContextPath: "/nacos"}
@@ -106,15 +106,15 @@ func newAction(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.
 
 	nc := nacos_client.NacosClient{}
 	if err := nc.SetClientConfig(clientConfig); err != nil {
-		return nil, fmt.Errorf("nacos: set client config: %w", err)
+		return nil, nil, fmt.Errorf("nacos: set client config: %w", err)
 	}
 	if err := nc.SetServerConfig(serverConfigs); err != nil {
-		return nil, fmt.Errorf("nacos: set server config: %w", err)
+		return nil, nil, fmt.Errorf("nacos: set server config: %w", err)
 	}
 
 	client, err := naming_client.NewNamingClient(&nc)
 	if err != nil {
-		return nil, fmt.Errorf("nacos: create client: %w", err)
+		return nil, nil, fmt.Errorf("nacos: create client: %w", err)
 	}
 
 	var opts []nacosPlugin.Option
@@ -136,9 +136,5 @@ func newAction(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.
 
 	reg := nacosPlugin.New(client, opts...)
 
-	regCleanup, err := bootstrap.RegisterInstance(ctx, reg, appCfg, endpoints)
-	if err != nil {
-		return nil, err
-	}
-	return regCleanup, nil
+	return reg, nil, nil
 }

@@ -22,17 +22,17 @@ func init() {
 	bootstrap.MustRegisterRegistryAction(bootstrap.RegistryTypePolaris, newAction)
 }
 
-func newAction(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.Registry) (func(), error) {
+func newAction(ctx context.Context, cfg *v1.Registry) (bootstrap.Registry, func(), error) {
 	c := cfg.GetPolaris()
 	if c == nil {
-		return nil, fmt.Errorf("polaris: config is nil")
+		return nil, nil, fmt.Errorf("polaris: config is nil")
 	}
 
 	var polarisCfg config.Configuration
 	if configFile := c.GetConfigFile(); configFile != "" {
 		loaded, err := config.LoadConfigurationByFile(configFile)
 		if err != nil {
-			return nil, fmt.Errorf("polaris: load config file: %w", err)
+			return nil, nil, fmt.Errorf("polaris: load config file: %w", err)
 		}
 		polarisCfg = loaded
 	} else {
@@ -83,9 +83,5 @@ func newAction(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.
 
 	reg := polarisPlugin.NewRegistryWithConfig(polarisCfg, opts...)
 
-	regCleanup, err := bootstrap.RegisterInstance(ctx, reg, appCfg, endpoints)
-	if err != nil {
-		return nil, err
-	}
-	return regCleanup, nil
+	return reg, nil, nil
 }

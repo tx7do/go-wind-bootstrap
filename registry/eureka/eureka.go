@@ -20,15 +20,15 @@ func init() {
 	bootstrap.MustRegisterRegistryAction(bootstrap.RegistryTypeEureka, newAction)
 }
 
-func newAction(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.Registry) (func(), error) {
+func newAction(ctx context.Context, cfg *v1.Registry) (bootstrap.Registry, func(), error) {
 	c := cfg.GetEureka()
 	if c == nil {
-		return nil, fmt.Errorf("eureka: config is nil")
+		return nil, nil, fmt.Errorf("eureka: config is nil")
 	}
 
 	eps := c.GetEndpoints()
 	if len(eps) == 0 {
-		return nil, fmt.Errorf("eureka: no endpoints")
+		return nil, nil, fmt.Errorf("eureka: no endpoints")
 	}
 
 	var opts []eurekaPlugin.Option
@@ -44,12 +44,8 @@ func newAction(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.
 
 	reg, err := eurekaPlugin.New(eps, opts...)
 	if err != nil {
-		return nil, fmt.Errorf("eureka: create registry: %w", err)
+		return nil, nil, fmt.Errorf("eureka: create registry: %w", err)
 	}
 
-	regCleanup, err := bootstrap.RegisterInstance(ctx, reg, appCfg, endpoints)
-	if err != nil {
-		return nil, err
-	}
-	return regCleanup, nil
+	return reg, nil, nil
 }

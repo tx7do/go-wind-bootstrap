@@ -24,15 +24,15 @@ func init() {
 	bootstrap.MustRegisterRegistryAction(bootstrap.RegistryTypeServiceComb, newAction)
 }
 
-func newAction(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.Registry) (func(), error) {
+func newAction(ctx context.Context, cfg *v1.Registry) (bootstrap.Registry, func(), error) {
 	c := cfg.GetServiceComb()
 	if c == nil {
-		return nil, fmt.Errorf("servicecomb: config is nil")
+		return nil, nil, fmt.Errorf("servicecomb: config is nil")
 	}
 
 	eps := c.GetEndpoints()
 	if len(eps) == 0 {
-		return nil, fmt.Errorf("servicecomb: no endpoints")
+		return nil, nil, fmt.Errorf("servicecomb: no endpoints")
 	}
 
 	clientOpts := sc.Options{
@@ -55,21 +55,17 @@ func newAction(ctx context.Context, appCfg *v1.App, endpoints []string, cfg *v1.
 		clientOpts.TokenExpiration = time.Duration(expiration) * time.Second
 	}
 	if tlsCfg, err := tlsutil.ClientTLS(c.GetTls()); err != nil {
-		return nil, fmt.Errorf("servicecomb: load tls: %w", err)
+		return nil, nil, fmt.Errorf("servicecomb: load tls: %w", err)
 	} else if tlsCfg != nil {
 		clientOpts.TLSConfig = tlsCfg
 	}
 
 	client, err := sc.NewClient(clientOpts)
 	if err != nil {
-		return nil, fmt.Errorf("servicecomb: create client: %w", err)
+		return nil, nil, fmt.Errorf("servicecomb: create client: %w", err)
 	}
 
 	reg := servicecombPlugin.New(client)
 
-	regCleanup, err := bootstrap.RegisterInstance(ctx, reg, appCfg, endpoints)
-	if err != nil {
-		return nil, err
-	}
-	return regCleanup, nil
+	return reg, nil, nil
 }

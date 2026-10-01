@@ -16,7 +16,7 @@ func TestContextServerAccessor(t *testing.T) {
 	}
 
 	servers := map[string]any{"http": "fake-instance"}
-	c := newContext(nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, servers, func() {}, nil)
+	c := newContext(nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, servers, nil, func() {}, nil)
 
 	if got := c.Server("http"); got != "fake-instance" {
 		t.Fatalf("Server(http): want fake-instance, got %v", got)
@@ -40,7 +40,7 @@ func TestContextLoggerAccessor(t *testing.T) {
 	}
 
 	l := log.GetLogger()
-	c := newContext(nil, nil, l, nil, nil, nil, nil, nil, nil, nil, nil, func() {}, nil)
+	c := newContext(nil, nil, l, nil, nil, nil, nil, nil, nil, nil, nil, nil, func() {}, nil)
 
 	if got := c.Logger(); got != l {
 		t.Fatalf("Logger: want the resolved logger, got %v", got)

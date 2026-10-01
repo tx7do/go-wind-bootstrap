@@ -8,28 +8,42 @@ import (
 	"time"
 
 	wind "github.com/tx7do/go-wind"
+	baseRegistry "github.com/tx7do/go-wind-plugins/registry"
 
 	v1 "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1"
 )
 
-// InstanceRegistrar is the minimal registration surface a registry plugin
-// must expose for the bootstrap layer to manage the app instance lifecycle.
-// All registry plugins ([wind.Instance]-based Register/Deregister) satisfy it.
-type InstanceRegistrar interface {
-	Register(ctx context.Context, inst *wind.Instance) error
-	Deregister(ctx context.Context, inst *wind.Instance) error
+// Watcher、InstanceRegistrar 与 Discovery 是 go-wind-plugins/registry 中
+// 对应接口的别名——registry 插件实现均满足它们，适配器无需包装即可
+// 返回插件实例。
+
+// Watcher observes instance changes for a service name.
+type Watcher = baseRegistry.Watcher
+
+// InstanceRegistrar registers/deregisters the application instance.
+type InstanceRegistrar = baseRegistry.Registrar
+
+// Discovery resolves service instances by name (client side).
+type Discovery = baseRegistry.Discovery
+
+// Registry combines instance registration with service discovery.
+// All registry plugin implementations satisfy it.
+type Registry interface {
+	InstanceRegistrar
+	Discovery
 }
 
 // RegisterInstance registers the application instance described by [appCfg]
-// with the given registrar, using the (already resolved) server endpoints.
+// with the given registry, using the (already resolved) server endpoints.
 //
 // Registration is skipped — returning a no-op cleanup — when the app has no
 // name or there are no endpoints, i.e. when the registry acts purely as a
 // client (discovery) instead of a registrar.
 //
-// The returned cleanup deregisters the instance; it is safe to call after the
-// application context has been cancelled and uses its own short deadline.
-// The caller remains responsible for closing the underlying registry client.
+// The returned cleanup deregisters the instance; it is safe to call after
+// the application context has been cancelled and uses its own short
+// deadline. The caller remains responsible for closing the underlying
+// registry client.
 func RegisterInstance(ctx context.Context, reg InstanceRegistrar, appCfg *v1.App, endpoints []string) (func(), error) {
 	name := appCfg.GetName()
 	if name == "" || len(endpoints) == 0 {
