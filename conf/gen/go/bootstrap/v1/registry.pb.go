@@ -574,7 +574,15 @@ type Registry_Nacos struct {
 	// 是否开启异步订阅更新服务列表。
 	AsyncUpdateService bool `protobuf:"varint,22,opt,name=async_update_service,json=asyncUpdateService,proto3" json:"async_update_service,omitempty"`
 	// TLS 配置（仅支持文件路径）。
-	Tls           *TLS `protobuf:"bytes,23,opt,name=tls,proto3" json:"tls,omitempty"`
+	Tls *TLS `protobuf:"bytes,23,opt,name=tls,proto3" json:"tls,omitempty"`
+	// 日志目录，默认当前路径。
+	LogDir string `protobuf:"bytes,24,opt,name=log_dir,json=logDir,proto3" json:"log_dir,omitempty"`
+	// 日志等级：debug、info、warn、error，默认 info。
+	LogLevel string `protobuf:"bytes,25,opt,name=log_level,json=logLevel,proto3" json:"log_level,omitempty"`
+	// 缓存目录（服务信息持久化），默认当前路径。
+	CacheDir string `protobuf:"bytes,26,opt,name=cache_dir,json=cacheDir,proto3" json:"cache_dir,omitempty"`
+	// 是否开启 KMS 加解密（阿里云）。
+	OpenKms       bool `protobuf:"varint,27,opt,name=open_kms,json=openKms,proto3" json:"open_kms,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -768,6 +776,34 @@ func (x *Registry_Nacos) GetTls() *TLS {
 		return x.Tls
 	}
 	return nil
+}
+
+func (x *Registry_Nacos) GetLogDir() string {
+	if x != nil {
+		return x.LogDir
+	}
+	return ""
+}
+
+func (x *Registry_Nacos) GetLogLevel() string {
+	if x != nil {
+		return x.LogLevel
+	}
+	return ""
+}
+
+func (x *Registry_Nacos) GetCacheDir() string {
+	if x != nil {
+		return x.CacheDir
+	}
+	return ""
+}
+
+func (x *Registry_Nacos) GetOpenKms() bool {
+	if x != nil {
+		return x.OpenKms
+	}
+	return false
 }
 
 type Registry_Zookeeper struct {
@@ -1016,7 +1052,9 @@ type Registry_Eureka struct {
 	// 服务列表刷新间隔（秒）。
 	RefreshInterval int32 `protobuf:"varint,4,opt,name=refresh_interval,json=refreshInterval,proto3" json:"refresh_interval,omitempty"`
 	// Eureka 路径前缀。
-	EurekaPath    string `protobuf:"bytes,5,opt,name=eureka_path,json=eurekaPath,proto3" json:"eureka_path,omitempty"`
+	EurekaPath string `protobuf:"bytes,5,opt,name=eureka_path,json=eurekaPath,proto3" json:"eureka_path,omitempty"`
+	// 请求失败重试次数，默认 endpoints 数量。
+	MaxRetry      int32 `protobuf:"varint,6,opt,name=max_retry,json=maxRetry,proto3" json:"max_retry,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1084,6 +1122,13 @@ func (x *Registry_Eureka) GetEurekaPath() string {
 		return x.EurekaPath
 	}
 	return ""
+}
+
+func (x *Registry_Eureka) GetMaxRetry() int32 {
+	if x != nil {
+		return x.MaxRetry
+	}
+	return 0
 }
 
 type Registry_Kubernetes struct {
@@ -1353,7 +1398,7 @@ var File_bootstrap_v1_registry_proto protoreflect.FileDescriptor
 
 const file_bootstrap_v1_registry_proto_rawDesc = "" +
 	"\n" +
-	"\x1bbootstrap/v1/registry.proto\x12\fbootstrap.v1\x1a\x16bootstrap/v1/tls.proto\"\xc4 \n" +
+	"\x1bbootstrap/v1/registry.proto\x12\fbootstrap.v1\x1a\x16bootstrap/v1/tls.proto\"\xcf!\n" +
 	"\bRegistry\x12\x12\n" +
 	"\x04type\x18\x01 \x01(\tR\x04type\x12:\n" +
 	"\x06consul\x18\x02 \x01(\v2\x1d.bootstrap.v1.Registry.ConsulH\x00R\x06consul\x88\x01\x01\x124\n" +
@@ -1407,7 +1452,7 @@ const file_bootstrap_v1_registry_proto_rawDesc = "" +
 	" \x01(\x05R\x14dialKeepAliveTimeout\x12,\n" +
 	"\x12reject_old_cluster\x18\v \x01(\bR\x10rejectOldCluster\x122\n" +
 	"\x15permit_without_stream\x18\f \x01(\bR\x13permitWithoutStream\x12#\n" +
-	"\x03tls\x18\r \x01(\v2\x11.bootstrap.v1.TLSR\x03tls\x1a\xa8\x06\n" +
+	"\x03tls\x18\r \x01(\v2\x11.bootstrap.v1.TLSR\x03tls\x1a\x96\a\n" +
 	"\x05Nacos\x12!\n" +
 	"\fserver_addrs\x18\x01 \x03(\tR\vserverAddrs\x12\x1c\n" +
 	"\tnamespace\x18\x02 \x01(\tR\tnamespace\x12\x14\n" +
@@ -1435,7 +1480,11 @@ const file_bootstrap_v1_registry_proto_rawDesc = "" +
 	"\x15disable_use_snap_shot\x18\x14 \x01(\bR\x12disableUseSnapShot\x12(\n" +
 	"\x10append_to_stdout\x18\x15 \x01(\bR\x0eappendToStdout\x120\n" +
 	"\x14async_update_service\x18\x16 \x01(\bR\x12asyncUpdateService\x12#\n" +
-	"\x03tls\x18\x17 \x01(\v2\x11.bootstrap.v1.TLSR\x03tls\x1a\xa7\x01\n" +
+	"\x03tls\x18\x17 \x01(\v2\x11.bootstrap.v1.TLSR\x03tls\x12\x17\n" +
+	"\alog_dir\x18\x18 \x01(\tR\x06logDir\x12\x1b\n" +
+	"\tlog_level\x18\x19 \x01(\tR\blogLevel\x12\x1b\n" +
+	"\tcache_dir\x18\x1a \x01(\tR\bcacheDir\x12\x19\n" +
+	"\bopen_kms\x18\x1b \x01(\bR\aopenKms\x1a\xa7\x01\n" +
 	"\tZookeeper\x12\x1c\n" +
 	"\tendpoints\x18\x01 \x03(\tR\tendpoints\x12\x1b\n" +
 	"\troot_path\x18\x02 \x01(\tR\brootPath\x12'\n" +
@@ -1465,14 +1514,15 @@ const file_bootstrap_v1_registry_proto_rawDesc = "" +
 	"\n" +
 	"\b_isolateB\f\n" +
 	"\n" +
-	"_heartbeat\x1a\xbc\x01\n" +
+	"_heartbeat\x1a\xd9\x01\n" +
 	"\x06Eureka\x12\x1c\n" +
 	"\tendpoints\x18\x01 \x03(\tR\tendpoints\x12\x19\n" +
 	"\bapp_name\x18\x02 \x01(\tR\aappName\x12-\n" +
 	"\x12heartbeat_interval\x18\x03 \x01(\x05R\x11heartbeatInterval\x12)\n" +
 	"\x10refresh_interval\x18\x04 \x01(\x05R\x0frefreshInterval\x12\x1f\n" +
 	"\veureka_path\x18\x05 \x01(\tR\n" +
-	"eurekaPath\x1a}\n" +
+	"eurekaPath\x12\x1b\n" +
+	"\tmax_retry\x18\x06 \x01(\x05R\bmaxRetry\x1a}\n" +
 	"\n" +
 	"Kubernetes\x12\x1c\n" +
 	"\tnamespace\x18\x01 \x01(\tR\tnamespace\x12\x1e\n" +

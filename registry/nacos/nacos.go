@@ -91,6 +91,18 @@ func newAction(ctx context.Context, cfg *v1.Registry) (bootstrap.Registry, func(
 	if c.GetAsyncUpdateService() {
 		clientConfig.AsyncUpdateService = true
 	}
+	if logDir := c.GetLogDir(); logDir != "" {
+		clientConfig.LogDir = logDir
+	}
+	if logLevel := c.GetLogLevel(); logLevel != "" {
+		clientConfig.LogLevel = logLevel
+	}
+	if cacheDir := c.GetCacheDir(); cacheDir != "" {
+		clientConfig.CacheDir = cacheDir
+	}
+	if c.GetOpenKms() {
+		clientConfig.OpenKMS = true
+	}
 	// nacos SDK 的 TLS 仅支持文件路径。
 	if tlsCfg := c.GetTls(); tlsCfg != nil {
 		clientConfig.TLSCfg = constant.TLSConfig{

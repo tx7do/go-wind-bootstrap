@@ -41,6 +41,9 @@ func newAction(ctx context.Context, cfg *v1.Registry) (bootstrap.Registry, func(
 	if path := c.GetEurekaPath(); path != "" {
 		opts = append(opts, eurekaPlugin.WithEurekaPath(path))
 	}
+	if mr := c.GetMaxRetry(); mr > 0 {
+		opts = append(opts, eurekaPlugin.MaxRetry(int(mr)))
+	}
 
 	reg, err := eurekaPlugin.New(eps, opts...)
 	if err != nil {

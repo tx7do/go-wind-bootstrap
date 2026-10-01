@@ -127,6 +127,14 @@ message Registry {
     bool async_update_service = 22;
     // TLS 配置（仅支持文件路径）。
     bootstrap.v1.TLS tls = 23;
+    // 日志目录，默认当前路径。
+    string log_dir = 24;
+    // 日志等级：debug、info、warn、error，默认 info。
+    string log_level = 25;
+    // 缓存目录（服务信息持久化），默认当前路径。
+    string cache_dir = 26;
+    // 是否开启 KMS 加解密（阿里云）。
+    bool open_kms = 27;
   }
 
   message Zookeeper {
@@ -176,6 +184,8 @@ message Registry {
     int32 refresh_interval = 4;
     // Eureka 路径前缀。
     string eureka_path = 5;
+    // 请求失败重试次数，默认 endpoints 数量。
+    int32 max_retry = 6;
   }
 
   message Kubernetes {
