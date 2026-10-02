@@ -1,0 +1,57 @@
+name: CI
+
+# 多模块仓库：每个 go.mod 独立编译（GOWORK=off），保证以模块代理拉取时
+# go.mod/go.sum 自洽；根模块跑单测；integration 模块的 e2e 在检测到
+# 本地 etcd 时自动运行，否则跳过。
+on:
+  push:
+    branches: [main]
+    tags: ['**']
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-all:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+
+      - name: Build all modules standalone
+        run: |
+          set -e
+          find . -name go.mod -not -path "./.zcode/*" | while read -r mod; do
+            dir=$(dirname "$mod")
+            echo "::group::build $dir"
+            (cd "$dir" && env GOWORK=off go build ./...)
+            echo "::endgroup::"
+          done
+
+      - name: Vet root module
+        run: env GOWORK=off go vet ./...
+
+      - name: Test root module
+        run: env GOWORK=off go test -count=1 ./...
+
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+
+      - name: Start etcd
+        run: |
+          docker run -d --name etcd \
+            -p 2379:2379 \
+            gcr.io/etcd-development/etcd:v3.5.16 \
+            etcd --advertise-client-urls http://0.0.0.0:2379 \
+                 --listen-client-urls http://0.0.0.0:2379
+
+      - name: Test integration (etcd-gated e2e)
+        run: (cd integration && env GOWORK=off go test -count=1 -v ./...)
