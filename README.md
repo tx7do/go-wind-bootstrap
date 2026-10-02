@@ -202,6 +202,40 @@ app.Run(ctx)
 
 ---
 
+## 服务注册与发现
+
+配置注册中心后，bootstrap 自动管理实例生命周期：
+
+- **注册**：应用启动后（`AfterStart` 钩子）以真实监听端点注册——配置 `":0"`
+  随机端口时会等待绑定完成后取实际端口；
+- **注销**：优雅停机时（`BeforeStop` 钩子）在服务器停止前摘除实例；
+- 任一注册中心注册失败会注销已注册实例并触发优雅停机。
+
+客户端服务发现按需选用两条路径（go-wind core 不含发现概念）：
+
+```go
+// 路径一：gRPC 经 resolver 按服务名寻址（负载均衡用 gRPC 内置 round_robin）
+import "github.com/tx7do/go-wind-plugins/resolver"
+
+conn, err := grpc.NewClient("wind:///user-service",
+    grpc.WithResolvers(resolver.NewBuilder(ctx.Registry("etcd"))),
+    grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`),
+)
+
+// 路径二：任意客户端用 selector 直接挑选实例
+import "github.com/tx7do/go-wind-plugins/selector"
+
+balancer := selector.NewWatchedBalancer(ctx.Registry("etcd"), selector.RoundRobin())
+defer balancer.Close()
+inst, err := balancer.Pick(ctx, "user-service")
+```
+
+> `ctx.Registry("etcd")` 返回 bootstrap 装配好的注册中心实例
+> （`GetService/Watch/Register/Deregister`），resolver 与 selector 来自
+> [go-wind-plugins](https://github.com/tx7do/go-wind-plugins)。
+
+---
+
 ## 架构总览
 
 ```mermaid
