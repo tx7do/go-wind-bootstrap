@@ -12,7 +12,6 @@ require (
 require (
 	github.com/coreos/go-semver v0.3.1 // indirect
 	github.com/coreos/go-systemd/v22 v22.7.0 // indirect
-	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.29.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
@@ -20,6 +19,7 @@ require (
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/tx7do/go-wind v0.0.3 // indirect
 	github.com/tx7do/go-wind-bootstrap v0.0.0 // indirect
+	github.com/tx7do/go-wind-plugins/registry v0.0.1 // indirect
 	go.etcd.io/etcd/api/v3 v3.7.1 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.7.1 // indirect
 	go.etcd.io/etcd/client/v3 v3.7.1 // indirect

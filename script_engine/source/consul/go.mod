@@ -31,6 +31,7 @@ require (
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/tx7do/go-wind v0.0.3 // indirect
 	github.com/tx7do/go-wind-bootstrap v0.0.0 // indirect
+	github.com/tx7do/go-wind-plugins/registry v0.0.1 // indirect
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
 	golang.org/x/exp v0.0.0-20260727155853-b88d891fe743 // indirect
 	golang.org/x/sync v0.22.0 // indirect
