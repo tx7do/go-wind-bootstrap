@@ -163,4 +163,8 @@ const (
 	DatabaseTypeOpensearch    = "opensearch"
 	DatabaseTypeInfluxdb      = "influxdb"
 	DatabaseTypeCassandra     = "cassandra"
+	DatabaseTypeQdrant        = "qdrant"
+	DatabaseTypeMilvus        = "milvus"
+	DatabaseTypeNeo4j         = "neo4j"
+	DatabaseTypeWeaviate      = "weaviate"
 )

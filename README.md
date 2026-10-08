@@ -356,6 +356,26 @@ graph TB
 | SQS | `sqs` |
 | STOMP | `stomp` |
 
+### 数据库（Database）
+
+| 类型 | 常量 | 适配器 |
+|------|------|--------|
+| GORM（MySQL/Postgres/SQLite/SQLServer 等） | `gorm` | `database/gorm` ✅ |
+| MongoDB | `mongodb` | `database/mongodb` ✅ |
+| ClickHouse | `clickhouse` | `database/clickhouse` ✅ |
+| Doris | `doris` | `database/doris` ✅ |
+| Elasticsearch | `elasticsearch` | `database/elasticsearch` ✅ |
+| OpenSearch | `opensearch` | `database/opensearch` ✅ |
+| InfluxDB | `influxdb` | `database/influxdb` ✅ |
+| Cassandra | `cassandra` | `database/cassandra` ✅ |
+| Qdrant（向量） | `qdrant` | `database/qdrant` ✅ |
+| Milvus（向量） | `milvus` | `database/milvus` ✅ |
+| Neo4j（图） | `neo4j` | `database/neo4j` ✅ |
+| Weaviate（向量） | `weaviate` | `database/weaviate` ✅ |
+| Ent | — | `database/ent`（泛型 Helper，非 SPI 注册） |
+
+> 关系型/文档型/搜索型引擎升级 go-crud 后同步获得向量检索能力（`go-crud/vector` 契约：GORM+pgvector、Elasticsearch knn、OpenSearch knn、MongoDB Atlas `$vectorSearch`、ClickHouse/Doris 距离函数）。
+
 ---
 
 ## 声明式中间件

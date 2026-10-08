@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gocql/gocql"
+	cassandraCrud "github.com/tx7do/go-crud/cassandra"
 
 	bootstrap "github.com/tx7do/go-wind-bootstrap"
 	v1 "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1"
@@ -26,40 +26,36 @@ func newBuilder(ctx context.Context, cfg *v1.Database) (any, func(), error) {
 		return nil, nil, fmt.Errorf("cassandra: config is nil")
 	}
 
-	cluster := gocql.NewCluster(c.GetAddress())
+	var options []cassandraCrud.Option
 
-	// 认证
-	cluster.Authenticator = gocql.PasswordAuthenticator{
-		Username: c.GetUsername(),
-		Password: c.GetPassword(),
+	if addr := c.GetAddress(); addr != "" {
+		options = append(options, cassandraCrud.WithHosts(addr))
 	}
-
-	// Keyspace
+	if u := c.GetUsername(); u != "" {
+		options = append(options, cassandraCrud.WithUsername(u))
+		options = append(options, cassandraCrud.WithPassword(c.GetPassword()))
+	}
 	if ks := c.GetKeyspace(); ks != "" {
-		cluster.Keyspace = ks
+		options = append(options, cassandraCrud.WithKeyspace(ks))
 	}
-
-	// 一致性级别
+	// 一致性级别：未配置时由 go-crud 缺省为 Quorum
+	// （gocql 零值 Any 仅对写合法，服务端会拒绝全部读路径）。
 	if v := c.GetConsistency(); v > 0 {
-		cluster.Consistency = gocql.Consistency(v)
+		options = append(options, cassandraCrud.WithConsistency(uint32(v)))
 	}
-
-	// 超时
 	if v := c.GetConnectTimeoutSeconds(); v > 0 {
-		cluster.ConnectTimeout = time.Duration(v) * time.Second
+		options = append(options, cassandraCrud.WithConnectTimeout(time.Duration(v)*time.Second))
 	}
 	if v := c.GetTimeoutSeconds(); v > 0 {
-		cluster.Timeout = time.Duration(v) * time.Second
+		options = append(options, cassandraCrud.WithTimeout(time.Duration(v)*time.Second))
 	}
+	options = append(options, cassandraCrud.WithDisableInitialHostLookup(c.GetDisableInitialHostLookup()))
 
-	// 禁止主机查找
-	cluster.DisableInitialHostLookup = c.GetDisableInitialHostLookup()
-
-	session, err := cluster.CreateSession()
+	client, err := cassandraCrud.NewCassandraClient(options...)
 	if err != nil {
-		return nil, nil, fmt.Errorf("cassandra: create session failed: %w", err)
+		return nil, nil, fmt.Errorf("cassandra: create client failed: %w", err)
 	}
 
-	cleanup := func() { session.Close() }
-	return session, cleanup, nil
+	cleanup := func() { client.Close() }
+	return client, cleanup, nil
 }

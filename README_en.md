@@ -322,6 +322,26 @@ graph TB
 | SQS | `sqs` |
 | STOMP | `stomp` |
 
+### Database
+
+| Type | Constant | Adapter |
+|------|----------|---------|
+| GORM (MySQL/Postgres/SQLite/SQLServer, etc.) | `gorm` | `database/gorm` ✅ |
+| MongoDB | `mongodb` | `database/mongodb` ✅ |
+| ClickHouse | `clickhouse` | `database/clickhouse` ✅ |
+| Doris | `doris` | `database/doris` ✅ |
+| Elasticsearch | `elasticsearch` | `database/elasticsearch` ✅ |
+| OpenSearch | `opensearch` | `database/opensearch` ✅ |
+| InfluxDB | `influxdb` | `database/influxdb` ✅ |
+| Cassandra | `cassandra` | `database/cassandra` ✅ |
+| Qdrant (vector) | `qdrant` | `database/qdrant` ✅ |
+| Milvus (vector) | `milvus` | `database/milvus` ✅ |
+| Neo4j (graph) | `neo4j` | `database/neo4j` ✅ |
+| Weaviate (vector) | `weaviate` | `database/weaviate` ✅ |
+| Ent | — | `database/ent` (generic Helper, not SPI-registered) |
+
+> Relational/document/search engines gain vector search support with the go-crud upgrade (the `go-crud/vector` contract: GORM+pgvector, Elasticsearch knn, OpenSearch knn, MongoDB Atlas `$vectorSearch`, ClickHouse/Doris distance functions).
+
 ---
 
 ## Declarative Middleware

@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package bootstrap.v1;
 
+import "bootstrap/v1/tls.proto";
+
 option go_package = "github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1";
 
 // Database 描述数据库配置，支持通过 optional 字段同时配置多种数据库。
@@ -117,6 +119,41 @@ message Database {
     bool disable_initial_host_lookup = 8;   // 禁止主机查找
   }
 
+  // Qdrant 配置。
+  message Qdrant {
+    string host = 1;                // 主机地址（gRPC 端口所在主机）
+    int32 port = 2;                 // gRPC 端口（默认 6334）
+    string api_key = 3;             // API Key（Qdrant Cloud）
+    bool use_tls = 4;               // 是否启用 TLS
+    // TLS 配置（与 use_tls 配合；启用后未提供证书材料时使用系统默认）。
+    bootstrap.v1.TLS tls = 5;
+  }
+
+  // Milvus 配置。
+  message Milvus {
+    string address = 1;             // 地址（host:port，默认 localhost:19530）
+    string username = 2;            // 用户名
+    string password = 3;            // 密码
+    string api_key = 4;             // API Key（Zilliz Cloud，设置后优先于用户名密码）
+    string db_name = 5;             // 数据库名
+  }
+
+  // Neo4j 配置。
+  message Neo4j {
+    string uri = 1;                 // 连接 URI（bolt:// / neo4j://，默认 bolt://localhost:7687）
+    string username = 2;            // 用户名
+    string password = 3;            // 密码
+    string realm = 4;               // 认证域（可选）
+  }
+
+  // Weaviate 配置。
+  message Weaviate {
+    string host = 1;                // 主机地址（host:port，默认 localhost:8080）
+    string scheme = 2;              // 协议（http / https，默认 http）
+    string api_key = 3;             // API Key（映射为 Authorization 头）
+    map<string, string> headers = 4; // 自定义请求头
+  }
+
   optional SQL sql = 1;
   optional MongoDB mongodb = 2;
   optional ClickHouse clickhouse = 3;
@@ -125,4 +162,8 @@ message Database {
   optional OpenSearch opensearch = 6;
   optional InfluxDB influxdb = 7;
   optional Cassandra cassandra = 8;
+  optional Qdrant qdrant = 9;
+  optional Milvus milvus = 10;
+  optional Neo4j neo4j = 11;
+  optional Weaviate weaviate = 12;
 }

@@ -322,6 +322,26 @@ graph TB
 | SQS | `sqs` |
 | STOMP | `stomp` |
 
+### データベース
+
+| タイプ | 定数 | アダプタ |
+|--------|------|----------|
+| GORM（MySQL/Postgres/SQLite/SQLServer など） | `gorm` | `database/gorm` ✅ |
+| MongoDB | `mongodb` | `database/mongodb` ✅ |
+| ClickHouse | `clickhouse` | `database/clickhouse` ✅ |
+| Doris | `doris` | `database/doris` ✅ |
+| Elasticsearch | `elasticsearch` | `database/elasticsearch` ✅ |
+| OpenSearch | `opensearch` | `database/opensearch` ✅ |
+| InfluxDB | `influxdb` | `database/influxdb` ✅ |
+| Cassandra | `cassandra` | `database/cassandra` ✅ |
+| Qdrant（ベクトル） | `qdrant` | `database/qdrant` ✅ |
+| Milvus（ベクトル） | `milvus` | `database/milvus` ✅ |
+| Neo4j（グラフ） | `neo4j` | `database/neo4j` ✅ |
+| Weaviate（ベクトル） | `weaviate` | `database/weaviate` ✅ |
+| Ent | — | `database/ent`（ジェネリック Helper、SPI 非登録） |
+
+> リレーショナル/ドキュメント/検索エンジンは go-crud のアップグレードによりベクトル検索に対応（`go-crud/vector` 契約：GORM+pgvector、Elasticsearch knn、OpenSearch knn、MongoDB Atlas `$vectorSearch`、ClickHouse/Doris 距離関数）。
+
 ---
 
 ## 宣言型ミドルウェア

@@ -74,6 +74,34 @@ func resolveDatabase(ctx context.Context, cfg *v1.Database) (map[string]any, fun
 		}
 		fields = append(fields, field{name: DatabaseTypeCassandra, builder: b})
 	}
+	if cfg.GetQdrant() != nil {
+		b, err := getDatabaseBuilder(DatabaseTypeQdrant)
+		if err != nil {
+			return nil, nil, err
+		}
+		fields = append(fields, field{name: DatabaseTypeQdrant, builder: b})
+	}
+	if cfg.GetMilvus() != nil {
+		b, err := getDatabaseBuilder(DatabaseTypeMilvus)
+		if err != nil {
+			return nil, nil, err
+		}
+		fields = append(fields, field{name: DatabaseTypeMilvus, builder: b})
+	}
+	if cfg.GetNeo4J() != nil {
+		b, err := getDatabaseBuilder(DatabaseTypeNeo4j)
+		if err != nil {
+			return nil, nil, err
+		}
+		fields = append(fields, field{name: DatabaseTypeNeo4j, builder: b})
+	}
+	if cfg.GetWeaviate() != nil {
+		b, err := getDatabaseBuilder(DatabaseTypeWeaviate)
+		if err != nil {
+			return nil, nil, err
+		}
+		fields = append(fields, field{name: DatabaseTypeWeaviate, builder: b})
+	}
 
 	if len(fields) == 0 {
 		return nil, nil, nil
