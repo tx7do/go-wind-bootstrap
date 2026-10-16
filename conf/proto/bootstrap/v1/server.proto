@@ -254,6 +254,29 @@ message Server {
     string version = 2;
     // 监听地址。
     string address = 3;
+    // 服务器类型：SSE / HTTP / STDIO / IN_PROCESS。
+    string server_type = 4;
+    // 指令集（返回给客户端的能力说明）。
+    string instructions = 5;
+
+    // 恢复模式（工具调用 panic 恢复）。
+    bool recovery = 10;
+    // 日志记录。
+    bool logging = 11;
+    // 工具能力集。
+    bool tool_capabilities = 12;
+    // 提示词能力集。
+    bool prompt_capabilities = 13;
+    // 需求挖掘（elicitation）。
+    bool elicitation = 14;
+    // 根源（roots）。
+    bool roots = 15;
+    // 资源能力集（订阅/列表变更）。
+    bool resource_capabilities = 16;
+    // 入参 Schema 校验。
+    bool enable_input_schema_validation = 17;
+    // 出参 Schema 校验。
+    bool enable_output_schema_validation = 18;
   }
 
   // SignalR 传输层。
