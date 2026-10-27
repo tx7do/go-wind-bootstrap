@@ -514,6 +514,30 @@ bootstrap.MustRegisterBrokerBuilder(bootstrap.BrokerTypeKafka,
 
 ---
 
+## 字段映射代码生成
+
+各适配器里"配置字段 → 上游选项"的机械映射由 [protoc-gen-fieldmap](https://github.com/tx7do/go-wind-toolkit) 生成：每个适配器旁一份 `mapping.spec.yaml` 声明映射规则，生成的 `mapping.gen.go` 提供强类型映射函数（如 `MapSQLOptions`、`NewMinioConfig`），需特殊处理的字段（复合选项、TLS 装载、模式联动）以 `skip: true` 记录并保留在适配器手工段。
+
+```bash
+# 调整某适配器的映射规则后重新生成（以 database/gorm 为例）
+go run github.com/tx7do/go-wind-toolkit/protoc-gen-fieldmap@latest \
+  -I conf/proto -spec database/gorm/mapping.spec.yaml -out .
+```
+
+spec 中写了 proto 上不存在的字段名、或对不兼容类型用了 cast/guard，生成阶段直接报错——上游配置面变更时先跑一次生成，漂移即刻暴露。
+
+**保持手写的适配器**（生成收益不足，勿硬凑）：
+
+- `transport/http`、`transport/grpc` 等服务器适配器——中间件链、TLS、keepalive 等控制流支配，机械字段占比低；
+- `log/zap`、`log/zerolog`、`log/logrus`、`log/phuslu`、`log/charm`——level/format/writer 三组 switch 支配一切；
+- 多数 MQ 类 transport/broker（kafka、nats、mqtt…）——仅 1~2 个机械字段，认证皆为复合选项；
+- `database/ent`——不走 SPI 注册，映射面仅 4 个位置参数；
+- `workflow/*`、`ai/*`——字段个位数且为嵌套复合配置。
+
+各适配器 spec 中 `skip: true` 的字段即"有意不映射"的完整清单（复合选项、TLS 装载、proto 有字段但实现未消费的部分）。
+
+---
+
 ## 相关项目
 
 | 项目 | 说明 |
