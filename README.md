@@ -524,7 +524,7 @@ go run github.com/tx7do/go-wind-toolkit/protoc-gen-fieldmap@latest \
   -I conf/proto -spec database/gorm/mapping.spec.yaml -out .
 ```
 
-spec 中写了 proto 上不存在的字段名、或对不兼容类型用了 cast/guard，生成阶段直接报错——上游配置面变更时先跑一次生成，漂移即刻暴露。
+spec 中写了 proto 上不存在的字段名、或对不兼容类型用了 cast/guard，生成阶段直接报错——上游配置面变更时先跑一次生成，漂移即刻暴露。完整维护约定（风格选择、guard/cast 规则、手工段边界、AI 代理守则）见 [docs/fieldmap-conventions.md](docs/fieldmap-conventions.md)。
 
 **保持手写的适配器**（生成收益不足，勿硬凑）：
 
