@@ -55,3 +55,31 @@ jobs:
 
       - name: Test integration (etcd-gated e2e)
         run: (cd integration && env GOWORK=off go test -count=1 -v ./...)
+
+  # 字段映射防漂移：按各适配器的 mapping.spec.yaml 重新生成，
+  # 产出与提交的 mapping.gen.go 逐字节对比——改了 proto 忘了同步 spec
+  # 会在这一步红。
+  # continue-on-error 仅为过渡：待 go-wind-toolkit 发布 protoc-gen-fieldmap/v0.1.0
+  # tag 后移除。
+  fieldmap-drift:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+
+      - name: Regenerate field mappings and check drift
+        run: |
+          set -e
+          go build -o /tmp/fmgen github.com/tx7do/go-wind-toolkit/protoc-gen-fieldmap@v0.1.0
+          args=()
+          while IFS= read -r f; do args+=( -spec "$f" ); done < <(find . -name 'mapping.spec.yaml' -not -path './.zcode/*')
+          echo "specs: ${#args[@]}"
+          /tmp/fmgen -I conf/proto "${args[@]}" -out . > /dev/null
+          git diff --exit-code -- '**/mapping.gen.go' || {
+            echo "::error::mapping.gen.go 与 spec 不同步——请重新运行 protoc-gen-fieldmap 并提交生成结果"
+            exit 1
+          }
