@@ -7,7 +7,6 @@ package loki
 
 import (
 	"fmt"
-	"time"
 
 	lokiPlugin "github.com/tx7do/go-wind-plugins/log/loki"
 	windLog "github.com/tx7do/go-wind/log"
@@ -29,17 +28,11 @@ func newBuilder(cfg *v1.Logger) (windLog.Logger, func(), error) {
 		return nil, nil, fmt.Errorf("loki: endpoint is required")
 	}
 
-	var opts []lokiPlugin.Option
-	opts = append(opts, lokiPlugin.WithEndpoint(c.GetEndpoint()))
-
+	// 常规配置字段 → 选项的映射由 protoc-gen-fieldmap 生成（mapping.spec.yaml）；
+	// labels 逐键 WithLabel 的循环保留在手工段。
+	opts := MapLokiOptions(c, nil)
 	for k, v := range c.GetLabels() {
 		opts = append(opts, lokiPlugin.WithLabel(k, v))
-	}
-	if c.GetBatchSize() > 0 {
-		opts = append(opts, lokiPlugin.WithBatchSize(int(c.GetBatchSize())))
-	}
-	if c.GetFlushInterval() > 0 {
-		opts = append(opts, lokiPlugin.WithFlushInterval(time.Duration(c.GetFlushInterval())*time.Millisecond))
 	}
 
 	logger, err := lokiPlugin.NewLogger(opts...)

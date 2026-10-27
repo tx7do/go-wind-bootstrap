@@ -1,0 +1,37 @@
+# consul 注册中心适配器的字段映射规则（protoc-gen-fieldmap）。
+# api.Config 机械字段生成 FillConsulConfig；basic_auth 嵌套消息合成
+# HttpAuth、TLS 装载以及 consulPlugin.Option 拼装段（含超时回退分支、
+# datacenter 命名类型转换）保留在 consul.go 手工段。
+# 调整映射后重新生成:
+#   go run github.com/tx7do/go-wind-toolkit/protoc-gen-fieldmap@latest \
+#     -I conf/proto -spec registry/consul/mapping.spec.yaml -out .
+output:
+  file: registry/consul/mapping.gen.go
+  package: consul
+imports:
+  api: github.com/hashicorp/consul/api
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/registry.proto
+  type: Registry.Consul
+  func: FillConsulConfig
+  style: fill
+  target_type: api.Config
+  fields:
+    address: { target: Address }
+    scheme: { target: Scheme }
+    token: { target: Token }
+    token_file: { target: TokenFile }
+    namespace: { target: Namespace }
+    partition: { target: Partition }
+    path_prefix: { target: PathPrefix }
+    wait_time: { target: WaitTime, cast: seconds, guard: positive }
+    basic_auth: { skip: true }
+    tls: { skip: true }
+    health_check_interval: { skip: true }
+    health_check_timeout: { skip: true }
+    enable_health_check: { skip: true }
+    heartbeat: { skip: true }
+    deregister_critical_service_after: { skip: true }
+    datacenter: { skip: true }
+    discovery_timeout: { skip: true }

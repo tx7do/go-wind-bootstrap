@@ -1,0 +1,20 @@
+# 由 protoc-gen-fieldmap 生成字段映射，调整规则后重新生成（见 toolkit/protoc-gen-fieldmap）。
+# 连接字段 → go-redis Options（构造式；手写为无条件装配，显式 guard: none）。
+# path 插件选项，保留在 redis.go 手工段。
+output:
+  file: config/redis/mapping.gen.go
+  package: redis
+imports:
+  goredis: github.com/redis/go-redis/v9
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/config.proto
+  type: Config.Redis
+  func: NewRedisConfig
+  style: struct
+  target_type: goredis.Options
+  fields:
+    address: { target: Addr, guard: none }
+    path: { skip: true }
+    password: { target: Password, guard: none }
+    db: { target: DB, cast: int, guard: none }

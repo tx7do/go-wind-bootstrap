@@ -1,0 +1,26 @@
+# 由 protoc-gen-fieldmap 生成字段映射，调整规则后重新生成（见 toolkit/protoc-gen-fieldmap）。
+# access_key/secret_key/security_token 合成为 WithCredentials 三参选项，保留在手工段；
+# topic 手写映射未使用，显式跳过。
+output:
+  file: broker/rocketmq/mapping.gen.go
+  package: rocketmq
+imports:
+  rocketmqPlugin: github.com/tx7do/go-wind-plugins/transport/rocketmq
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/broker.proto
+  type: Broker.Rocketmq
+  func: MapRocketmqOptions
+  target_type: rocketmqPlugin.ServerOption
+  target_qualifier: rocketmqPlugin
+  fields:
+    name_servers: { target: WithNameServer }
+    name_server_url: { target: WithNameServerDomain }
+    access_key: { skip: true }
+    secret_key: { skip: true }
+    security_token: { skip: true }
+    group_name: { target: WithGroupName }
+    namespace: { target: WithNamespace }
+    instance_name: { target: WithInstanceName }
+    topic: { skip: true }
+    retry_count: { target: WithRetryCount, cast: int, guard: positive }

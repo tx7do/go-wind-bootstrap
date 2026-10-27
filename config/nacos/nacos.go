@@ -34,6 +34,7 @@ func newAction(ctx context.Context, cfg *v1.Config) (func(), error) {
 		return nil, fmt.Errorf("nacos: no server_addrs")
 	}
 
+	// ServerConfig 组装与多地址展开保留手工段。
 	serverCfg := constant.ServerConfig{ContextPath: "/nacos"}
 	if scheme := c.GetScheme(); scheme != "" {
 		serverCfg.Scheme = scheme
@@ -52,22 +53,11 @@ func newAction(ctx context.Context, cfg *v1.Config) (func(), error) {
 		serverConfigs = append(serverConfigs, sc)
 	}
 
-	clientConfig := constant.ClientConfig{
-		NamespaceId: c.GetNamespace(),
-	}
-	if endpoint := c.GetEndpoint(); endpoint != "" {
-		clientConfig.Endpoint = endpoint
-	}
-	if username := c.GetUsername(); username != "" {
-		clientConfig.Username = username
-	}
-	if password := c.GetPassword(); password != "" {
-		clientConfig.Password = password
-	}
-	if timeoutMs := c.GetTimeoutMs(); timeoutMs > 0 {
-		clientConfig.TimeoutMs = uint64(timeoutMs)
-	}
-	// nacos SDK 的 TLS 仅支持文件路径。
+	// 常规客户端字段 → ClientConfig 的映射由 protoc-gen-fieldmap 生成（mapping.spec.yaml）。
+	clientConfig := constant.ClientConfig{}
+	FillNacosClientConfig(c, &clientConfig)
+
+	// nacos SDK 的 TLS 仅支持文件路径，保留手工段。
 	if tlsCfg := c.GetTls(); tlsCfg != nil {
 		clientConfig.TLSCfg = constant.TLSConfig{
 			Enable:   true,
@@ -89,6 +79,7 @@ func newAction(ctx context.Context, cfg *v1.Config) (func(), error) {
 		return nil, fmt.Errorf("nacos: create client: %w", err)
 	}
 
+	// group/data_id 为插件选项，保留手工段。
 	var opts []nacosPlugin.Option
 	if group := c.GetGroup(); group != "" {
 		opts = append(opts, nacosPlugin.WithGroup(group))

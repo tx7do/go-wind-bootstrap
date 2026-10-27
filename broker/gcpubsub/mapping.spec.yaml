@@ -1,0 +1,18 @@
+# 由 protoc-gen-fieldmap 生成字段映射，调整规则后重新生成（见 toolkit/protoc-gen-fieldmap）。
+# 全部字段均为单参选项的直接映射，无手工段。
+output:
+  file: broker/gcpubsub/mapping.gen.go
+  package: gcpubsub
+imports:
+  gcpubsubPlugin: github.com/tx7do/go-wind-plugins/transport/gcpubsub
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/broker.proto
+  type: Broker.Gcpubsub
+  func: MapGcpubsubOptions
+  target_type: gcpubsubPlugin.ServerOption
+  target_qualifier: gcpubsubPlugin
+  fields:
+    project_id: { target: WithProjectID }
+    credentials_file: { target: WithCredentialsFile }
+    endpoint: { target: WithEndpoint }

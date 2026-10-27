@@ -26,28 +26,10 @@ func newBuilder(cfg *v1.Tracer) (interface{}, func(), error) {
 		return nil, nil, fmt.Errorf("otlp tracer: config is nil")
 	}
 
+	// 常规配置字段 → 选项的映射由 protoc-gen-fieldmap 生成（mapping.spec.yaml）；
+	// sampler 上游暂未消费，与原手写保持一致，不映射。
 	var opts []otlpPlugin.Option
-	if endpoint := c.GetEndpoint(); endpoint != "" {
-		opts = append(opts, otlpPlugin.WithEndpoint(endpoint))
-	}
-	if c.GetInsecure() {
-		opts = append(opts, otlpPlugin.WithInsecure(true))
-	}
-	if c.GetUseHttp() {
-		opts = append(opts, otlpPlugin.WithHTTP(true))
-	}
-	if headers := c.GetHeaders(); len(headers) > 0 {
-		opts = append(opts, otlpPlugin.WithHeaders(headers))
-	}
-	if ratio := c.GetSampleRatio(); ratio > 0 {
-		opts = append(opts, otlpPlugin.WithSampleRatio(ratio))
-	}
-	if ms := c.GetBatchTimeoutMs(); ms > 0 {
-		opts = append(opts, otlpPlugin.WithBatchTimeout(time.Duration(ms)*time.Millisecond))
-	}
-	if ms := c.GetExportTimeoutMs(); ms > 0 {
-		opts = append(opts, otlpPlugin.WithExportTimeout(time.Duration(ms)*time.Millisecond))
-	}
+	opts = MapOtlpOptions(c, opts)
 
 	tp, err := otlpPlugin.New(opts...)
 	if err != nil {

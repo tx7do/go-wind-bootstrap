@@ -28,12 +28,12 @@ func newBuilder(cfg *v1.Logger) (windLog.Logger, func(), error) {
 		return nil, nil, fmt.Errorf("hclog: config is nil")
 	}
 
-	opts := &hclogLib.LoggerOptions{
-		Name:  c.GetName(),
-		Level: hclogLib.Info,
-	}
+	// 常规配置字段（name/include_location/time_format）→ 结构体的映射
+	// 由 protoc-gen-fieldmap 生成（mapping.spec.yaml）。
+	opts := NewHclogConfig(c)
 
-	// Level.
+	// Level：默认 Info，按配置覆盖（枚举→枚举映射，保留手工段）。
+	opts.Level = hclogLib.Info
 	switch c.GetLevel() {
 	case "debug":
 		opts.Level = hclogLib.Debug
@@ -43,10 +43,10 @@ func newBuilder(cfg *v1.Logger) (windLog.Logger, func(), error) {
 		opts.Level = hclogLib.Error
 	}
 
-	// Format.
+	// Format。
 	opts.JSONFormat = c.GetFormat() == "json"
 
-	// Output.
+	// Output。
 	switch c.GetOutputPath() {
 	case "", "stderr":
 		opts.Output = os.Stderr
@@ -60,14 +60,6 @@ func newBuilder(cfg *v1.Logger) (windLog.Logger, func(), error) {
 		opts.Output = f
 		l := hclogLib.New(opts)
 		return hclogPlugin.NewLoggerWith(l), func() { _ = f.Close() }, nil
-	}
-
-	// IncludeLocation.
-	opts.IncludeLocation = c.GetIncludeLocation()
-
-	// TimeFormat.
-	if tf := c.GetTimeFormat(); tf != "" {
-		opts.TimeFormat = tf
 	}
 
 	l := hclogLib.New(opts)

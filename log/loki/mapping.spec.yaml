@@ -1,0 +1,20 @@
+# 由 protoc-gen-fieldmap 生成字段映射，调整规则后重新生成（见 toolkit/protoc-gen-fieldmap）。
+# labels 逐键 WithLabel(k, v) 的循环保留在 loki.go 手工段；
+# endpoint 为必填项，builder 先做非空校验，映射无条件应用。
+output:
+  file: log/loki/mapping.gen.go
+  package: loki
+imports:
+  lokiPlugin: github.com/tx7do/go-wind-plugins/log/loki
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/log.proto
+  type: Logger.Loki
+  func: MapLokiOptions
+  target_type: lokiPlugin.Option
+  target_qualifier: lokiPlugin
+  fields:
+    endpoint: { target: WithEndpoint, guard: none }
+    labels: { skip: true }
+    batch_size: { target: WithBatchSize, cast: int, guard: positive }
+    flush_interval: { target: WithFlushInterval, cast: millis, guard: positive }

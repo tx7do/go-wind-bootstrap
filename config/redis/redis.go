@@ -27,12 +27,10 @@ func newAction(ctx context.Context, cfg *v1.Config) (func(), error) {
 		return nil, fmt.Errorf("redis: config is nil")
 	}
 
-	rdb := goredis.NewClient(&goredis.Options{
-		Addr:     c.GetAddress(),
-		Password: c.GetPassword(),
-		DB:       int(c.GetDb()),
-	})
+	// 连接字段 → 客户端配置的映射由 protoc-gen-fieldmap 生成（mapping.spec.yaml）。
+	rdb := goredis.NewClient(NewRedisConfig(c))
 
+	// path 为插件选项，保留手工段。
 	var opts []redisPlugin.Option
 	if path := c.GetPath(); path != "" {
 		opts = append(opts, redisPlugin.WithPath(path))

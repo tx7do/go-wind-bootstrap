@@ -40,16 +40,9 @@ func newAction(ctx context.Context, cfg *v1.Config) (func(), error) {
 		return nil, fmt.Errorf("polaris: create SDK: %w", err)
 	}
 
+	// 常规配置字段 → 选项的映射由 protoc-gen-fieldmap 生成（mapping.spec.yaml）。
 	var opts []polarisPlugin.Option
-	if ns := c.GetNamespace(); ns != "" {
-		opts = append(opts, polarisPlugin.WithNamespace(ns))
-	}
-	if fg := c.GetGroup(); fg != "" {
-		opts = append(opts, polarisPlugin.WithFileGroup(fg))
-	}
-	if fn := c.GetFileName(); fn != "" {
-		opts = append(opts, polarisPlugin.WithFileName(fn))
-	}
+	opts = MapPolarisOptions(c, opts)
 
 	_, err = polarisPlugin.New(sdk, opts...)
 	if err != nil {

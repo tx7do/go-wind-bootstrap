@@ -1,0 +1,47 @@
+# nacos 注册中心适配器的字段映射规则（protoc-gen-fieldmap）。
+# constant.ClientConfig 机械字段生成 FillNacosConfig；ServerConfig 填充与
+# 地址列表展开、TLS 装载（仅支持文件路径）以及 nacosPlugin.Option 拼装段
+# 保留在 nacos.go 手工段。
+# 调整映射后重新生成:
+#   go run github.com/tx7do/go-wind-toolkit/protoc-gen-fieldmap@latest \
+#     -I conf/proto -spec registry/nacos/mapping.spec.yaml -out .
+output:
+  file: registry/nacos/mapping.gen.go
+  package: nacos
+imports:
+  constant: github.com/nacos-group/nacos-sdk-go/v2/common/constant
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/registry.proto
+  type: Registry.Nacos
+  func: FillNacosConfig
+  style: fill
+  target_type: constant.ClientConfig
+  fields:
+    namespace: { target: NamespaceId }
+    endpoint: { target: Endpoint }
+    username: { target: Username }
+    password: { target: Password }
+    timeout_ms: { target: TimeoutMs, cast: uint64, guard: positive }
+    beat_interval_ms: { target: BeatInterval, cast: int64, guard: positive }
+    access_key: { target: AccessKey }
+    secret_key: { target: SecretKey }
+    not_load_cache_at_start: { target: NotLoadCacheAtStart, guard: zero }
+    update_cache_when_empty: { target: UpdateCacheWhenEmpty, guard: zero }
+    disable_use_snap_shot: { target: DisableUseSnapShot, guard: zero }
+    append_to_stdout: { target: AppendToStdout, guard: zero }
+    async_update_service: { target: AsyncUpdateService, guard: zero }
+    log_dir: { target: LogDir }
+    log_level: { target: LogLevel }
+    cache_dir: { target: CacheDir }
+    open_kms: { target: OpenKMS, guard: zero }
+    server_addrs: { skip: true }
+    scheme: { skip: true }
+    context_path: { skip: true }
+    grpc_port: { skip: true }
+    group: { skip: true }
+    cluster_name: { skip: true }
+    weight: { skip: true }
+    prefix: { skip: true }
+    default_kind: { skip: true }
+    tls: { skip: true }

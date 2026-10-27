@@ -25,30 +25,15 @@ func newAction(ctx context.Context, cfg *v1.Config) (func(), error) {
 		return nil, fmt.Errorf("apollo: config is nil")
 	}
 
+	// 常规配置字段 → 选项的映射由 protoc-gen-fieldmap 生成（mapping.spec.yaml）。
 	var opts []apolloPlugin.Option
+	opts = MapApolloOptions(c, opts)
 
-	if appID := c.GetAppId(); appID != "" {
-		opts = append(opts, apolloPlugin.WithAppID(appID))
-	}
-	if cluster := c.GetCluster(); cluster != "" {
-		opts = append(opts, apolloPlugin.WithCluster(cluster))
-	}
-	if endpoint := c.GetEndpoint(); endpoint != "" {
-		opts = append(opts, apolloPlugin.WithEndpoint(endpoint))
-	}
-	if ns := c.GetNamespace(); ns != "" {
-		opts = append(opts, apolloPlugin.WithNamespace(ns))
-	}
-	if secret := c.GetSecret(); secret != "" {
-		opts = append(opts, apolloPlugin.WithSecret(secret))
-	}
+	// 备份开关是无参选项的布尔分支，保留手工段。
 	if c.GetIsBackupConfig() {
 		opts = append(opts, apolloPlugin.WithEnableBackup())
 	} else {
 		opts = append(opts, apolloPlugin.WithDisableBackup())
-	}
-	if backupPath := c.GetBackupPath(); backupPath != "" {
-		opts = append(opts, apolloPlugin.WithBackupPath(backupPath))
 	}
 
 	apolloPlugin.NewSource(opts...)

@@ -1,0 +1,24 @@
+# 由 protoc-gen-fieldmap 生成字段映射，调整规则后重新生成（见 toolkit/protoc-gen-fieldmap）。
+# is_backup_config 是无参选项的布尔分支（WithEnableBackup/WithDisableBackup），
+# ip 手写代码未映射，两者保留在 apollo.go 手工段。
+output:
+  file: config/apollo/mapping.gen.go
+  package: apollo
+imports:
+  apolloPlugin: github.com/tx7do/go-wind-plugins/config/apollo
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/config.proto
+  type: Config.Apollo
+  func: MapApolloOptions
+  target_type: apolloPlugin.Option
+  target_qualifier: apolloPlugin
+  fields:
+    app_id: { target: WithAppID }
+    cluster: { target: WithCluster }
+    namespace: { target: WithNamespace }
+    ip: { skip: true }
+    endpoint: { target: WithEndpoint }
+    secret: { target: WithSecret }
+    is_backup_config: { skip: true }
+    backup_path: { target: WithBackupPath }

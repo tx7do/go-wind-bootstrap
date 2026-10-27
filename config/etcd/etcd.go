@@ -8,7 +8,6 @@ package etcd
 import (
 	"context"
 	"fmt"
-	"time"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
 
@@ -29,24 +28,11 @@ func newAction(ctx context.Context, cfg *v1.Config) (func(), error) {
 		return nil, fmt.Errorf("etcd: config is nil")
 	}
 
-	clientCfg := clientv3.Config{
-		Endpoints: c.GetEndpoints(),
-	}
-	if username := c.GetUsername(); username != "" {
-		clientCfg.Username = username
-	}
-	if password := c.GetPassword(); password != "" {
-		clientCfg.Password = password
-	}
-	if dialTimeout := c.GetDialTimeout(); dialTimeout > 0 {
-		clientCfg.DialTimeout = time.Duration(dialTimeout) * time.Second
-	}
-	if keepAliveTime := c.GetDialKeepAliveTime(); keepAliveTime > 0 {
-		clientCfg.DialKeepAliveTime = time.Duration(keepAliveTime) * time.Second
-	}
-	if keepAliveTimeout := c.GetDialKeepAliveTimeout(); keepAliveTimeout > 0 {
-		clientCfg.DialKeepAliveTimeout = time.Duration(keepAliveTimeout) * time.Second
-	}
+	// 常规连接字段 → 客户端配置的映射由 protoc-gen-fieldmap 生成（mapping.spec.yaml）。
+	clientCfg := clientv3.Config{}
+	FillEtcdConfig(c, &clientCfg)
+
+	// TLS 证书装载经 tlsutil 转换，保留手工段。
 	if tlsCfg, err := tlsutil.ClientTLS(c.GetTls()); err != nil {
 		return nil, fmt.Errorf("etcd: load tls: %w", err)
 	} else if tlsCfg != nil {
@@ -58,6 +44,7 @@ func newAction(ctx context.Context, cfg *v1.Config) (func(), error) {
 		return nil, fmt.Errorf("etcd: create client: %w", err)
 	}
 
+	// path/prefix 为插件选项，保留手工段。
 	var opts []etcdPlugin.Option
 	if path := c.GetPath(); path != "" {
 		opts = append(opts, etcdPlugin.WithPath(path))

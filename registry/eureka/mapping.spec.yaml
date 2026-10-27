@@ -1,0 +1,26 @@
+# eureka 注册中心适配器的字段映射规则（protoc-gen-fieldmap）。
+# eurekaPlugin.Option 机械字段生成 MapEurekaOptions；endpoints 校验与
+# 位置传参（eurekaPlugin.New 的第一个参数）保留在 eureka.go 手工段。
+# 调整映射后重新生成:
+#   go run github.com/tx7do/go-wind-toolkit/protoc-gen-fieldmap@latest \
+#     -I conf/proto -spec registry/eureka/mapping.spec.yaml -out .
+output:
+  file: registry/eureka/mapping.gen.go
+  package: eureka
+imports:
+  eurekaPlugin: github.com/tx7do/go-wind-plugins/registry/eureka
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/registry.proto
+  type: Registry.Eureka
+  func: MapEurekaOptions
+  style: option
+  target_type: eurekaPlugin.Option
+  target_qualifier: eurekaPlugin
+  fields:
+    heartbeat_interval: { target: WithHeartbeat, cast: seconds, guard: positive }
+    refresh_interval: { target: WithRefresh, cast: seconds, guard: positive }
+    eureka_path: { target: WithEurekaPath }
+    max_retry: { target: MaxRetry, cast: int, guard: positive }
+    endpoints: { skip: true }
+    app_name: { skip: true }

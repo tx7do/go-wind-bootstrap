@@ -52,58 +52,9 @@ func newAction(ctx context.Context, cfg *v1.Registry) (bootstrap.Registry, func(
 		serverConfigs = append(serverConfigs, sc)
 	}
 
-	clientConfig := constant.ClientConfig{
-		NamespaceId: c.GetNamespace(),
-	}
-	if endpoint := c.GetEndpoint(); endpoint != "" {
-		clientConfig.Endpoint = endpoint
-	}
-	if username := c.GetUsername(); username != "" {
-		clientConfig.Username = username
-	}
-	if password := c.GetPassword(); password != "" {
-		clientConfig.Password = password
-	}
-	if timeoutMs := c.GetTimeoutMs(); timeoutMs > 0 {
-		clientConfig.TimeoutMs = uint64(timeoutMs)
-	}
-	if beatInterval := c.GetBeatIntervalMs(); beatInterval > 0 {
-		clientConfig.BeatInterval = int64(beatInterval)
-	}
-	if accessKey := c.GetAccessKey(); accessKey != "" {
-		clientConfig.AccessKey = accessKey
-	}
-	if secretKey := c.GetSecretKey(); secretKey != "" {
-		clientConfig.SecretKey = secretKey
-	}
-	if c.GetNotLoadCacheAtStart() {
-		clientConfig.NotLoadCacheAtStart = true
-	}
-	if c.GetUpdateCacheWhenEmpty() {
-		clientConfig.UpdateCacheWhenEmpty = true
-	}
-	if c.GetDisableUseSnapShot() {
-		clientConfig.DisableUseSnapShot = true
-	}
-	if c.GetAppendToStdout() {
-		clientConfig.AppendToStdout = true
-	}
-	if c.GetAsyncUpdateService() {
-		clientConfig.AsyncUpdateService = true
-	}
-	if logDir := c.GetLogDir(); logDir != "" {
-		clientConfig.LogDir = logDir
-	}
-	if logLevel := c.GetLogLevel(); logLevel != "" {
-		clientConfig.LogLevel = logLevel
-	}
-	if cacheDir := c.GetCacheDir(); cacheDir != "" {
-		clientConfig.CacheDir = cacheDir
-	}
-	if c.GetOpenKms() {
-		clientConfig.OpenKMS = true
-	}
-	// nacos SDK 的 TLS 仅支持文件路径。
+	// 客户端常规字段（namespace/endpoint/…/open_kms）由 FillNacosConfig 生成映射。
+	clientConfig := FillNacosConfig(c, &constant.ClientConfig{})
+	// nacos SDK 的 TLS 仅支持文件路径，保留手工段。
 	if tlsCfg := c.GetTls(); tlsCfg != nil {
 		clientConfig.TLSCfg = constant.TLSConfig{
 			Enable:   true,
@@ -117,7 +68,7 @@ func newAction(ctx context.Context, cfg *v1.Registry) (bootstrap.Registry, func(
 	}
 
 	nc := nacos_client.NacosClient{}
-	if err := nc.SetClientConfig(clientConfig); err != nil {
+	if err := nc.SetClientConfig(*clientConfig); err != nil {
 		return nil, nil, fmt.Errorf("nacos: set client config: %w", err)
 	}
 	if err := nc.SetServerConfig(serverConfigs); err != nil {

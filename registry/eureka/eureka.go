@@ -8,7 +8,6 @@ package eureka
 import (
 	"context"
 	"fmt"
-	"time"
 
 	eurekaPlugin "github.com/tx7do/go-wind-plugins/registry/eureka"
 
@@ -31,21 +30,9 @@ func newAction(ctx context.Context, cfg *v1.Registry) (bootstrap.Registry, func(
 		return nil, nil, fmt.Errorf("eureka: no endpoints")
 	}
 
-	var opts []eurekaPlugin.Option
-	if interval := c.GetHeartbeatInterval(); interval > 0 {
-		opts = append(opts, eurekaPlugin.WithHeartbeat(time.Duration(interval)*time.Second))
-	}
-	if ri := c.GetRefreshInterval(); ri > 0 {
-		opts = append(opts, eurekaPlugin.WithRefresh(time.Duration(ri)*time.Second))
-	}
-	if path := c.GetEurekaPath(); path != "" {
-		opts = append(opts, eurekaPlugin.WithEurekaPath(path))
-	}
-	if mr := c.GetMaxRetry(); mr > 0 {
-		opts = append(opts, eurekaPlugin.MaxRetry(int(mr)))
-	}
-
-	reg, err := eurekaPlugin.New(eps, opts...)
+	// 选项字段（heartbeat_interval/refresh_interval/eureka_path/max_retry）
+	// 由 MapEurekaOptions 生成映射。
+	reg, err := eurekaPlugin.New(eps, MapEurekaOptions(c, nil)...)
 	if err != nil {
 		return nil, nil, fmt.Errorf("eureka: create registry: %w", err)
 	}

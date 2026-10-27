@@ -8,7 +8,6 @@ package vault
 import (
 	"context"
 	"fmt"
-	"time"
 
 	vaultapi "github.com/hashicorp/vault/api"
 
@@ -28,6 +27,7 @@ func newAction(ctx context.Context, cfg *v1.Config) (func(), error) {
 		return nil, fmt.Errorf("vault: config is nil")
 	}
 
+	// address → vaultapi.Config 仅一个字段，保留手工段。
 	vaultCfg := vaultapi.DefaultConfig()
 	if addr := c.GetAddress(); addr != "" {
 		vaultCfg.Address = addr
@@ -37,20 +37,14 @@ func newAction(ctx context.Context, cfg *v1.Config) (func(), error) {
 	if err != nil {
 		return nil, fmt.Errorf("vault: create client: %w", err)
 	}
+	// token 是客户端方法调用，保留手工段。
 	if token := c.GetToken(); token != "" {
 		client.SetToken(token)
 	}
 
+	// 常规配置字段 → 选项的映射由 protoc-gen-fieldmap 生成（mapping.spec.yaml）。
 	var opts []vaultPlugin.Option
-	if path := c.GetPath(); path != "" {
-		opts = append(opts, vaultPlugin.WithPath(path))
-	}
-	if dataKey := c.GetDataKey(); dataKey != "" {
-		opts = append(opts, vaultPlugin.WithDataKey(dataKey))
-	}
-	if pollMs := c.GetPollInterval(); pollMs > 0 {
-		opts = append(opts, vaultPlugin.WithPollInterval(time.Duration(pollMs)*time.Millisecond))
-	}
+	opts = MapVaultOptions(c, opts)
 
 	_, err = vaultPlugin.New(client, opts...)
 	if err != nil {

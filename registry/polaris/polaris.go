@@ -8,7 +8,6 @@ package polaris
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/polarismesh/polaris-go/pkg/config"
 
@@ -43,22 +42,11 @@ func newAction(ctx context.Context, cfg *v1.Registry) (bootstrap.Registry, func(
 		polarisCfg = config.NewDefaultConfiguration(addresses)
 	}
 
+	// 常规选项字段（namespace/token/…/retry_count）由 MapPolarisOptions 生成映射。
+	// healthy/isolate/heartbeat 依赖 optional 存在性判断，ttl 有心跳兜底分支，
+	// 保留手工段。
 	var opts []polarisPlugin.Option
-	if ns := c.GetNamespace(); ns != "" {
-		opts = append(opts, polarisPlugin.WithNamespace(ns))
-	}
-	if token := c.GetToken(); token != "" {
-		opts = append(opts, polarisPlugin.WithServiceToken(token))
-	}
-	if protocol := c.GetProtocol(); protocol != "" {
-		opts = append(opts, polarisPlugin.WithProtocol(protocol))
-	}
-	if weight := c.GetWeight(); weight > 0 {
-		opts = append(opts, polarisPlugin.WithWeight(int(weight)))
-	}
-	if priority := c.GetPriority(); priority > 0 {
-		opts = append(opts, polarisPlugin.WithPriority(int(priority)))
-	}
+	opts = MapPolarisOptions(c, opts)
 	if c.Healthy != nil {
 		opts = append(opts, polarisPlugin.WithHealthy(c.GetHealthy()))
 	}
@@ -67,12 +55,6 @@ func newAction(ctx context.Context, cfg *v1.Registry) (bootstrap.Registry, func(
 	}
 	if c.Heartbeat != nil {
 		opts = append(opts, polarisPlugin.WithHeartbeat(c.GetHeartbeat()))
-	}
-	if timeout := c.GetTimeout(); timeout > 0 {
-		opts = append(opts, polarisPlugin.WithTimeout(time.Duration(timeout)*time.Millisecond))
-	}
-	if retryCount := c.GetRetryCount(); retryCount > 0 {
-		opts = append(opts, polarisPlugin.WithRetryCount(int(retryCount)))
 	}
 	if ttl := c.GetTtl(); ttl > 0 {
 		opts = append(opts, polarisPlugin.WithTTL(int(ttl)))

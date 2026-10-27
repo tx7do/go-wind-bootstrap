@@ -1,0 +1,22 @@
+# 由 protoc-gen-fieldmap 生成字段映射，调整规则后重新生成（见 toolkit/protoc-gen-fieldmap）。
+# endpoint 在 S3 客户端回调里装配，access_key_id/access_key_secret 手写代码未映射
+# （沿用 AWS 默认凭证链），保留在 oss.go 手工段。
+output:
+  file: config/oss/mapping.gen.go
+  package: oss
+imports:
+  ossPlugin: github.com/tx7do/go-wind-plugins/config/oss
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/config.proto
+  type: Config.Oss
+  func: MapOssOptions
+  target_type: ossPlugin.Option
+  target_qualifier: ossPlugin
+  fields:
+    endpoint: { skip: true }
+    bucket: { target: WithBucket }
+    key: { target: WithKey }
+    access_key_id: { skip: true }
+    access_key_secret: { skip: true }
+    poll_interval: { target: WithPollInterval, cast: millis, guard: positive }

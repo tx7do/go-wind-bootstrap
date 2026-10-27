@@ -1,0 +1,19 @@
+# 由 protoc-gen-fieldmap 生成字段映射，调整规则后重新生成（见 toolkit/protoc-gen-fieldmap）。
+output:
+  file: log/cloudwatch/mapping.gen.go
+  package: cloudwatch
+imports:
+  cloudwatchPlugin: github.com/tx7do/go-wind-plugins/log/cloudwatch
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/log.proto
+  type: Logger.Cloudwatch
+  func: MapCloudwatchOptions
+  target_type: cloudwatchPlugin.Option
+  target_qualifier: cloudwatchPlugin
+  fields:
+    region: { target: WithRegion }
+    log_group: { target: WithLogGroup }
+    log_stream: { target: WithLogStream }
+    batch_size: { target: WithBatchSize, cast: int, guard: positive }
+    flush_interval: { target: WithFlushInterval, cast: millis, guard: positive }

@@ -26,28 +26,10 @@ func newBuilder(ctx context.Context, cfg *v1.Broker) (any, func(), error) {
 		return nil, nil, fmt.Errorf("rocketmq: config is nil")
 	}
 
-	var opts []rocketmqPlugin.ServerOption
-
-	if len(c.GetNameServers()) > 0 {
-		opts = append(opts, rocketmqPlugin.WithNameServer(c.GetNameServers()))
-	}
-	if url := c.GetNameServerUrl(); url != "" {
-		opts = append(opts, rocketmqPlugin.WithNameServerDomain(url))
-	}
+	opts := MapRocketmqOptions(c, nil)
+	// access_key/secret_key/security_token 合成为 WithCredentials 三参选项，非单字段映射，保留手工段。
 	if ak := c.GetAccessKey(); ak != "" {
 		opts = append(opts, rocketmqPlugin.WithCredentials(ak, c.GetSecretKey(), c.GetSecurityToken()))
-	}
-	if ns := c.GetNamespace(); ns != "" {
-		opts = append(opts, rocketmqPlugin.WithNamespace(ns))
-	}
-	if inst := c.GetInstanceName(); inst != "" {
-		opts = append(opts, rocketmqPlugin.WithInstanceName(inst))
-	}
-	if gn := c.GetGroupName(); gn != "" {
-		opts = append(opts, rocketmqPlugin.WithGroupName(gn))
-	}
-	if rc := c.GetRetryCount(); rc > 0 {
-		opts = append(opts, rocketmqPlugin.WithRetryCount(int(rc)))
 	}
 
 	srv := rocketmqPlugin.NewServer(rocketmqOption.DriverTypeV2, opts...)

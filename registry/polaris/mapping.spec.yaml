@@ -1,0 +1,35 @@
+# polaris 注册中心适配器的字段映射规则（protoc-gen-fieldmap）。
+# polarisPlugin.Option 机械字段生成 MapPolarisOptions；SDK 配置文件加载
+# 与 address 构造、healthy/isolate/heartbeat 的 optional 存在性判断、
+# ttl 心跳兜底分支保留在 polaris.go 手工段。
+# 调整映射后重新生成:
+#   go run github.com/tx7do/go-wind-toolkit/protoc-gen-fieldmap@latest \
+#     -I conf/proto -spec registry/polaris/mapping.spec.yaml -out .
+output:
+  file: registry/polaris/mapping.gen.go
+  package: polaris
+imports:
+  polarisPlugin: github.com/tx7do/go-wind-plugins/registry/polaris
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/registry.proto
+  type: Registry.Polaris
+  func: MapPolarisOptions
+  style: option
+  target_type: polarisPlugin.Option
+  target_qualifier: polarisPlugin
+  fields:
+    namespace: { target: WithNamespace }
+    token: { target: WithServiceToken }
+    protocol: { target: WithProtocol }
+    weight: { target: WithWeight, cast: int, guard: positive }
+    priority: { target: WithPriority, cast: int, guard: positive }
+    timeout: { target: WithTimeout, cast: millis, guard: positive }
+    retry_count: { target: WithRetryCount, cast: int, guard: positive }
+    address: { skip: true }
+    service: { skip: true }
+    healthy: { skip: true }
+    isolate: { skip: true }
+    heartbeat: { skip: true }
+    ttl: { skip: true }
+    config_file: { skip: true }

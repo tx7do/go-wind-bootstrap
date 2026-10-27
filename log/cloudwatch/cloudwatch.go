@@ -8,7 +8,6 @@ package cloudwatch
 import (
 	"context"
 	"fmt"
-	"time"
 
 	cloudwatchPlugin "github.com/tx7do/go-wind-plugins/log/cloudwatch"
 	windLog "github.com/tx7do/go-wind/log"
@@ -27,22 +26,9 @@ func newBuilder(cfg *v1.Logger) (windLog.Logger, func(), error) {
 		return nil, nil, fmt.Errorf("cloudwatch: config is nil")
 	}
 
+	// 常规配置字段 → 选项的映射由 protoc-gen-fieldmap 生成（mapping.spec.yaml）。
 	var opts []cloudwatchPlugin.Option
-	if c.GetRegion() != "" {
-		opts = append(opts, cloudwatchPlugin.WithRegion(c.GetRegion()))
-	}
-	if c.GetLogGroup() != "" {
-		opts = append(opts, cloudwatchPlugin.WithLogGroup(c.GetLogGroup()))
-	}
-	if c.GetLogStream() != "" {
-		opts = append(opts, cloudwatchPlugin.WithLogStream(c.GetLogStream()))
-	}
-	if c.GetBatchSize() > 0 {
-		opts = append(opts, cloudwatchPlugin.WithBatchSize(int(c.GetBatchSize())))
-	}
-	if c.GetFlushInterval() > 0 {
-		opts = append(opts, cloudwatchPlugin.WithFlushInterval(time.Duration(c.GetFlushInterval())*time.Millisecond))
-	}
+	opts = MapCloudwatchOptions(c, opts)
 
 	logger, err := cloudwatchPlugin.NewCloudWatchLogger(context.Background(), opts...)
 	if err != nil {

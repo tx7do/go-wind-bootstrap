@@ -1,0 +1,25 @@
+# 由 protoc-gen-fieldmap 生成字段映射，调整规则后重新生成（见 toolkit/protoc-gen-fieldmap）。
+# 常规连接字段 → clientv3.Config（先构造后填字段，fill 风格）。
+# tls 经 tlsutil 装载、path/prefix 插件选项，保留在 etcd.go 手工段。
+output:
+  file: config/etcd/mapping.gen.go
+  package: etcd
+imports:
+  clientv3: go.etcd.io/etcd/client/v3
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/config.proto
+  type: Config.Etcd
+  func: FillEtcdConfig
+  style: fill
+  target_type: clientv3.Config
+  fields:
+    endpoints: { target: Endpoints, guard: none }
+    path: { skip: true }
+    username: { target: Username }
+    password: { target: Password }
+    prefix: { skip: true }
+    tls: { skip: true }
+    dial_timeout: { target: DialTimeout, cast: seconds, guard: positive }
+    dial_keep_alive_time: { target: DialKeepAliveTime, cast: seconds, guard: positive }
+    dial_keep_alive_timeout: { target: DialKeepAliveTimeout, cast: seconds, guard: positive }

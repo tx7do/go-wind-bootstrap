@@ -1,0 +1,23 @@
+# 由 protoc-gen-fieldmap 生成字段映射，调整规则后重新生成（见 toolkit/protoc-gen-fieldmap）。
+# 常规连接字段 → consul/api Config（DefaultConfig 后逐字段覆盖，fill 风格）。
+# tls 展开到 Consul 专属 TLSConfig 子结构、path 插件选项，保留在 consul.go 手工段。
+output:
+  file: config/consul/mapping.gen.go
+  package: consul
+imports:
+  api: github.com/hashicorp/consul/api
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/config.proto
+  type: Config.Consul
+  func: FillConsulConfig
+  style: fill
+  target_type: api.Config
+  fields:
+    address: { target: Address }
+    path: { skip: true }
+    token: { target: Token }
+    scheme: { target: Scheme }
+    datacenter: { target: Datacenter }
+    namespace: { target: Namespace }
+    tls: { skip: true }

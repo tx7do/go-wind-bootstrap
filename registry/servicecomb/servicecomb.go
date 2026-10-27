@@ -8,7 +8,6 @@ package servicecomb
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/go-chassis/cari/rbac"
 	"github.com/go-chassis/sc-client"
@@ -35,15 +34,10 @@ func newAction(ctx context.Context, cfg *v1.Registry) (bootstrap.Registry, func(
 		return nil, nil, fmt.Errorf("servicecomb: no endpoints")
 	}
 
-	clientOpts := sc.Options{
-		Endpoints:  eps,
-		EnableSSL:  c.GetEnableSsl(),
-		Compressed: c.GetCompressed(),
-		Verbose:    c.GetVerbose(),
-	}
-	if timeout := c.GetTimeout(); timeout > 0 {
-		clientOpts.Timeout = time.Duration(timeout) * time.Second
-	}
+	// 结构体字面量机械字段（endpoints/enable_ssl/timeout/token_expiration/
+	// verbose/compressed）由 NewServiceCombConfig 生成映射。
+	clientOpts := NewServiceCombConfig(c)
+	// enable_auth 分支合成 rbac.AuthUser，保留手工段。
 	if c.GetEnableAuth() {
 		clientOpts.EnableAuth = true
 		clientOpts.AuthUser = &rbac.AuthUser{
@@ -51,16 +45,14 @@ func newAction(ctx context.Context, cfg *v1.Registry) (bootstrap.Registry, func(
 			Password: c.GetPassword(),
 		}
 	}
-	if expiration := c.GetTokenExpiration(); expiration > 0 {
-		clientOpts.TokenExpiration = time.Duration(expiration) * time.Second
-	}
+	// TLS 装载经 tlsutil 转换，保留手工段。
 	if tlsCfg, err := tlsutil.ClientTLS(c.GetTls()); err != nil {
 		return nil, nil, fmt.Errorf("servicecomb: load tls: %w", err)
 	} else if tlsCfg != nil {
 		clientOpts.TLSConfig = tlsCfg
 	}
 
-	client, err := sc.NewClient(clientOpts)
+	client, err := sc.NewClient(*clientOpts)
 	if err != nil {
 		return nil, nil, fmt.Errorf("servicecomb: create client: %w", err)
 	}

@@ -1,0 +1,22 @@
+# 由 protoc-gen-fieldmap 生成字段映射，调整规则后重新生成（见 toolkit/protoc-gen-fieldmap）。
+# address → vaultapi.Config 仅一个字段、token 是 client.SetToken 调用、mount_path
+# 手写代码未映射，均保留在 vault.go 手工段。
+output:
+  file: config/vault/mapping.gen.go
+  package: vault
+imports:
+  vaultPlugin: github.com/tx7do/go-wind-plugins/config/vault
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/config.proto
+  type: Config.Vault
+  func: MapVaultOptions
+  target_type: vaultPlugin.Option
+  target_qualifier: vaultPlugin
+  fields:
+    address: { skip: true }
+    token: { skip: true }
+    path: { target: WithPath }
+    mount_path: { skip: true }
+    data_key: { target: WithDataKey }
+    poll_interval: { target: WithPollInterval, cast: millis, guard: positive }

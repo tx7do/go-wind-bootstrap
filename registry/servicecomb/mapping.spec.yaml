@@ -1,0 +1,32 @@
+# servicecomb 注册中心适配器的字段映射规则（protoc-gen-fieldmap）。
+# sc.Options 结构体字面量机械字段生成 NewServiceCombConfig；enable_auth
+# 分支合成 rbac.AuthUser、TLS 装载（tlsutil）保留在 servicecomb.go 手工段。
+# 调整映射后重新生成:
+#   go run github.com/tx7do/go-wind-toolkit/protoc-gen-fieldmap@latest \
+#     -I conf/proto -spec registry/servicecomb/mapping.spec.yaml -out .
+output:
+  file: registry/servicecomb/mapping.gen.go
+  package: servicecomb
+imports:
+  sc: github.com/go-chassis/sc-client
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/registry.proto
+  type: Registry.ServiceComb
+  func: NewServiceCombConfig
+  style: struct
+  target_type: sc.Options
+  fields:
+    endpoints: { target: Endpoints }
+    enable_ssl: { target: EnableSSL }
+    timeout: { target: Timeout, cast: seconds }
+    token_expiration: { target: TokenExpiration, cast: seconds }
+    verbose: { target: Verbose }
+    compressed: { target: Compressed }
+    app_id: { skip: true }
+    service_name: { skip: true }
+    version: { skip: true }
+    enable_auth: { skip: true }
+    username: { skip: true }
+    password: { skip: true }
+    tls: { skip: true }

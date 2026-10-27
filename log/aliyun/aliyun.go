@@ -25,25 +25,9 @@ func newBuilder(cfg *v1.Logger) (windLog.Logger, func(), error) {
 		return nil, nil, fmt.Errorf("aliyun: config is nil")
 	}
 
+	// 常规配置字段 → 选项的映射由 protoc-gen-fieldmap 生成（mapping.spec.yaml）。
 	var opts []aliyunPlugin.Option
-	if c.GetEndpoint() != "" {
-		opts = append(opts, aliyunPlugin.WithEndpoint(c.GetEndpoint()))
-	}
-	if c.GetProject() != "" {
-		opts = append(opts, aliyunPlugin.WithProject(c.GetProject()))
-	}
-	if c.GetLogstore() != "" {
-		opts = append(opts, aliyunPlugin.WithLogstore(c.GetLogstore()))
-	}
-	if c.GetAccessKey() != "" {
-		opts = append(opts, aliyunPlugin.WithAccessKey(c.GetAccessKey()))
-	}
-	if c.GetAccessSecret() != "" {
-		opts = append(opts, aliyunPlugin.WithAccessSecret(c.GetAccessSecret()))
-	}
-	if c.GetSecurityToken() != "" {
-		opts = append(opts, aliyunPlugin.WithSecurityToken(c.GetSecurityToken()))
-	}
+	opts = MapAliyunOptions(c, opts)
 
 	logger, err := aliyunPlugin.NewAliyunLogger(opts...)
 	if err != nil {

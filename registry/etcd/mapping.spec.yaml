@@ -1,0 +1,33 @@
+# etcd 注册中心适配器的字段映射规则（protoc-gen-fieldmap）。
+# clientv3.Config 机械字段生成 FillEtcdConfig；TLS 装载（tlsutil）以及
+# etcdPlugin.Option 拼装段（Namespace/RegisterTTL/MaxRetry）保留在
+# etcd.go 手工段。
+# 调整映射后重新生成:
+#   go run github.com/tx7do/go-wind-toolkit/protoc-gen-fieldmap@latest \
+#     -I conf/proto -spec registry/etcd/mapping.spec.yaml -out .
+output:
+  file: registry/etcd/mapping.gen.go
+  package: etcd
+imports:
+  clientv3: go.etcd.io/etcd/client/v3
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/registry.proto
+  type: Registry.Etcd
+  func: FillEtcdConfig
+  style: fill
+  target_type: clientv3.Config
+  fields:
+    endpoints: { target: Endpoints, guard: none }
+    username: { target: Username }
+    password: { target: Password }
+    dial_timeout: { target: DialTimeout, cast: seconds, guard: positive }
+    auto_sync_interval: { target: AutoSyncInterval, cast: seconds, guard: positive }
+    dial_keep_alive_time: { target: DialKeepAliveTime, cast: seconds, guard: positive }
+    dial_keep_alive_timeout: { target: DialKeepAliveTimeout, cast: seconds, guard: positive }
+    reject_old_cluster: { target: RejectOldCluster, guard: zero }
+    permit_without_stream: { target: PermitWithoutStream, guard: zero }
+    prefix: { skip: true }
+    ttl: { skip: true }
+    max_retry: { skip: true }
+    tls: { skip: true }

@@ -1,0 +1,30 @@
+# 由 protoc-gen-fieldmap 生成字段映射，调整规则后重新生成（见 toolkit/protoc-gen-fieldmap）。
+# 常规客户端字段 → constant.ClientConfig（先构造后填字段，fill 风格）。
+# server_addrs 校验、ServerConfig 组装与多地址展开、tls（SDK 仅支持文件路径）、
+# group/data_id 插件选项，保留在 nacos.go 手工段。
+output:
+  file: config/nacos/mapping.gen.go
+  package: nacos
+imports:
+  constant: github.com/nacos-group/nacos-sdk-go/v2/common/constant
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/config.proto
+  type: Config.Nacos
+  func: FillNacosClientConfig
+  style: fill
+  target_type: constant.ClientConfig
+  fields:
+    server_addrs: { skip: true }
+    namespace: { target: NamespaceId, guard: none }
+    group: { skip: true }
+    data_id: { skip: true }
+    format: { skip: true }
+    scheme: { skip: true }
+    grpc_port: { skip: true }
+    context_path: { skip: true }
+    endpoint: { target: Endpoint }
+    username: { target: Username }
+    password: { target: Password }
+    timeout_ms: { target: TimeoutMs, cast: uint64, guard: positive }
+    tls: { skip: true }

@@ -1,0 +1,23 @@
+# 由 protoc-gen-fieldmap 生成字段映射，调整规则后重新生成（见 toolkit/protoc-gen-fieldmap）。
+# sampler 上游暂未消费，与原手写保持一致，显式不映射。
+output:
+  file: tracer/otlp/mapping.gen.go
+  package: otlp
+imports:
+  otlpPlugin: github.com/tx7do/go-wind-plugins/tracer/otlp
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/tracer.proto
+  type: Tracer.Otlp
+  func: MapOtlpOptions
+  target_type: otlpPlugin.Option
+  target_qualifier: otlpPlugin
+  fields:
+    endpoint: { target: WithEndpoint }
+    insecure: { target: WithInsecure, guard: zero }
+    headers: { target: WithHeaders }
+    sampler: { skip: true }
+    sample_ratio: { target: WithSampleRatio, guard: positive }
+    use_http: { target: WithHTTP, guard: zero }
+    batch_timeout_ms: { target: WithBatchTimeout, cast: millis, guard: positive }
+    export_timeout_ms: { target: WithExportTimeout, cast: millis, guard: positive }

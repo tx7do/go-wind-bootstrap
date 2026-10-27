@@ -29,40 +29,16 @@ func newAction(ctx context.Context, cfg *v1.Registry) (bootstrap.Registry, func(
 		return nil, nil, fmt.Errorf("etcd: config is nil")
 	}
 
-	clientCfg := clientv3.Config{
-		Endpoints: c.GetEndpoints(),
-	}
-	if username := c.GetUsername(); username != "" {
-		clientCfg.Username = username
-	}
-	if password := c.GetPassword(); password != "" {
-		clientCfg.Password = password
-	}
-	if dialTimeout := c.GetDialTimeout(); dialTimeout > 0 {
-		clientCfg.DialTimeout = time.Duration(dialTimeout) * time.Second
-	}
-	if syncInterval := c.GetAutoSyncInterval(); syncInterval > 0 {
-		clientCfg.AutoSyncInterval = time.Duration(syncInterval) * time.Second
-	}
-	if keepAliveTime := c.GetDialKeepAliveTime(); keepAliveTime > 0 {
-		clientCfg.DialKeepAliveTime = time.Duration(keepAliveTime) * time.Second
-	}
-	if keepAliveTimeout := c.GetDialKeepAliveTimeout(); keepAliveTimeout > 0 {
-		clientCfg.DialKeepAliveTimeout = time.Duration(keepAliveTimeout) * time.Second
-	}
-	if c.GetRejectOldCluster() {
-		clientCfg.RejectOldCluster = true
-	}
-	if c.GetPermitWithoutStream() {
-		clientCfg.PermitWithoutStream = true
-	}
+	// 常规字段（endpoints/username/…/permit_without_stream）由 FillEtcdConfig 生成映射。
+	clientCfg := FillEtcdConfig(c, &clientv3.Config{})
+	// TLS 装载经 tlsutil 转换，保留手工段。
 	if tlsCfg, err := tlsutil.ClientTLS(c.GetTls()); err != nil {
 		return nil, nil, fmt.Errorf("etcd: load tls: %w", err)
 	} else if tlsCfg != nil {
 		clientCfg.TLS = tlsCfg
 	}
 
-	client, err := clientv3.New(clientCfg)
+	client, err := clientv3.New(*clientCfg)
 	if err != nil {
 		return nil, nil, fmt.Errorf("etcd: create client: %w", err)
 	}
@@ -72,7 +48,7 @@ func newAction(ctx context.Context, cfg *v1.Registry) (bootstrap.Registry, func(
 		opts = append(opts, etcdPlugin.Namespace(prefix))
 	}
 	if ttl := c.GetTtl(); ttl > 0 {
-		opts = append(opts, etcdPlugin.RegisterTTL(time.Duration(ttl) * time.Second))
+		opts = append(opts, etcdPlugin.RegisterTTL(time.Duration(ttl)*time.Second))
 	}
 	if maxRetry := c.GetMaxRetry(); maxRetry > 0 {
 		opts = append(opts, etcdPlugin.MaxRetry(int(maxRetry)))

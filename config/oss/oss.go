@@ -8,7 +8,6 @@ package oss
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
@@ -35,22 +34,16 @@ func newAction(ctx context.Context, cfg *v1.Config) (func(), error) {
 		return nil, fmt.Errorf("oss: load AWS config: %w", err)
 	}
 
+	// endpoint 在 S3 客户端回调里装配，保留手工段。
 	client := awss3.NewFromConfig(awsCfg, func(o *awss3.Options) {
 		if endpoint := c.GetEndpoint(); endpoint != "" {
 			o.BaseEndpoint = aws.String(endpoint)
 		}
 	})
 
+	// 常规配置字段 → 选项的映射由 protoc-gen-fieldmap 生成（mapping.spec.yaml）。
 	var opts []ossPlugin.Option
-	if bucket := c.GetBucket(); bucket != "" {
-		opts = append(opts, ossPlugin.WithBucket(bucket))
-	}
-	if key := c.GetKey(); key != "" {
-		opts = append(opts, ossPlugin.WithKey(key))
-	}
-	if pollMs := c.GetPollInterval(); pollMs > 0 {
-		opts = append(opts, ossPlugin.WithPollInterval(time.Duration(pollMs)*time.Millisecond))
-	}
+	opts = MapOssOptions(c, opts)
 
 	_, err = ossPlugin.New(client, opts...)
 	if err != nil {

@@ -28,36 +28,14 @@ func newAction(ctx context.Context, cfg *v1.Registry) (bootstrap.Registry, func(
 		return nil, nil, fmt.Errorf("consul: config is nil")
 	}
 
-	consulCfg := api.DefaultConfig()
-	if addr := c.GetAddress(); addr != "" {
-		consulCfg.Address = addr
-	}
-	if scheme := c.GetScheme(); scheme != "" {
-		consulCfg.Scheme = scheme
-	}
-	if token := c.GetToken(); token != "" {
-		consulCfg.Token = token
-	}
-	if tokenFile := c.GetTokenFile(); tokenFile != "" {
-		consulCfg.TokenFile = tokenFile
-	}
-	if namespace := c.GetNamespace(); namespace != "" {
-		consulCfg.Namespace = namespace
-	}
-	if partition := c.GetPartition(); partition != "" {
-		consulCfg.Partition = partition
-	}
-	if pathPrefix := c.GetPathPrefix(); pathPrefix != "" {
-		consulCfg.PathPrefix = pathPrefix
-	}
+	// 常规字段（address/scheme/token/…/wait_time）由 FillConsulConfig 生成映射。
+	consulCfg := FillConsulConfig(c, api.DefaultConfig())
+	// basic_auth 嵌套消息合成 HttpAuth，保留手工段。
 	if auth := c.GetBasicAuth(); auth != nil {
 		consulCfg.HttpAuth = &api.HttpBasicAuth{
 			Username: auth.GetUsername(),
 			Password: auth.GetPassword(),
 		}
-	}
-	if waitTime := c.GetWaitTime(); waitTime > 0 {
-		consulCfg.WaitTime = time.Duration(waitTime) * time.Second
 	}
 	if tlsCfg := c.GetTls(); tlsCfg != nil {
 		consulCfg.TLSConfig = api.TLSConfig{

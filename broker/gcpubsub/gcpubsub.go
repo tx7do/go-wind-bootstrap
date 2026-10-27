@@ -25,18 +25,6 @@ func newBuilder(ctx context.Context, cfg *v1.Broker) (any, func(), error) {
 		return nil, nil, fmt.Errorf("gcpubsub: config is nil")
 	}
 
-	var opts []gcpubsubPlugin.ServerOption
-
-	if projectID := c.GetProjectId(); projectID != "" {
-		opts = append(opts, gcpubsubPlugin.WithProjectID(projectID))
-	}
-	if credFile := c.GetCredentialsFile(); credFile != "" {
-		opts = append(opts, gcpubsubPlugin.WithCredentialsFile(credFile))
-	}
-	if endpoint := c.GetEndpoint(); endpoint != "" {
-		opts = append(opts, gcpubsubPlugin.WithEndpoint(endpoint))
-	}
-
-	srv := gcpubsubPlugin.NewServer(opts...)
+	srv := gcpubsubPlugin.NewServer(MapGcpubsubOptions(c, nil)...)
 	return srv, func() {}, nil
 }

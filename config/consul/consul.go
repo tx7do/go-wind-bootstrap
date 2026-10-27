@@ -28,21 +28,10 @@ func newAction(ctx context.Context, cfg *v1.Config) (func(), error) {
 	}
 
 	consulCfg := api.DefaultConfig()
-	if addr := c.GetAddress(); addr != "" {
-		consulCfg.Address = addr
-	}
-	if token := c.GetToken(); token != "" {
-		consulCfg.Token = token
-	}
-	if scheme := c.GetScheme(); scheme != "" {
-		consulCfg.Scheme = scheme
-	}
-	if dc := c.GetDatacenter(); dc != "" {
-		consulCfg.Datacenter = dc
-	}
-	if ns := c.GetNamespace(); ns != "" {
-		consulCfg.Namespace = ns
-	}
+	// 常规连接字段 → 客户端配置的映射由 protoc-gen-fieldmap 生成（mapping.spec.yaml）。
+	FillConsulConfig(c, consulCfg)
+
+	// TLS 展开到 Consul 专属 TLSConfig 子结构，保留手工段。
 	if tlsCfg := c.GetTls(); tlsCfg != nil {
 		consulCfg.TLSConfig = api.TLSConfig{
 			InsecureSkipVerify: tlsCfg.GetInsecureSkipVerify(),
@@ -64,6 +53,7 @@ func newAction(ctx context.Context, cfg *v1.Config) (func(), error) {
 		return nil, fmt.Errorf("consul: create client: %w", err)
 	}
 
+	// path 为插件选项，保留手工段。
 	var opts []consulPlugin.Option
 	if path := c.GetPath(); path != "" {
 		opts = append(opts, consulPlugin.WithPath(path))

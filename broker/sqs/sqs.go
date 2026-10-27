@@ -25,18 +25,6 @@ func newBuilder(ctx context.Context, cfg *v1.Broker) (any, func(), error) {
 		return nil, nil, fmt.Errorf("sqs: config is nil")
 	}
 
-	var opts []sqsPlugin.ServerOption
-
-	if region := c.GetRegion(); region != "" {
-		opts = append(opts, sqsPlugin.WithRegion(region))
-	}
-	if endpoint := c.GetEndpoint(); endpoint != "" {
-		opts = append(opts, sqsPlugin.WithEndpoint(endpoint))
-	}
-	if queueURL := c.GetQueueUrl(); queueURL != "" {
-		opts = append(opts, sqsPlugin.WithQueueUrl(queueURL))
-	}
-
-	srv := sqsPlugin.NewServer(opts...)
+	srv := sqsPlugin.NewServer(MapSqsOptions(c, nil)...)
 	return srv, func() {}, nil
 }

@@ -1,0 +1,21 @@
+# 由 protoc-gen-fieldmap 生成字段映射，调整规则后重新生成（见 toolkit/protoc-gen-fieldmap）。
+# level/format/output_path 为枚举→枚举与输出目标分支逻辑，保留在 hclog.go 手工段。
+output:
+  file: log/hclog/mapping.gen.go
+  package: hclog
+imports:
+  hclogLib: github.com/hashicorp/go-hclog
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/log.proto
+  type: Logger.Hclog
+  func: NewHclogConfig
+  style: struct
+  target_type: hclogLib.LoggerOptions
+  fields:
+    level: { skip: true }
+    format: { skip: true }
+    output_path: { skip: true }
+    name: { target: Name }
+    include_location: { target: IncludeLocation }
+    time_format: { target: TimeFormat }

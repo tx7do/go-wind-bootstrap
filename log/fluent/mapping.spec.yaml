@@ -1,0 +1,24 @@
+# 由 protoc-gen-fieldmap 生成字段映射，调整规则后重新生成（见 toolkit/protoc-gen-fieldmap）。
+# addr 为构造函数必填入参，校验与传参保留在 fluent.go 手工段。
+output:
+  file: log/fluent/mapping.gen.go
+  package: fluent
+imports:
+  fluentPlugin: github.com/tx7do/go-wind-plugins/log/fluent
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/log.proto
+  type: Logger.Fluent
+  func: MapFluentOptions
+  target_type: fluentPlugin.Option
+  target_qualifier: fluentPlugin
+  fields:
+    addr: { skip: true }
+    timeout: { target: WithTimeout, cast: millis, guard: positive }
+    write_timeout: { target: WithWriteTimeout, cast: millis, guard: positive }
+    buffer_limit: { target: WithBufferLimit, cast: int, guard: positive }
+    retry_wait: { target: WithRetryWait, cast: int, guard: positive }
+    max_retry: { target: WithMaxRetry, cast: int, guard: positive }
+    max_retry_wait: { target: WithMaxRetryWait, cast: int, guard: positive }
+    tag_prefix: { target: WithTagPrefix }
+    async: { target: WithAsync, guard: zero }
