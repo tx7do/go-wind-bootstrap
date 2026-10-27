@@ -8,7 +8,6 @@ package redis
 import (
 	"context"
 	"fmt"
-	"time"
 
 	goredis "github.com/redis/go-redis/v9"
 
@@ -57,22 +56,10 @@ func newClient(ctx context.Context, c *v1.Cache_Redis) (goredis.UniversalClient,
 		return nil, fmt.Errorf("redis cache: load tls: %w", err)
 	}
 
-	base := goredis.UniversalOptions{
-		Username:        c.GetUsername(),
-		Password:        c.GetPassword(),
-		TLSConfig:       tlsCfg,
-		DialTimeout:     seconds(c.GetDialTimeout()),
-		ReadTimeout:     seconds(c.GetReadTimeout()),
-		WriteTimeout:    seconds(c.GetWriteTimeout()),
-		PoolTimeout:     seconds(c.GetPoolTimeout()),
-		ConnMaxIdleTime: seconds(c.GetConnMaxIdleTime()),
-		ConnMaxLifetime: seconds(c.GetConnMaxLifetime()),
-		MinRetryBackoff: millis(c.GetMinRetryBackoffMs()),
-		MaxRetryBackoff: millis(c.GetMaxRetryBackoffMs()),
-		PoolSize:        int(c.GetPoolSize()),
-		MinIdleConns:    int(c.GetMinIdleConns()),
-		MaxRetries:      int(c.GetMaxRetries()),
-	}
+	// 机械字段由 protoc-gen-fieldmap 生成（mapping.spec.yaml）；
+	// TLS 装载与模式相关字段（addr/addrs/db/master_name/…）保留手工段。
+	base := NewRedisUniversalOptions(c)
+	base.TLSConfig = tlsCfg
 
 	var rdb goredis.UniversalClient
 
@@ -84,7 +71,7 @@ func newClient(ctx context.Context, c *v1.Cache_Redis) (goredis.UniversalClient,
 		}
 		base.Addrs = []string{addr}
 		base.DB = int(c.GetDb())
-		rdb = goredis.NewUniversalClient(&base)
+		rdb = goredis.NewUniversalClient(base)
 
 	case "cluster":
 		addrs := c.GetAddrs()
@@ -95,7 +82,7 @@ func newClient(ctx context.Context, c *v1.Cache_Redis) (goredis.UniversalClient,
 			return nil, fmt.Errorf("redis cache: cluster mode requires addrs")
 		}
 		base.Addrs = addrs
-		rdb = goredis.NewUniversalClient(&base)
+		rdb = goredis.NewUniversalClient(base)
 
 	case "sentinel":
 		if c.GetMasterName() == "" {
@@ -112,7 +99,7 @@ func newClient(ctx context.Context, c *v1.Cache_Redis) (goredis.UniversalClient,
 		base.MasterName = c.GetMasterName()
 		base.SentinelUsername = c.GetSentinelUsername()
 		base.SentinelPassword = c.GetSentinelPassword()
-		rdb = goredis.NewUniversalClient(&base)
+		rdb = goredis.NewUniversalClient(base)
 
 	default:
 		return nil, fmt.Errorf("redis cache: unknown mode %q (want standalone/cluster/sentinel)", mode)
@@ -124,12 +111,4 @@ func newClient(ctx context.Context, c *v1.Cache_Redis) (goredis.UniversalClient,
 		return nil, fmt.Errorf("redis cache: ping failed: %w", err)
 	}
 	return rdb, nil
-}
-
-func seconds(v int32) time.Duration {
-	return time.Duration(v) * time.Second
-}
-
-func millis(v int32) time.Duration {
-	return time.Duration(v) * time.Millisecond
 }

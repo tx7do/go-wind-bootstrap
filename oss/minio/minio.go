@@ -26,15 +26,8 @@ func newBuilder(ctx context.Context, cfg *v1.Storage) (any, func(), error) {
 		return nil, nil, fmt.Errorf("minio: config is nil")
 	}
 
-	pluginCfg := &minioPlugin.Config{
-		Endpoint:       c.GetEndpoint(),
-		AccessKey:      c.GetAccessKey(),
-		SecretKey:      c.GetSecretKey(),
-		Token:          c.GetToken(),
-		UseSsl:         c.GetUseSsl(),
-		Region:         c.GetRegion(),
-		ForcePathStyle: c.GetForcePathStyle(),
-	}
+	// 配置字段 → 结构体的映射由 protoc-gen-fieldmap 生成（mapping.spec.yaml）。
+	pluginCfg := NewMinioConfig(c)
 	if tlsCfg, err := tlsutil.ClientTLS(c.GetTls()); err != nil {
 		return nil, nil, fmt.Errorf("minio: load tls: %w", err)
 	} else if tlsCfg != nil {

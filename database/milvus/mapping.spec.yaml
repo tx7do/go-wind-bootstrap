@@ -1,0 +1,20 @@
+# 由 protoc-gen-fieldmap 生成字段映射，调整规则后重新生成（见 toolkit/protoc-gen-fieldmap）。
+# api_key 优先于用户名密码的分支逻辑，保留在 client.go 手工段。
+output:
+  file: database/milvus/mapping.gen.go
+  package: milvus
+imports:
+  milvusCrud: github.com/tx7do/go-crud/milvus
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/database.proto
+  type: Database.Milvus
+  func: MapMilvusOptions
+  target_type: milvusCrud.Option
+  target_qualifier: milvusCrud
+  fields:
+    address: { target: WithAddress }
+    username: { skip: true }
+    password: { skip: true }
+    api_key: { skip: true }
+    db_name: { target: WithDBName }

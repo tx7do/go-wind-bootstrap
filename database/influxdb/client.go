@@ -8,7 +8,6 @@ package influxdb
 import (
 	"context"
 	"fmt"
-	"time"
 
 	influxdbCrud "github.com/tx7do/go-crud/influxdb"
 
@@ -26,35 +25,8 @@ func newBuilder(ctx context.Context, cfg *v1.Database) (any, func(), error) {
 		return nil, nil, fmt.Errorf("influxdb: config is nil")
 	}
 
-	var options []influxdbCrud.Option
-
-	if host := c.GetHost(); host != "" {
-		options = append(options, influxdbCrud.WithHost(host))
-	}
-	if token := c.GetToken(); token != "" {
-		options = append(options, influxdbCrud.WithToken(token))
-	}
-	if db := c.GetDatabase(); db != "" {
-		options = append(options, influxdbCrud.WithDatabase(db))
-	}
-	if org := c.GetOrganization(); org != "" {
-		options = append(options, influxdbCrud.WithOrganization(org))
-	}
-	if scheme := c.GetAuthScheme(); scheme != "" {
-		options = append(options, influxdbCrud.WithAuthScheme(scheme))
-	}
-	if v := c.GetWriteTimeoutSeconds(); v > 0 {
-		options = append(options, influxdbCrud.WithWriteTimeout(time.Duration(v)*time.Second))
-	}
-	if v := c.GetQueryTimeoutSeconds(); v > 0 {
-		options = append(options, influxdbCrud.WithQueryTimeout(time.Duration(v)*time.Second))
-	}
-	if v := c.GetMaxIdleConnections(); v > 0 {
-		options = append(options, influxdbCrud.WithMaxIdleConnections(int(v)))
-	}
-	if v := c.GetIdleConnectionTimeoutSeconds(); v > 0 {
-		options = append(options, influxdbCrud.WithIdleConnectionTimeout(time.Duration(v)*time.Second))
-	}
+	// 全部配置字段 → 选项的映射由 protoc-gen-fieldmap 生成（mapping.spec.yaml）。
+	options := MapInfluxDBOptions(c, nil)
 
 	client, err := influxdbCrud.NewClient(options...)
 	if err != nil {

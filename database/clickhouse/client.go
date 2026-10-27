@@ -8,7 +8,6 @@ package clickhouse
 import (
 	"context"
 	"fmt"
-	"time"
 
 	clickhouseCrud "github.com/tx7do/go-crud/clickhouse"
 
@@ -26,46 +25,8 @@ func newBuilder(ctx context.Context, cfg *v1.Database) (any, func(), error) {
 		return nil, nil, fmt.Errorf("clickhouse: config is nil")
 	}
 
-	var options []clickhouseCrud.Option
-
-	if dsn := c.GetDsn(); dsn != "" {
-		options = append(options, clickhouseCrud.WithDsn(dsn))
-	}
-	if addrs := c.GetAddresses(); len(addrs) > 0 {
-		options = append(options, clickhouseCrud.WithAddresses(addrs...))
-	}
-	if db := c.GetDatabase(); db != "" {
-		options = append(options, clickhouseCrud.WithDatabase(db))
-	}
-	if u := c.GetUsername(); u != "" {
-		options = append(options, clickhouseCrud.WithUsername(u))
-	}
-	if p := c.GetPassword(); p != "" {
-		options = append(options, clickhouseCrud.WithPassword(p))
-	}
-	options = append(options, clickhouseCrud.WithDebug(c.GetDebug()))
-
-	if v := c.GetMaxOpenConns(); v > 0 {
-		options = append(options, clickhouseCrud.WithMaxOpenConns(int(v)))
-	}
-	if v := c.GetMaxIdleConns(); v > 0 {
-		options = append(options, clickhouseCrud.WithMaxIdleConns(int(v)))
-	}
-	if v := c.GetCompressionMethod(); v != "" {
-		options = append(options, clickhouseCrud.WithCompressionMethod(v))
-	}
-	if v := c.GetDialTimeoutSeconds(); v > 0 {
-		options = append(options, clickhouseCrud.WithDialTimeout(time.Duration(v)*time.Second))
-	}
-	if v := c.GetReadTimeoutSeconds(); v > 0 {
-		options = append(options, clickhouseCrud.WithReadTimeout(time.Duration(v)*time.Second))
-	}
-	if v := c.GetConnMaxLifetimeSeconds(); v > 0 {
-		options = append(options, clickhouseCrud.WithConnMaxLifetime(time.Duration(v)*time.Second))
-	}
-	if v := c.GetScheme(); v != "" {
-		options = append(options, clickhouseCrud.WithScheme(v))
-	}
+	// 全部配置字段 → 选项的映射由 protoc-gen-fieldmap 生成（mapping.spec.yaml）。
+	options := MapClickHouseOptions(c, nil)
 
 	client, err := clickhouseCrud.NewClient(options...)
 	if err != nil {

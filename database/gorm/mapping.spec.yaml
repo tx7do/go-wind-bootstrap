@@ -1,0 +1,27 @@
+# gorm 适配器的字段映射规则（protoc-gen-fieldmap）。
+# 常规配置字段 → gormCrud.Option 的映射由此生成；迁移模型桥接等
+# 函数指针注入保留在 client.go 手工段。
+# 调整映射后重新生成:
+#   go run github.com/tx7do/go-wind-toolkit/protoc-gen-fieldmap@latest \
+#     -I conf/proto -spec database/gorm/mapping.spec.yaml -out .
+output:
+  file: database/gorm/mapping.gen.go
+  package: gorm
+imports:
+  gormCrud: github.com/tx7do/go-crud/gorm
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/database.proto
+  type: Database.SQL
+  func: MapSQLOptions
+  target_type: gormCrud.Option
+  target_qualifier: gormCrud
+  fields:
+    driver: { target: WithDriverName }
+    source: { target: WithDSN }
+    migrate: { target: WithEnableMigrate }
+    enable_trace: { target: WithEnableTrace }
+    enable_metrics: { target: WithEnableMetrics }
+    max_idle_connections: { target: WithMaxIdleConns, cast: int, guard: positive }
+    max_open_connections: { target: WithMaxOpenConns, cast: int, guard: positive }
+    connection_max_lifetime_seconds: { target: WithConnMaxLifetime, cast: seconds }

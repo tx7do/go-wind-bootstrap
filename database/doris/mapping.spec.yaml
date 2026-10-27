@@ -1,0 +1,24 @@
+# 由 protoc-gen-fieldmap 生成字段映射，调整规则后重新生成（见 toolkit/protoc-gen-fieldmap）。
+# stream_load_username/password 合成为 WithStreamLoadAuth 双参选项，保留在 client.go 手工段。
+output:
+  file: database/doris/mapping.gen.go
+  package: doris
+imports:
+  dorisCrud: github.com/tx7do/go-crud/doris
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/database.proto
+  type: Database.Doris
+  func: MapDorisOptions
+  target_type: dorisCrud.Option
+  target_qualifier: dorisCrud
+  fields:
+    dsn: { target: WithDSN }
+    max_idle_connections: { target: WithMaxIdleConns, cast: int, guard: positive }
+    max_open_connections: { target: WithMaxOpenConns, cast: int, guard: positive }
+    connection_max_lifetime_seconds: { target: WithConnMaxLifetime, cast: seconds }
+    stream_load_endpoint: { target: WithStreamLoadEndpoint }
+    stream_load_username: { skip: true }
+    stream_load_password: { skip: true }
+    stream_load_timeout_seconds: { target: WithStreamLoadTimeout, cast: seconds }
+    stream_load_method: { target: WithStreamLoadMethod }

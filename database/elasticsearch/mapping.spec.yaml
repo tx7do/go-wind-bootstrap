@@ -1,0 +1,27 @@
+# 由 protoc-gen-fieldmap 生成字段映射，调整规则后重新生成（见 toolkit/protoc-gen-fieldmap）。
+output:
+  file: database/elasticsearch/mapping.gen.go
+  package: elasticsearch
+imports:
+  esCrud: github.com/tx7do/go-crud/elasticsearch
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/database.proto
+  type: Database.Elasticsearch
+  func: MapElasticsearchOptions
+  target_type: esCrud.Option
+  target_qualifier: esCrud
+  fields:
+    addresses: { target: WithAddresses, spread: true }
+    username: { target: WithUsername }
+    password: { target: WithPassword }
+    cloud_id: { target: WithCloudID }
+    api_key: { target: WithAPIKey }
+    service_token: { target: WithServiceToken }
+    certificate_fingerprint: { target: WithCertificateFingerprint }
+    enable_metrics: { target: WithEnableMetrics }
+    enable_debug_logger: { target: WithEnableDebugLogger }
+    max_retries: { target: WithMaxRetries, cast: int, guard: positive }
+    compress_request_body: { target: WithCompressRequestBody }
+    discover_nodes_on_start: { target: WithDiscoverNodesOnStart }
+    discover_nodes_interval_seconds: { target: WithDiscoverNodesInterval, cast: seconds }

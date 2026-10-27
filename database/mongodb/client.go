@@ -4,7 +4,6 @@ package mongodb
 import (
 	"context"
 	"fmt"
-	"time"
 
 	mongodbCrud "github.com/tx7do/go-crud/mongodb"
 
@@ -22,31 +21,13 @@ func newBuilder(ctx context.Context, cfg *v1.Database) (any, func(), error) {
 		return nil, nil, fmt.Errorf("mongodb: config is nil")
 	}
 
+	// 常规配置字段 → 选项的映射由 protoc-gen-fieldmap 生成（mapping.spec.yaml）。
 	var options []mongodbCrud.Option
+	options = MapMongoDBOptions(c, options)
 
-	if uri := c.GetUri(); uri != "" {
-		options = append(options, mongodbCrud.WithURI(uri))
-	}
-	if db := c.GetDatabase(); db != "" {
-		options = append(options, mongodbCrud.WithDatabase(db))
-	}
+	// 用户名密码合成一项凭证选项，保留手工段。
 	if u := c.GetUsername(); u != "" && c.GetPassword() != "" {
 		options = append(options, mongodbCrud.WithCredentials(u, c.GetPassword()))
-	}
-	if v := c.GetTimeoutSeconds(); v > 0 {
-		options = append(options, mongodbCrud.WithTimeout(time.Duration(v)*time.Second))
-	}
-	if v := c.GetConnectTimeoutSeconds(); v > 0 {
-		options = append(options, mongodbCrud.WithConnectTimeout(time.Duration(v)*time.Second))
-	}
-	if v := c.GetServerSelectionTimeoutSeconds(); v > 0 {
-		options = append(options, mongodbCrud.WithServerSelectionTimeout(time.Duration(v)*time.Second))
-	}
-	if v := c.GetHeartbeatIntervalSeconds(); v > 0 {
-		options = append(options, mongodbCrud.WithHeartbeatInterval(time.Duration(v)*time.Second))
-	}
-	if v := c.GetMaxConnIdleTimeSeconds(); v > 0 {
-		options = append(options, mongodbCrud.WithMaxConnIdleTime(time.Duration(v)*time.Second))
 	}
 
 	client, err := mongodbCrud.NewClient(options...)

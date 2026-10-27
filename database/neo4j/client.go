@@ -25,11 +25,11 @@ func newBuilder(ctx context.Context, cfg *v1.Database) (any, func(), error) {
 		return nil, nil, fmt.Errorf("neo4j: config is nil")
 	}
 
+	// 常规配置字段 → 选项的映射由 protoc-gen-fieldmap 生成（mapping.spec.yaml）。
 	var options []neo4jCrud.Option
+	options = MapNeo4jOptions(c, options)
 
-	if uri := c.GetUri(); uri != "" {
-		options = append(options, neo4jCrud.WithURI(uri))
-	}
+	// 用户名/密码/域合成一项认证选项，保留手工段。
 	if u := c.GetUsername(); u != "" {
 		options = append(options, neo4jCrud.WithBasicAuth(u, c.GetPassword(), c.GetRealm()))
 	}

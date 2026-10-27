@@ -1,0 +1,23 @@
+# 由 protoc-gen-fieldmap 生成字段映射，调整规则后重新生成（见 toolkit/protoc-gen-fieldmap）。
+output:
+  file: database/influxdb/mapping.gen.go
+  package: influxdb
+imports:
+  influxdbCrud: github.com/tx7do/go-crud/influxdb
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/database.proto
+  type: Database.InfluxDB
+  func: MapInfluxDBOptions
+  target_type: influxdbCrud.Option
+  target_qualifier: influxdbCrud
+  fields:
+    host: { target: WithHost }
+    token: { target: WithToken }
+    database: { target: WithDatabase }
+    organization: { target: WithOrganization }
+    auth_scheme: { target: WithAuthScheme }
+    write_timeout_seconds: { target: WithWriteTimeout, cast: seconds }
+    query_timeout_seconds: { target: WithQueryTimeout, cast: seconds }
+    max_idle_connections: { target: WithMaxIdleConnections, cast: int, guard: positive }
+    idle_connection_timeout_seconds: { target: WithIdleConnectionTimeout, cast: seconds }

@@ -1,0 +1,19 @@
+# 由 protoc-gen-fieldmap 生成字段映射，调整规则后重新生成（见 toolkit/protoc-gen-fieldmap）。
+# api_key 拼入 Authorization 头、与自定义 headers 合并的逻辑，保留在 client.go 手工段。
+output:
+  file: database/weaviate/mapping.gen.go
+  package: weaviate
+imports:
+  weaviateCrud: github.com/tx7do/go-crud/weaviate
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/database.proto
+  type: Database.Weaviate
+  func: MapWeaviateOptions
+  target_type: weaviateCrud.Option
+  target_qualifier: weaviateCrud
+  fields:
+    host: { target: WithHost }
+    scheme: { target: WithScheme }
+    api_key: { skip: true }
+    headers: { skip: true }

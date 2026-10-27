@@ -1,0 +1,44 @@
+# redis 缓存适配器的字段映射规则（protoc-gen-fieldmap）。
+# UniversalOptions 机械字段生成 NewRedisUniversalOptions；TLS 装载与
+# standalone/cluster/sentinel 模式字段（addr/addrs/db/master_name/…）
+# 联动逻辑保留在 redis.go 手工段。
+# 调整映射后重新生成:
+#   go run github.com/tx7do/go-wind-toolkit/protoc-gen-fieldmap@latest \
+#     -I conf/proto -spec cache/redis/mapping.spec.yaml -out .
+output:
+  file: cache/redis/mapping.gen.go
+  package: redis
+imports:
+  goredis: github.com/redis/go-redis/v9
+  redisPlugin: github.com/tx7do/go-wind-plugins/cache/redis
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/cache.proto
+  type: Cache.Redis
+  func: NewRedisUniversalOptions
+  style: struct
+  target_type: goredis.UniversalOptions
+  fields:
+    username: {}
+    password: {}
+    dial_timeout: { target: DialTimeout, cast: seconds }
+    read_timeout: { target: ReadTimeout, cast: seconds }
+    write_timeout: { target: WriteTimeout, cast: seconds }
+    pool_timeout: { target: PoolTimeout, cast: seconds }
+    conn_max_idle_time: { target: ConnMaxIdleTime, cast: seconds }
+    conn_max_lifetime: { target: ConnMaxLifetime, cast: seconds }
+    min_retry_backoff_ms: { target: MinRetryBackoff, cast: millis }
+    max_retry_backoff_ms: { target: MaxRetryBackoff, cast: millis }
+    pool_size: { target: PoolSize, cast: int }
+    min_idle_conns: { target: MinIdleConns, cast: int }
+    max_retries: { target: MaxRetries, cast: int }
+    network: { skip: true }
+    addr: { skip: true }
+    db: { skip: true }
+    tls: { skip: true }
+    mode: { skip: true }
+    master_name: { skip: true }
+    addrs: { skip: true }
+    sentinel_username: { skip: true }
+    sentinel_password: { skip: true }
+    key_prefix: { skip: true }

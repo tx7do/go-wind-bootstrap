@@ -1,0 +1,23 @@
+# 由 protoc-gen-fieldmap 生成字段映射，调整规则后重新生成（见 toolkit/protoc-gen-fieldmap）。
+# username/password 合成 WithUsername+WithPassword 联动写入，保留在 client.go 手工段。
+output:
+  file: database/cassandra/mapping.gen.go
+  package: cassandra
+imports:
+  cassandraCrud: github.com/tx7do/go-crud/cassandra
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/database.proto
+  type: Database.Cassandra
+  func: MapCassandraOptions
+  target_type: cassandraCrud.Option
+  target_qualifier: cassandraCrud
+  fields:
+    address: { target: WithHosts }
+    username: { skip: true }
+    password: { skip: true }
+    keyspace: { target: WithKeyspace }
+    consistency: { target: WithConsistency, cast: uint32, guard: positive }
+    connect_timeout_seconds: { target: WithConnectTimeout, cast: seconds }
+    timeout_seconds: { target: WithTimeout, cast: seconds }
+    disable_initial_host_lookup: { target: WithDisableInitialHostLookup }

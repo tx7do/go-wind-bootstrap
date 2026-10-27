@@ -8,7 +8,6 @@ package doris
 import (
 	"context"
 	"fmt"
-	"time"
 
 	dorisCrud "github.com/tx7do/go-crud/doris"
 
@@ -26,33 +25,13 @@ func newBuilder(ctx context.Context, cfg *v1.Database) (any, func(), error) {
 		return nil, nil, fmt.Errorf("doris: config is nil")
 	}
 
+	// 常规配置字段 → 选项的映射由 protoc-gen-fieldmap 生成（mapping.spec.yaml）。
 	var options []dorisCrud.Option
+	options = MapDorisOptions(c, options)
 
-	if dsn := c.GetDsn(); dsn != "" {
-		options = append(options, dorisCrud.WithDSN(dsn))
-	}
-	if v := c.GetMaxIdleConnections(); v > 0 {
-		options = append(options, dorisCrud.WithMaxIdleConns(int(v)))
-	}
-	if v := c.GetMaxOpenConnections(); v > 0 {
-		options = append(options, dorisCrud.WithMaxOpenConns(int(v)))
-	}
-	if v := c.GetConnectionMaxLifetimeSeconds(); v > 0 {
-		options = append(options, dorisCrud.WithConnMaxLifetime(time.Duration(v)*time.Second))
-	}
-
-	// Stream Load 配置
-	if ep := c.GetStreamLoadEndpoint(); ep != "" {
-		options = append(options, dorisCrud.WithStreamLoadEndpoint(ep))
-	}
+	// Stream Load 认证合成一项，保留手工段。
 	if u := c.GetStreamLoadUsername(); u != "" && c.GetStreamLoadPassword() != "" {
 		options = append(options, dorisCrud.WithStreamLoadAuth(u, c.GetStreamLoadPassword()))
-	}
-	if v := c.GetStreamLoadTimeoutSeconds(); v > 0 {
-		options = append(options, dorisCrud.WithStreamLoadTimeout(time.Duration(v)*time.Second))
-	}
-	if m := c.GetStreamLoadMethod(); m != "" {
-		options = append(options, dorisCrud.WithStreamLoadMethod(m))
 	}
 
 	client, err := dorisCrud.NewClient(options...)

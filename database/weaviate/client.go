@@ -25,14 +25,9 @@ func newBuilder(ctx context.Context, cfg *v1.Database) (any, func(), error) {
 		return nil, nil, fmt.Errorf("weaviate: config is nil")
 	}
 
+	// 常规配置字段 → 选项的映射由 protoc-gen-fieldmap 生成（mapping.spec.yaml）。
 	var options []weaviateCrud.Option
-
-	if host := c.GetHost(); host != "" {
-		options = append(options, weaviateCrud.WithHost(host))
-	}
-	if scheme := c.GetScheme(); scheme != "" {
-		options = append(options, weaviateCrud.WithScheme(scheme))
-	}
+	options = MapWeaviateOptions(c, options)
 
 	// 认证：Weaviate 官方客户端以请求头承载（Authorization: Bearer <key>）。
 	headers := map[string]string{}

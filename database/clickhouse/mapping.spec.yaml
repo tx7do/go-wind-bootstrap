@@ -1,0 +1,27 @@
+# 由 protoc-gen-fieldmap 生成字段映射，调整规则后重新生成（见 toolkit/protoc-gen-fieldmap）。
+output:
+  file: database/clickhouse/mapping.gen.go
+  package: clickhouse
+imports:
+  clickhouseCrud: github.com/tx7do/go-crud/clickhouse
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/database.proto
+  type: Database.ClickHouse
+  func: MapClickHouseOptions
+  target_type: clickhouseCrud.Option
+  target_qualifier: clickhouseCrud
+  fields:
+    dsn: { target: WithDsn }
+    addresses: { target: WithAddresses, spread: true }
+    database: { target: WithDatabase }
+    username: { target: WithUsername }
+    password: { target: WithPassword }
+    debug: { target: WithDebug }
+    max_open_conns: { target: WithMaxOpenConns, cast: int, guard: positive }
+    max_idle_conns: { target: WithMaxIdleConns, cast: int, guard: positive }
+    compression_method: { target: WithCompressionMethod }
+    dial_timeout_seconds: { target: WithDialTimeout, cast: seconds }
+    read_timeout_seconds: { target: WithReadTimeout, cast: seconds }
+    conn_max_lifetime_seconds: { target: WithConnMaxLifetime, cast: seconds }
+    scheme: { target: WithScheme }

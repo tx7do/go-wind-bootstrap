@@ -1,0 +1,19 @@
+# 由 protoc-gen-fieldmap 生成字段映射，调整规则后重新生成（见 toolkit/protoc-gen-fieldmap）。
+# username/password/realm 合成为 WithBasicAuth 三参选项，保留在 client.go 手工段。
+output:
+  file: database/neo4j/mapping.gen.go
+  package: neo4j
+imports:
+  neo4jCrud: github.com/tx7do/go-crud/neo4j
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/database.proto
+  type: Database.Neo4j
+  func: MapNeo4jOptions
+  target_type: neo4jCrud.Option
+  target_qualifier: neo4jCrud
+  fields:
+    uri: { target: WithURI }
+    username: { skip: true }
+    password: { skip: true }
+    realm: { skip: true }

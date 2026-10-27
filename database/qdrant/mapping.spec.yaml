@@ -1,0 +1,20 @@
+# 由 protoc-gen-fieldmap 生成字段映射，调整规则后重新生成（见 toolkit/protoc-gen-fieldmap）。
+# use_tls 与 tls 证书装载联动，保留在 client.go 手工段。
+output:
+  file: database/qdrant/mapping.gen.go
+  package: qdrant
+imports:
+  qdrantCrud: github.com/tx7do/go-crud/qdrant
+  v1: github.com/tx7do/go-wind-bootstrap/conf/gen/go/bootstrap/v1
+message:
+  proto: bootstrap/v1/database.proto
+  type: Database.Qdrant
+  func: MapQdrantOptions
+  target_type: qdrantCrud.Option
+  target_qualifier: qdrantCrud
+  fields:
+    host: { target: WithHost }
+    port: { target: WithPort, cast: int, guard: positive }
+    api_key: { target: WithAPIKey }
+    use_tls: { skip: true }
+    tls: { skip: true }

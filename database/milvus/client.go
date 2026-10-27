@@ -25,20 +25,16 @@ func newBuilder(ctx context.Context, cfg *v1.Database) (any, func(), error) {
 		return nil, nil, fmt.Errorf("milvus: config is nil")
 	}
 
+	// 常规配置字段 → 选项的映射由 protoc-gen-fieldmap 生成（mapping.spec.yaml）。
 	var options []milvusCrud.Option
+	options = MapMilvusOptions(c, options)
 
-	if addr := c.GetAddress(); addr != "" {
-		options = append(options, milvusCrud.WithAddress(addr))
-	}
+	// Zilliz Cloud：API Key 优先于用户名密码，保留手工段。
 	if key := c.GetApiKey(); key != "" {
-		// Zilliz Cloud：API Key 优先于用户名密码。
 		options = append(options, milvusCrud.WithAPIKey(key))
 	} else if u := c.GetUsername(); u != "" {
 		options = append(options, milvusCrud.WithUsername(u))
 		options = append(options, milvusCrud.WithPassword(c.GetPassword()))
-	}
-	if db := c.GetDbName(); db != "" {
-		options = append(options, milvusCrud.WithDBName(db))
 	}
 
 	client, err := milvusCrud.NewClient(options...)

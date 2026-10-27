@@ -9,7 +9,6 @@ import (
 	"context"
 	"fmt"
 	"sync"
-	"time"
 
 	gormCrud "github.com/tx7do/go-crud/gorm"
 
@@ -68,34 +67,15 @@ func newBuilder(ctx context.Context, cfg *v1.Database) (any, func(), error) {
 		return nil, nil, fmt.Errorf("gorm: sql config is nil")
 	}
 
+	// 常规配置字段 → 选项的映射由 protoc-gen-fieldmap 生成（mapping.spec.yaml）。
 	var options []gormCrud.Option
-
-	if driver := c.GetDriver(); driver != "" {
-		options = append(options, gormCrud.WithDriverName(driver))
-	}
-	if source := c.GetSource(); source != "" {
-		options = append(options, gormCrud.WithDSN(source))
-	}
-
-	options = append(options, gormCrud.WithEnableMigrate(c.GetMigrate()))
-	options = append(options, gormCrud.WithEnableTrace(c.GetEnableTrace()))
-	options = append(options, gormCrud.WithEnableMetrics(c.GetEnableMetrics()))
+	options = MapSQLOptions(c, options)
 
 	// 桥接全局注册的迁移模型到实例函数指针。
 	// go-crud/gorm 的 initGormClient.doAutoMigrate 调用 c.getMigrateModels()，
 	// 而不是 resolveMigrateModels()，因此需要显式桥接。
 	// 业务代码通过 RegisterMigrateModel(&MyPO{}) 全局注册模型即可。
 	options = append(options, gormCrud.WithGetMigrateModels(getMigrateModelList))
-
-	if v := c.GetMaxIdleConnections(); v > 0 {
-		options = append(options, gormCrud.WithMaxIdleConns(int(v)))
-	}
-	if v := c.GetMaxOpenConnections(); v > 0 {
-		options = append(options, gormCrud.WithMaxOpenConns(int(v)))
-	}
-	if v := c.GetConnectionMaxLifetimeSeconds(); v > 0 {
-		options = append(options, gormCrud.WithConnMaxLifetime(time.Duration(v)*time.Second))
-	}
 
 	db, err := gormCrud.NewClient(options...)
 	if err != nil {
